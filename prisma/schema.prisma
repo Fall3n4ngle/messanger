@@ -7,12 +7,12 @@ generator client {
 
 generator zod {
   provider              = "zod-prisma"
-  output                = "./zod" 
-  relationModel         = true 
-  modelCase             = "camelCase" 
-  modelSuffix           = "Schema" 
-  useDecimalJs          = true 
-  prismaJsonNullability = true 
+  output                = "./zod"
+  relationModel         = true
+  modelCase             = "camelCase"
+  modelSuffix           = "Schema"
+  useDecimalJs          = true
+  prismaJsonNullability = true
 }
 
 datasource db {
@@ -20,3 +20,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String         @id @default(uuid())
+  clerkId       String
+  name          String
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt()
+  conversations Conversation[]
+  sentMessages  Message[]
+  seenMessages  Message[]      @relation(name: "seenMessages")
+}
+
+model Conversation {
+  id            String    @id @default(uuid())
+  name          String
+  image         String?
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt()
+  users         User[]
+  messages      Message[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  content        String?
+  file           String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt()
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sentBy         User?        @relation(fields: [senderId], references: [id])
+  senderId       String?
+  seenBy         User[]       @relation(name: "seenMessages")
+}
