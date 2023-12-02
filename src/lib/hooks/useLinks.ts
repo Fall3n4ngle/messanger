@@ -13,8 +13,8 @@ export const useLinks = () => {
     return [
       {
         label: "Conversations",
-        href: "/conversations",
-        active: pathname === "/conversations",
+        href: "/",
+        active: pathname === "/",
         Icon: MessageCircle,
       },
       {

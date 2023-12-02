@@ -1,3 +1,4 @@
+import Navigation from "@/components/navigation";
 import { getUserByClerkId } from "@/lib/actions/user/queries";
 import { getUserAuth } from "@/lib/utils";
 import { redirect } from "next/navigation";
@@ -10,5 +11,10 @@ export default async function layout({ children }: PropsWithChildren) {
   const currentUser = await getUserByClerkId(session.user.id);
   if (!currentUser) redirect("/onboarding");
 
-  return <div>{children}</div>;
+  return (
+    <>
+      <Navigation {...currentUser} />
+      {children}
+    </>
+  );
 }

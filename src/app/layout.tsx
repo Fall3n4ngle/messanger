@@ -4,11 +4,8 @@ import Providers from "@/providers";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
-import { redirect } from "next/navigation";
-import { getUserAuth } from "@/lib/utils";
 
 import "./globals.css";
-import { getUserByClerkId } from "@/lib/actions/user/queries";
 
 const inter = Inter({ subsets: ["latin"] });
 
