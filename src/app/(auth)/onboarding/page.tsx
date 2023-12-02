@@ -1,4 +1,4 @@
-import UserForm from "@/components/common/UserForm";
+import { UserForm } from "@/components/common";
 import OnBoardingCard from "@/components/onBoarding/OnBoardingCard";
 import { getUserByClerkId } from "@/lib/actions/user/queries";
 import { getUserAuth } from "@/lib/utils";

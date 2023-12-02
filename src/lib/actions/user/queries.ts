@@ -8,3 +8,29 @@ export const getUserByClerkId = async (clerkId: string) => {
 
   return user;
 };
+
+type Props = {
+  query?: string;
+  currentUserClerkId: string;
+};
+
+export const getUsers = async ({ currentUserClerkId, query = "" }: Props) => {
+  const users = await db.user.findMany({
+    where: {
+      NOT: {
+        clerkId: currentUserClerkId,
+      },
+      name: {
+        contains: query,
+        mode: "insensitive",
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+    },
+  });
+
+  return users;
+};

@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from "../ui";
 import UserDialog from "./UserDialog";
-import UserForm from "../common/UserForm";
+import { UserForm } from "../common";
 
 type Props = {
   image: string | null;
