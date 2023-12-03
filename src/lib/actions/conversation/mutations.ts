@@ -12,7 +12,7 @@ export const upsertConversation = async (fields: ConversationFields) => {
 
   if (result.success) {
     const {
-      data: { id, members, ...values },
+      data: { id, members, isGroup, ...values },
     } = result;
     try {
       const { session } = await getUserAuth();
@@ -24,6 +24,8 @@ export const upsertConversation = async (fields: ConversationFields) => {
       const newConversations = await db.conversation.upsert({
         where: { id },
         create: {
+          isGroup,
+          creatorId: currentUser.id,
           ...values,
           users: {
             connect: members.concat({ id: currentUser.id }),

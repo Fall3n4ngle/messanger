@@ -21,26 +21,30 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  clerkId       String         @unique
-  name          String
-  image         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt()
-  conversations Conversation[]
-  sentMessages  Message[]
-  seenMessages  Message[]      @relation(name: "seenMessages")
+  id                   String         @id @default(uuid())
+  clerkId              String         @unique
+  name                 String
+  image                String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt()
+  sentMessages         Message[]
+  seenMessages         Message[]      @relation(name: "seenMessages")
+  conversation         Conversation[]
+  createdConversations Conversation[] @relation(name: "createdConversations")
 }
 
 model Conversation {
   id            String    @id @default(uuid())
   name          String
   image         String?
+  isGroup       Boolean   @default(false)
   lastMessageAt DateTime  @default(now())
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt()
   users         User[]
   messages      Message[]
+  creator       User?     @relation(fields: [creatorId], references: [id], name: "createdConversations")
+  creatorId     String?
 }
 
 model Message {

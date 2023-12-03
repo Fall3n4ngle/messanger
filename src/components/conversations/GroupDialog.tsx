@@ -12,14 +12,14 @@ type Props = {
   setOpen: Dispatch<SetStateAction<boolean>>;
 } & PropsWithChildren;
 
-export default function ConversationDialog({ open, setOpen, children }: Props) {
+export default function GroupDialog({ open, setOpen, children }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create conversation</DialogTitle>
+          <DialogTitle>Create group</DialogTitle>
           <DialogDescription>
-            Choose conversation name, image and add members
+            Choose group name, image and add members
           </DialogDescription>
         </DialogHeader>
         {children}

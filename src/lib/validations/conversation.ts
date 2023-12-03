@@ -17,6 +17,7 @@ export const conversationSchema = z.object({
   members: memberSchema.array().min(1, {
     message: "Add at least one member",
   }),
+  isGroup: z.boolean().default(false),
 });
 
 export type ConversationFields = z.infer<typeof conversationSchema>;

@@ -2,7 +2,7 @@
 
 import { upsertConversation } from "@/lib/actions/conversation/mutations";
 import { useToast } from "@/lib/hooks";
-import { ConversationFields, conversationSchema } from "@/lib/validations";
+import { conversationSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import ToastMessage from "./FormMessage";
@@ -19,6 +19,7 @@ import {
 import { Loader } from "lucide-react";
 import FileInput from "../upload/FileInput";
 import UsersSelect from "./UsersSelect";
+import { z } from "zod";
 
 type Member = {
   value: string;
@@ -35,7 +36,15 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function ConversationForm({
+const formSchema = conversationSchema.pick({
+  name: true,
+  image: true,
+  members: true,
+});
+
+type FormFields = z.infer<typeof formSchema>;
+
+export default function CreateGroupForm({
   id = "",
   name = "",
   image = "",
@@ -45,8 +54,8 @@ export default function ConversationForm({
 }: Props) {
   const { toast } = useToast();
 
-  const form = useForm<ConversationFields>({
-    resolver: zodResolver(conversationSchema),
+  const form = useForm<FormFields>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name,
       image,
@@ -54,8 +63,8 @@ export default function ConversationForm({
     },
   });
 
-  async function onSubmit(fields: ConversationFields) {
-    const result = await upsertConversation({ ...fields, id });
+  async function onSubmit(fields: FormFields) {
+    const result = await upsertConversation({ ...fields, id, isGroup: true });
 
     if (result?.success) {
       toast({
@@ -98,7 +107,7 @@ export default function ConversationForm({
           name="name"
           render={({ field }) => (
             <FormItem className="mb-4">
-              <FormLabel>Conversation name</FormLabel>
+              <FormLabel>Group name</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -111,7 +120,7 @@ export default function ConversationForm({
           name="members"
           render={({ field }) => (
             <FormItem className="mb-6">
-              <FormLabel htmlFor="selectMembers">Add members</FormLabel>
+              <FormLabel htmlFor="selectMembers">Members</FormLabel>
               <UsersSelect
                 isMulti
                 id="selectMembers"

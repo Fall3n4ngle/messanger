@@ -9,10 +9,10 @@ import {
   TooltipTrigger,
 } from "../ui";
 import { UserPlus } from "lucide-react";
-import ConversationDialog from "./ConversationDialog";
-import { ConversationForm } from "../common";
+import ConversationDialog from "./GroupDialog";
+import { CreateGroupForm } from "../common";
 
-export default function ConversationButton() {
+export default function GroupButton() {
   const [open, setOpen] = useState(false);
 
   return (
@@ -30,12 +30,12 @@ export default function ConversationButton() {
               <UserPlus className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Create conversation</TooltipContent>
+          <TooltipContent>Create group</TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
       <ConversationDialog open={open} setOpen={setOpen}>
-        <ConversationForm
+        <CreateGroupForm
           successMessage="Conversation created successfully"
           errorMessage="Failed to create conversation"
         />

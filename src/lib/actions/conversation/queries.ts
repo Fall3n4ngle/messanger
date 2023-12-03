@@ -1,20 +1,12 @@
 import { db } from "@/lib/db";
 
 type Props = {
-  query?: string;
   currentUserId: string;
 };
 
-export const getUserConversations = async ({
-  currentUserId,
-  query = "",
-}: Props) => {
+export const getUserConversations = async ({ currentUserId }: Props) => {
   const convsersations = await db.conversation.findMany({
     where: {
-      name: {
-        contains: query,
-        mode: "insensitive",
-      },
       users: {
         some: {
           id: currentUserId,
@@ -27,4 +19,25 @@ export const getUserConversations = async ({
   });
 
   return convsersations;
+};
+
+export const getConversationById = async (conversationId: string) => {
+  const conversation = await db.conversation.findFirst({
+    where: { id: conversationId },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      creatorId: true,
+      messages: {
+        include: {
+          seenBy: true,
+          sentBy: true,
+        },
+      },
+      users: true,
+    },
+  });
+
+  return conversation;
 };
