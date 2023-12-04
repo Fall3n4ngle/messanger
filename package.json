@@ -28,6 +28,8 @@
     "lucide-react": "^0.294.0",
     "next": "14.0.3",
     "next-themes": "^0.2.1",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0-rc2",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.48.2",
