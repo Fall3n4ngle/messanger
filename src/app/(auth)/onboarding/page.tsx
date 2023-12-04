@@ -1,8 +1,14 @@
 import { UserForm } from "@/components/common";
-import OnBoardingCard from "@/components/onBoarding/OnBoardingCard";
 import { getUserByClerkId } from "@/lib/actions/user/queries";
 import { getUserAuth } from "@/lib/utils";
 import { redirect } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
 
 export default async function page() {
   const { session } = await getUserAuth();
@@ -12,8 +18,16 @@ export default async function page() {
   if (currentUser) redirect("/");
 
   return (
-    <OnBoardingCard>
-      <UserForm clerkId={session.user.id} />
-    </OnBoardingCard>
+    <Card className="max-w-[450px] w-full">
+      <CardHeader>
+        <CardTitle>OnBoarding</CardTitle>
+        <CardDescription>
+          Complete information about your account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <UserForm clerkId={session.user.id} />
+      </CardContent>
+    </Card>
   );
 }

@@ -8,7 +8,7 @@ type Props = {
 export default function UserCard({ image, name }: Props) {
   return (
     <div className="flex items-center gap-5 cursor-pointer p-2 hover:bg-secondary rounded-md transition-colors">
-      <Avatar className="">
+      <Avatar>
         {image && <AvatarImage src={image} alt={`${name} profile image`} />}
         <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
       </Avatar>

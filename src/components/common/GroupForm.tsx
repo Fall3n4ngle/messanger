@@ -44,7 +44,7 @@ const formSchema = conversationSchema.pick({
 
 type FormFields = z.infer<typeof formSchema>;
 
-export default function CreateGroupForm({
+export default function GroupForm({
   id = "",
   name = "",
   image = "",
@@ -91,7 +91,7 @@ export default function CreateGroupForm({
           name="image"
           render={({ field }) => (
             <FormItem className="mb-2">
-              <FormLabel>Conversation image</FormLabel>
+              <FormLabel>Group image</FormLabel>
               <FormControl>
                 <FileInput
                   value={field.value ?? ""}

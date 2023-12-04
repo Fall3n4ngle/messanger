@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Avatar,
   AvatarFallback,
@@ -7,8 +6,13 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "../ui";
-import UserDialog from "./UserDialog";
 import { UserForm } from "../common";
 
 type Props = {
@@ -18,33 +22,38 @@ type Props = {
 };
 
 export default function UserButton({ image, name, clerkId }: Props) {
-  const [open, setOpen] = useState(false);
-
   return (
-    <>
+    <Dialog>
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <button aria-label="open profile dialog">
-              <Avatar onClick={() => setOpen(true)}>
-                {image && (
-                  <AvatarImage
-                    src={image}
-                    alt="Profile picture"
-                    className="object-cover"
-                  />
-                )}
-                <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
-              </Avatar>
-            </button>
+            <DialogTrigger asChild>
+              <button aria-label="open profile dialog">
+                <Avatar>
+                  {image && (
+                    <AvatarImage
+                      src={image}
+                      alt="Profile picture"
+                      className="object-cover"
+                    />
+                  )}
+                  <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
+                </Avatar>
+              </button>
+            </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent side="right">Update profile</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-
-      <UserDialog open={open} setOpen={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit profile</DialogTitle>
+          <DialogDescription>
+            Change your display name or image
+          </DialogDescription>
+        </DialogHeader>
         <UserForm clerkId={clerkId} name={name} image={image} />
-      </UserDialog>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }

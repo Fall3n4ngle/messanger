@@ -1,4 +1,4 @@
-import UserCard from "./UserCard";
+import { UserCard } from "../common";
 import { ScrollArea } from "../ui";
 
 type Props = {

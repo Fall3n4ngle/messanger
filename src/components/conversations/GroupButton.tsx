@@ -1,45 +1,51 @@
-"use client";
-
-import { useState } from "react";
 import {
   Button,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
 } from "../ui";
 import { UserPlus } from "lucide-react";
-import ConversationDialog from "./GroupDialog";
-import { CreateGroupForm } from "../common";
+import { GroupForm } from "../common";
 
 export default function GroupButton() {
-  const [open, setOpen] = useState(false);
-
   return (
-    <>
+    <Dialog>
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="secondary"
-              size="icon"
-              aria-label="Create group conversation"
-              className="rounded-full"
-              onClick={() => setOpen(true)}
-            >
-              <UserPlus className="w-4 h-4" />
-            </Button>
+            <DialogTrigger asChild>
+              <Button
+                variant="secondary"
+                size="icon"
+                aria-label="Create group conversation"
+                className="rounded-full"
+              >
+                <UserPlus className="w-4 h-4" />
+              </Button>
+            </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>Create group</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-
-      <ConversationDialog open={open} setOpen={setOpen}>
-        <CreateGroupForm
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create group</DialogTitle>
+          <DialogDescription>
+            Choose group name, image and add other users
+          </DialogDescription>
+        </DialogHeader>
+        <GroupForm
           successMessage="Conversation created successfully"
           errorMessage="Failed to create conversation"
         />
-      </ConversationDialog>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }
