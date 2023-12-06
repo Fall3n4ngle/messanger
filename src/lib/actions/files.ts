@@ -7,9 +7,13 @@ export const deleteFiles = async (fileKeys: string | string[]) => {
     const result = await new UTApi().deleteFiles(fileKeys);
 
     if (!result.success) {
-      throw new Error("Error deleteting files");
+      return { success: false, error: "Error deleting file" };
     }
+
+    return { success: true };
   } catch (error) {
     console.log(error);
+    const message = (error as Error)?.message ?? "Error deleting file";
+    return { success: false, error: message };
   }
 };

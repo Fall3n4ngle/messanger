@@ -28,6 +28,9 @@ export default function FileInput({ value, onChange }: Props) {
     return (
       <UploadDropzone
         endpoint="imageUploader"
+        config={{
+          mode: "auto",
+        }}
         onClientUploadComplete={(result) => {
           const url = result?.[0].url;
           onChange(url);

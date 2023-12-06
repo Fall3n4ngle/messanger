@@ -6,9 +6,10 @@ const f = createUploadthing();
 const getUser = async () => await currentUser();
 
 export const ourFileRouter = {
-  imageUploader: f({ image: { maxFileSize: "4MB" } })
+  imageUploader: f({
+    image: { maxFileSize: "4MB" },
+  })
     .middleware(async () => {
-      
       return { userId: null };
     })
     .onUploadComplete(async ({ metadata, file }) => {

@@ -32,8 +32,21 @@ export const getConversationById = async (conversationId: string) => {
       creatorId: true,
       messages: {
         include: {
-          seenBy: true,
-          sentBy: true,
+          seenBy: {
+            select: {
+              id: true,
+            },
+          },
+          sentBy: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "asc",
         },
       },
       users: true,
