@@ -39,9 +39,9 @@ export const getConversationById = async (conversationId: string) => {
           },
           sentBy: {
             select: {
-              id: true,
               name: true,
               image: true,
+              clerkId: true,
             },
           },
         },

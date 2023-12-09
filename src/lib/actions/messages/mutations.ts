@@ -25,6 +25,23 @@ export const upsertMessage = async (fields: MessageFields) => {
         where: { id: id ?? "" },
         create: { ...data, conversationId, senderId: currentUser.id },
         update: data,
+        select: {
+          content: true,
+          file: true,
+          id: true,
+          seenBy: {
+            select: {
+              id: true,
+            },
+          },
+          sentBy: {
+            select: {
+              name: true,
+              image: true,
+              clerkId: true,
+            },
+          },
+        },
       });
 
       pusherServer.trigger(conversationId, "messages:new", upsertedMessage);

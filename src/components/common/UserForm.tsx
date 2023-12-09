@@ -55,11 +55,11 @@ export default function UserForm({
       toast({
         description: <ToastMessage type="success" message={successMessage} />,
       });
-
-      form.reset();
     }
 
     if (result?.error) {
+      console.log(result.error);
+      
       toast({
         description: <ToastMessage type="error" message={errorMessage} />,
       });

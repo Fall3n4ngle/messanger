@@ -1,12 +1,20 @@
+"use client";
+
 import { pusherClient } from "@/lib/pusher/client";
 import { useEffect, useRef, useState } from "react";
+import MessageCard from "./MessageCard";
+import { flushSync } from "react-dom";
 
 export type Message = {
   id: string;
   content: string | null;
   file: string | null;
   updatedAt: Date;
-  senderId: string | null;
+  sentBy: {
+    image: string | null;
+    name: string;
+    clerkId: string;
+  } | null;
 };
 
 type Props = {
@@ -15,10 +23,10 @@ type Props = {
 };
 
 export default function MessagesList({
-  initialMessages,
+  initialMessages = [],
   conversationId,
 }: Props) {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -30,7 +38,10 @@ export default function MessagesList({
     scrollToBottom();
 
     const handleNewMessage = (newMessage: Message) => {
-      setMessages((prev) => [...prev, newMessage]);
+      flushSync(() => {
+        setMessages((prevMsg) => [...prevMsg, newMessage]);
+      });
+
       scrollToBottom();
     };
 
@@ -42,10 +53,20 @@ export default function MessagesList({
     };
   }, [conversationId]);
 
-  return (
-    <div className="h-full">
-      <div className="flex flex-col"></div>
-      <div className="pt-24"></div>
+  return messages.length > 0 ? (
+    <>
+      <div className="flex flex-col gap-6 justify-end px-6 py-4">
+        {messages.map((message) => (
+          <MessageCard key={message.id} {...message} />
+        ))}
+      </div>
+      <div ref={bottomRef} />
+    </>
+  ) : (
+    <div className="px-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+        No messages yet
+      </h3>
     </div>
   );
 }

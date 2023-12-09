@@ -21,12 +21,6 @@ export const upsertUser = async (fields: UserFields) => {
         where: { clerkId: data.clerkId },
       });
 
-      if (pathname === "/") {
-        revalidatePath("/");
-      } else {
-        redirect("/");
-      }
-
       return { success: true, data: result };
     } catch (error) {
       const message = (error as Error).message ?? "Failed to upsert user";

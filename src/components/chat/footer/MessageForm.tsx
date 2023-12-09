@@ -62,7 +62,7 @@ export default function MessageForm({ conversationId }: Props) {
         });
       }
 
-      form.setValue("file", null);
+      form.setValue("file", "");
     });
 
   const onSubmit = async (fields: FormFields) => {
@@ -86,7 +86,7 @@ export default function MessageForm({ conversationId }: Props) {
   const url = form.watch("file");
 
   return (
-    <>
+    <div className="px-6 py-4 border-t">
       <div>
         {url && (
           <UploadImage
@@ -152,7 +152,10 @@ export default function MessageForm({ conversationId }: Props) {
                   <TextareaAutosize
                     id="message"
                     placeholder="Write a message..."
-                    className={cn(inputClassName, "!mt-0 resize-none")}
+                    className={cn(
+                      inputClassName,
+                      "!m-0 resize-none bg-secondary dark:bg-secondary/50 border-none"
+                    )}
                     {...field}
                   />
                 </FormControl>
@@ -180,6 +183,6 @@ export default function MessageForm({ conversationId }: Props) {
           </TooltipProvider>
         </form>
       </Form>
-    </>
+    </div>
   );
 }
