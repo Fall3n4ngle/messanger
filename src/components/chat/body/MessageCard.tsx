@@ -26,15 +26,20 @@ export default function MessageCard({
         )}
         <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
       </Avatar>
-      <div className={cn("mt-2 max-w-[450px] order-2", isOwn && "order-1")}>
-        <div className={cn("flex gap-2 mb-2", isOwn && "justify-end")}>
+      <div
+        className={cn(
+          "mt-2 max-w-[450px] flex flex-col gap-2 order-2",
+          isOwn && "order-1"
+        )}
+      >
+        <div className={cn("flex gap-2", isOwn && "justify-end")}>
           <span className=" font-semibold text-foreground/[85%]">{name}</span>
           <span className="text-sm mt-[3px] text-muted-foreground">
             {formatDate(updatedAt)}
           </span>
         </div>
         {file && (
-          <div className="relative w-44 pt-[92%] mb-2">
+          <div className="relative w-44 pt-[92%] mb-2 self-end">
             <Image
               src={file}
               alt="Attached image"
@@ -46,7 +51,7 @@ export default function MessageCard({
         <p
           className={cn(
             "p-2.5 rounded-2xl bg-secondary tracking-tight max-w-[max-content] min-w-[50px]",
-            isOwn && "bg-primary text-primary-foreground"
+            isOwn && "bg-primary text-primary-foreground self-end"
           )}
         >
           {content}

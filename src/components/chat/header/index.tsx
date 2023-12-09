@@ -1,5 +1,6 @@
 import ChatSheetButton from "./ChatSheetButton";
 import ConversationHeading from "./ConversationHeading";
+import MediaRoomButton from "./MediaRoomButton";
 
 export type Member = {
   id: string;
@@ -32,7 +33,8 @@ export default function ChatHeader({
           image={image}
           description={isGroup ? `${usersCount} members` : ""}
         />
-        <div>
+        <div className="flex items-center gap-1">
+          <MediaRoomButton conversationId={conversationId} />
           <ChatSheetButton
             members={members}
             name={name}
