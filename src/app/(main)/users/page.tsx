@@ -20,7 +20,7 @@ export default async function Users({ searchParams: { query } }: Props) {
     <>
       <div className="p-4 border-r max-w-[320px] w-full flex flex-col gap-6">
         <Search id="searchUsers" label="Search users" />
-        <UsersList users={users} />
+        <UsersList initialUsers={users} query={query} />
       </div>
       <div className="flex items-center justify-center w-full min-h-screen">
         <EmptyConversationMessage />

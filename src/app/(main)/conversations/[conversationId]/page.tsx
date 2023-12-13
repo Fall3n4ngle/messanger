@@ -31,7 +31,9 @@ export default async function Conversation({
         <ScrollArea className="flex-1 relative">
           <MessagesList initialMessages={messages} conversationId={id} />
         </ScrollArea>
-        <MessageForm conversationId={id} />
+        <div className="max-w-[1000px] self-center w-full">
+          <MessageForm conversationId={id} />
+        </div>
       </div>
     </div>
   );

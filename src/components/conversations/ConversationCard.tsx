@@ -1,21 +1,32 @@
+import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui";
 
 type Props = {
   name: string;
   image: string | null;
+  isActive: boolean;
   lastMessageAt: string;
 };
 
 export default function ConversationCard({
   name,
   image,
+  isActive,
   lastMessageAt,
 }: Props) {
   return (
-    <div className="flex items-center justify-between gap-3 cursor-pointer p-2 hover:bg-secondary rounded-md transition-colors">
+    <div
+      className={cn(
+        "flex items-center justify-between gap-3 cursor-pointer p-2 dark:hover:bg-secondary/70 hover:bg-secondary/80 rounded-md transition-colors",
+        isActive &&
+          "bg-secondary hover:bg-secondary/100 dark:hover:bg-secondary/100 cursor-default"
+      )}
+    >
       <Avatar>
         {image && <AvatarImage src={image} alt={`${name} image`} />}
-        <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
+        <AvatarFallback className={cn(isActive && "bg-background")}>
+          {name[0].toUpperCase()}
+        </AvatarFallback>
       </Avatar>
       <div className="grow">
         <h4 className="scroll-m-20 font-semibold tracking-tight whitespace-nowrap mb-1">

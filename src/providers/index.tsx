@@ -4,6 +4,15 @@ import { PropsWithChildren } from "react";
 import { ThemeProvider } from "./Theme";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export default function Providers({ children }: PropsWithChildren) {
   return (
@@ -13,8 +22,10 @@ export default function Providers({ children }: PropsWithChildren) {
       enableSystem
       disableTransitionOnChange
     >
-      <ClerkProvider>{children}</ClerkProvider>
-      <Toaster />
+      <QueryClientProvider client={queryClient}>
+        <ClerkProvider>{children}</ClerkProvider>
+        <Toaster />
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

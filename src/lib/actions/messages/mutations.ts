@@ -46,10 +46,14 @@ export const upsertMessage = async (fields: MessageFields) => {
 
       pusherServer.trigger(conversationId, "messages:new", upsertedMessage);
 
-      await db.conversation.update({
+      const updatedConversation = await db.conversation.update({
         where: { id: conversationId },
         data: {
           lastMessageAt: new Date(),
+        },
+        include: {
+          messages: true,
+          users: true,
         },
       });
 

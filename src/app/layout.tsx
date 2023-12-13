@@ -24,7 +24,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <Providers>
-          <div className="flex min-h-screen">{children}</div>
+          <div className="flex h-screen">{children}</div>
         </Providers>
       </body>
     </html>
