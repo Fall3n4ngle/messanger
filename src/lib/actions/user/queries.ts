@@ -12,8 +12,8 @@ export const getUserByClerkId = async (clerkId: string) => {
 };
 
 type Props = {
-  query?: string;
   currentUserClerkId: string;
+  query?: string;
   take?: number;
   lastCursor?: string;
 };
@@ -44,9 +44,10 @@ export const getUsers = async ({
     cursor,
     take,
     orderBy: {
-      id: 'asc', 
+      id: "asc",
     },
+    skip: cursor ? 1 : 0,
   });
-  
+
   return users;
 };

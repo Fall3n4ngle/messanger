@@ -23,7 +23,10 @@ export default async function layout({ children }: PropsWithChildren) {
     <>
       <div className="border-r max-w-[320px] w-full flex flex-col gap-2.5">
         <ConversationsHeader />
-        <ConversationsList intialConversations={userConversations} />
+        <ConversationsList
+          intialConversations={userConversations}
+          currentUserId={currentUser.id}
+        />
       </div>
       {children}
     </>

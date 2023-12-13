@@ -4,37 +4,83 @@ import { ScrollArea } from "../ui";
 import { formatDate } from "@/lib/utils";
 import ConversationCard from "./ConversationCard";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useInView } from "react-intersection-observer";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getUserConversations } from "@/lib/actions/conversation/queries";
+import { Fragment, useEffect } from "react";
 
 type Conversation = {
   id: string;
   name: string;
   image: string | null;
   lastMessageAt: Date;
+  createdAt: Date;
 };
 
 type Props = {
   intialConversations: Conversation[];
+  currentUserId: string;
 };
 
-export default function ConversationsList({ intialConversations }: Props) {
+const take = 25;
+
+export default function ConversationsList({
+  intialConversations,
+  currentUserId,
+}: Props) {
   const pathname = usePathname();
-  const [page, setPage] = useState(1)
-  const [conversations, setConversations] = useState(intialConversations);
+  const searchParams = useSearchParams();
+  const query = searchParams.get("query");
+
   const { ref: bottomRef, inView } = useInView({
     threshold: 0,
   });
 
-  
+  const getData = async ({ pageParam }: { pageParam?: Date }) => {
+    const conversations = await getUserConversations({
+      currentUserId,
+      query: query ?? "",
+      lastCursor: pageParam,
+      take,
+    });
+
+    return conversations;
+  };
+
+  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
+    queryKey: ["conversations", query],
+    queryFn: getData,
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.length < take) {
+        return;
+      }
+
+      return lastPage[lastPage.length - 1].createdAt;
+    },
+    initialData: {
+      pages: [intialConversations],
+      pageParams: [undefined],
+    },
+  });
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage]);
+
+  if (!data.pages[0].length) {
+    return <p className="ml-3">No conversations found</p>;
+  }
 
   return (
     <ScrollArea className="px-4">
-      {intialConversations.length > 0 ? (
-        <>
-          <ul className="flex flex-col gap-3">
-            {conversations.map(({ id, lastMessageAt, ...props }) => {
+      <ul className="flex flex-col gap-3">
+        {data.pages.map((group, id) => (
+          <Fragment key={id}>
+            {group.map(({ id, lastMessageAt, ...props }) => {
               const date = formatDate(lastMessageAt);
               const isActive = pathname.includes(id);
 
@@ -50,12 +96,10 @@ export default function ConversationsList({ intialConversations }: Props) {
                 </li>
               );
             })}
-          </ul>
-          <div ref={bottomRef} />
-        </>
-      ) : (
-        <p className="text-muted-foreground">No conversations yet</p>
-      )}
+          </Fragment>
+        ))}
+      </ul>
+      <div ref={bottomRef} />
     </ScrollArea>
   );
 }

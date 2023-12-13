@@ -64,6 +64,10 @@ export default function UsersList({ initialUsers, query }: Props) {
     }
   }, [hasNextPage, inView, fetchNextPage]);
 
+  if (!data.pages[0].length) {
+    return <p className="ml-3">No users found</p>
+  }
+
   return (
     <ScrollArea>
       <ul className="flex flex-col gap-2" ref={bottomRef}>

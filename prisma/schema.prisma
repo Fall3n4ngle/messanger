@@ -39,7 +39,7 @@ model Conversation {
   image         String?
   isGroup       Boolean   @default(false)
   lastMessageAt DateTime  @default(now())
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime  @default(now()) @unique
   updatedAt     DateTime  @updatedAt()
   users         User[]
   messages      Message[]

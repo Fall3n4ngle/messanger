@@ -3,7 +3,6 @@
 import { pusherClient } from "@/lib/pusher/client";
 import { useEffect, useRef, useState } from "react";
 import MessageCard from "./MessageCard";
-import { flushSync } from "react-dom";
 
 export type Message = {
   id: string;
@@ -38,11 +37,7 @@ export default function MessagesList({
     scrollToBottom();
 
     const handleNewMessage = (newMessage: Message) => {
-      flushSync(() => {
-        setMessages((prevMsg) => [...prevMsg, newMessage]);
-      });
-
-      scrollToBottom();
+      setMessages((prevMsg) => [...prevMsg, newMessage]);
     };
 
     pusherClient.bind("messages:new", handleNewMessage);
