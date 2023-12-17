@@ -1,8 +1,15 @@
 "use client";
 
-import { pusherClient } from "@/lib/pusher/client";
-import { useEffect, useRef, useState } from "react";
+import { Button, ScrollArea } from "@/components/ui";
+import { getMessages } from "@/lib/actions/messages/queries";
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { Fragment, useEffect, useRef } from "react";
 import MessageCard from "./MessageCard";
+import { pusherClient } from "@/lib/pusher/client";
 
 export type Message = {
   id: string;
@@ -21,23 +28,112 @@ type Props = {
   conversationId: string;
 };
 
+const take = 25;
+
 export default function MessagesList({
-  initialMessages = [],
   conversationId,
+  initialMessages,
 }: Props) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const { data, fetchPreviousPage, hasPreviousPage } = useInfiniteMessages({
+    conversationId,
+    initialMessages,
+  });
+
+  usePusherMessages({ conversationId });
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+
+  return (
+    <ScrollArea className="flex-1 px-6 pb-6 pt-3" ref={listRef}>
+      {hasPreviousPage && (
+        <div className="flex justify-center">
+          <Button
+            variant="ghost"
+            className="mb-6"
+            onClick={() => fetchPreviousPage()}
+          >
+            Load previous
+          </Button>
+        </div>
+      )}
+      <div className="flex-1 flex flex-col gap-6">
+        {data?.pages.map((group, id) => (
+          <Fragment key={id}>
+            {group.map((message) => (
+              <MessageCard key={message.id} {...message} />
+            ))}
+          </Fragment>
+        ))}
+      </div>
+      <div ref={bottomRef} />
+    </ScrollArea>
+  );
+}
+
+const useInfiniteMessages = ({ conversationId, initialMessages }: Props) => {
+  const getData = async ({ pageParam }: { pageParam?: string }) => {
+    const messages = await getMessages({
+      conversationId,
+      lastCursor: pageParam,
+      take: -take,
+    });
+
+    return messages;
+  };
+
+  return useInfiniteQuery({
+    queryKey: ["messages", conversationId],
+    queryFn: getData,
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.length < +take) {
+        return;
+      }
+
+      return lastPage[lastPage.length - 1].id;
+    },
+    getPreviousPageParam: (firstPage) => {
+      if (firstPage.length < +take) {
+        return;
+      }
+
+      return firstPage[0].id;
+    },
+    initialData: {
+      pages: [initialMessages],
+      pageParams: [undefined],
+    },
+    staleTime: Infinity,
+  });
+};
+
+const usePusherMessages = ({ conversationId }: { conversationId: string }) => {
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     pusherClient.subscribe(conversationId);
-    scrollToBottom();
 
     const handleNewMessage = (newMessage: Message) => {
-      setMessages((prevMsg) => [...prevMsg, newMessage]);
+      queryClient.setQueryData(
+        ["messages", conversationId],
+        ({ pageParams, pages }: InfiniteData<Message[], unknown>) => {
+          return {
+            pages: pages.map((page, index) =>
+              index === pages.length - 1 ? [...page, newMessage] : page
+            ),
+            pageParams,
+          };
+        }
+      );
     };
 
     pusherClient.bind("messages:new", handleNewMessage);
@@ -46,22 +142,5 @@ export default function MessagesList({
       pusherClient.unsubscribe(conversationId);
       pusherClient.unbind("messages:new", handleNewMessage);
     };
-  }, [conversationId]);
-
-  return messages.length > 0 ? (
-    <>
-      <div className="flex flex-col gap-6 justify-end px-6 py-4">
-        {messages.map((message) => (
-          <MessageCard key={message.id} {...message} />
-        ))}
-      </div>
-      <div ref={bottomRef} />
-    </>
-  ) : (
-    <div className="px-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        No messages yet
-      </h3>
-    </div>
-  );
-}
+  }, [conversationId, queryClient]);
+};

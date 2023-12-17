@@ -44,7 +44,7 @@ export const getUsers = async ({
     cursor,
     take,
     orderBy: {
-      id: "asc",
+      name: "asc",
     },
     skip: cursor ? 1 : 0,
   });

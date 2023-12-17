@@ -1,6 +1,6 @@
 import { MessageForm, ChatHeader, MessagesList } from "@/components/chat";
-import { ScrollArea } from "@/components/ui";
 import { getConversationById } from "@/lib/actions/conversation/queries";
+import { getMessages } from "@/lib/actions/messages/queries";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -12,10 +12,17 @@ type Props = {
 export default async function Conversation({
   params: { conversationId },
 }: Props) {
-  const conversation = await getConversationById(conversationId);
+  const conversationPromise = getConversationById(conversationId);
+  const messagesPromise = getMessages({ conversationId, take: -25 });
+
+  const [conversation, messages] = await Promise.all([
+    conversationPromise,
+    messagesPromise,
+  ]);
+
   if (!conversation) notFound();
 
-  const { id, name, image, creatorId, isGroup, messages, users } = conversation;
+  const { id, name, image, isGroup, users } = conversation;
 
   return (
     <div className="w-full h-screen">
@@ -28,9 +35,7 @@ export default async function Conversation({
           usersCount={users.length}
           members={users}
         />
-        <ScrollArea className="flex-1 relative">
-          <MessagesList initialMessages={messages} conversationId={id} />
-        </ScrollArea>
+        <MessagesList initialMessages={messages} conversationId={id} />
         <div className="max-w-[1000px] self-center w-full">
           <MessageForm conversationId={id} />
         </div>

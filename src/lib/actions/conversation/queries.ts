@@ -49,25 +49,6 @@ export const getConversationById = async (conversationId: string) => {
       image: true,
       isGroup: true,
       creatorId: true,
-      messages: {
-        include: {
-          seenBy: {
-            select: {
-              id: true,
-            },
-          },
-          sentBy: {
-            select: {
-              name: true,
-              image: true,
-              clerkId: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "asc",
-        },
-      },
       users: true,
     },
   });
