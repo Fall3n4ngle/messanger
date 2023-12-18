@@ -52,6 +52,16 @@ export default function MessagesList({
     scrollToBottom();
   }, []);
 
+  if (!data.pages[0].length) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+          No messages yet
+        </h3>
+      </div>
+    );
+  }
+
   return (
     <ScrollArea className="flex-1 px-6 pb-6 pt-3" ref={listRef}>
       {hasPreviousPage && (

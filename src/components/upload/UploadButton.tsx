@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, ReactNode } from "react";
+import { ChangeEvent, PropsWithChildren, ReactNode } from "react";
 import {
   UploadFileResponse,
   generateMimeTypes,
@@ -23,26 +23,24 @@ type Props = {
       ) => void)
     | undefined;
   className?: string;
-  renderChildren: ({ isUploading }: { isUploading: boolean }) => ReactNode;
   onUploadError?: ((e: Error) => void) | undefined;
-  onUploadBegin?: ((fileName: string) => void) | undefined
-};
+  onBeforeUploadBegin?: ((files: File[]) => File[]) | undefined;
+  disabled?: boolean;
+} & PropsWithChildren;
 
 export default function UploadButton({
   className,
   onClientUploadComplete,
-  renderChildren,
   onUploadError,
-  onUploadBegin
+  onBeforeUploadBegin,
+  children,
+  disabled,
 }: Props) {
-  const { startUpload, isUploading, permittedFileInfo } = useUploadThing(
-    "imageUploader",
-    {
-      onClientUploadComplete,
-      onUploadError,
-      onUploadBegin
-    }
-  );
+  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+    onClientUploadComplete,
+    onUploadError,
+    onBeforeUploadBegin,
+  });
 
   const { fileTypes, multiple } = generatePermittedFileTypes(
     permittedFileInfo?.config
@@ -61,6 +59,7 @@ export default function UploadButton({
           variant: "secondary",
         }),
         "cursor-pointer",
+        disabled && "cursor-default opacity-50",
         className
       )}
     >
@@ -70,8 +69,9 @@ export default function UploadButton({
         className="hidden"
         accept={generateMimeTypes(fileTypes ?? [])?.join(", ")}
         multiple={multiple}
+        disabled={disabled}
       />
-      {renderChildren({ isUploading })}
+      {children}
     </label>
   );
 }

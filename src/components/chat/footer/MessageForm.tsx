@@ -20,7 +20,7 @@ import { upsertMessage } from "@/lib/actions/messages/mutations";
 import { useToast } from "@/lib/hooks";
 import { messageSchema } from "@/lib/validations/message";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image as ImageIcon, Loader, SendHorizontal } from "lucide-react";
+import { Image as ImageIcon, Loader2, SendHorizontal } from "lucide-react";
 import Image from "next/image";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -37,8 +37,10 @@ type FormFields = z.infer<typeof formSchema>;
 
 export default function MessageForm({ conversationId }: Props) {
   const { toast } = useToast();
+
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -48,6 +50,8 @@ export default function MessageForm({ conversationId }: Props) {
     toast({
       description: <ToastMessage type="error" message={error.message} />,
     });
+
+    setIsUploading(false);
   };
 
   const handleDelete = () =>
@@ -118,23 +122,28 @@ export default function MessageForm({ conversationId }: Props) {
                 <FormLabel className="sr-only">Attach image</FormLabel>
                 <TooltipProvider delayDuration={300}>
                   <Tooltip>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger >
                       <UploadButton
                         className="rounded-full !mt-0"
                         onUploadError={handleUploadError}
+                        onBeforeUploadBegin={(files) => {
+                          setIsUploading(true);
+                          return files;
+                        }}
                         onClientUploadComplete={(result) => {
                           const { key, url } = result[0];
                           field.onChange(url);
                           setFileKey(key);
+                          setIsUploading(false);
                         }}
-                        renderChildren={({ isUploading }) =>
-                          isUploading ? (
-                            <Loader className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <ImageIcon />
-                          )
-                        }
-                      />
+                        disabled={isSubmitting || isUploading}
+                      >
+                        {isUploading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <ImageIcon />
+                        )}
+                      </UploadButton>
                     </TooltipTrigger>
                     <TooltipContent>Attach image</TooltipContent>
                   </Tooltip>
@@ -169,10 +178,10 @@ export default function MessageForm({ conversationId }: Props) {
                   size="icon"
                   className="rounded-full"
                   aria-label="Send message"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUploading}
                 >
                   {isSubmitting ? (
-                    <Loader className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <SendHorizontal />
                   )}
