@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Button,
   Sheet,
@@ -14,15 +16,10 @@ import {
 import { MoreVertical } from "lucide-react";
 import { UserCard } from "../../common";
 import DeleteConversationButton from "./DeleteConversationButton";
-import { getUserAuth } from "@/lib/utils";
-import { redirect } from "next/navigation";
 import LeaveConversationButton from "./LeaveConversationButton";
-
-type Member = {
-  id: string;
-  name: string;
-  image: string | null;
-};
+import { useAuth } from "@clerk/nextjs";
+import { useActiveUsers } from "@/store/useActiveUsers";
+import { Member } from ".";
 
 export type ChatSheetProps = {
   conversationId: string;
@@ -30,13 +27,15 @@ export type ChatSheetProps = {
   members: Member[];
 };
 
-export default async function ChatSheetButton({
+export default function ChatSheetButton({
   members,
   name,
   conversationId,
 }: ChatSheetProps) {
-  const { session } = await getUserAuth();
-  if (!session) redirect("/sign-in");
+  const { userId } = useAuth();
+  const { usersIds } = useActiveUsers();
+
+  if (!userId) return null;
 
   return (
     <Sheet>
@@ -59,16 +58,20 @@ export default async function ChatSheetButton({
         </SheetHeader>
         <div className="pt-6">
           <ul className="flex flex-col gap-2 mb-6">
-            {members.map(({ id, ...props }) => (
-              <li key={id}>
-                <UserCard {...props} />
-              </li>
-            ))}
+            {members.map(({ id, clerkId, ...props }) => {
+              const isActive = usersIds.includes(clerkId);
+
+              return (
+                <li key={id}>
+                  <UserCard isActive={isActive} {...props} />
+                </li>
+              );
+            })}
           </ul>
           <div className="flex items-center gap-3">
             <LeaveConversationButton
               conversationId={conversationId}
-              userClerkId={session.user.id}
+              userClerkId={userId}
             />
             <DeleteConversationButton conversationId={conversationId} />
           </div>

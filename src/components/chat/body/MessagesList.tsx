@@ -10,6 +10,8 @@ import {
 import { Fragment, useEffect, useRef } from "react";
 import MessageCard from "./MessageCard";
 import { pusherClient } from "@/lib/pusher/client";
+import { useAuth } from "@clerk/nextjs";
+import { useActiveUsers } from "@/store/useActiveUsers";
 
 export type Message = {
   id: string;
@@ -36,6 +38,8 @@ export default function MessagesList({
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const { userId } = useAuth();
+  const { usersIds } = useActiveUsers();
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -78,9 +82,21 @@ export default function MessagesList({
       <div className="flex-1 flex flex-col gap-6">
         {data?.pages.map((group, id) => (
           <Fragment key={id}>
-            {group.map((message) => (
-              <MessageCard key={message.id} {...message} />
-            ))}
+            {group.map((message) => {
+              if (!message.sentBy) return;
+              const { clerkId } = message.sentBy;
+              const isOwn = clerkId === userId;
+              const isActive = usersIds.includes(clerkId);
+
+              return (
+                <MessageCard
+                  key={message.id}
+                  isOwn={isOwn}
+                  isActive={isActive}
+                  {...message}
+                />
+              );
+            })}
           </Fragment>
         ))}
       </div>

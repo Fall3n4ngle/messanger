@@ -8,10 +8,12 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getUsers } from "@/lib/actions/user/queries";
 import { useAuth } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
+import { useActiveUsers } from "@/store/useActiveUsers";
 
 type User = {
   id: string;
   name: string;
+  clerkId: string;
   image: string | null;
 };
 
@@ -24,6 +26,7 @@ const take = 25;
 
 export default function UsersList({ initialUsers, query }: Props) {
   const { userId } = useAuth();
+  const { usersIds } = useActiveUsers();
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,
@@ -65,7 +68,7 @@ export default function UsersList({ initialUsers, query }: Props) {
   }, [hasNextPage, inView, fetchNextPage]);
 
   if (!data.pages[0].length) {
-    return <p className="ml-3">No users found</p>
+    return <p className="ml-3">No users found</p>;
   }
 
   return (
@@ -73,9 +76,11 @@ export default function UsersList({ initialUsers, query }: Props) {
       <ul className="flex flex-col gap-2" ref={bottomRef}>
         {data.pages.map((group, id) => (
           <Fragment key={id}>
-            {group.map(({ id, ...props }) => (
-              <UserCard key={id} {...props} />
-            ))}
+            {group.map(({ id, clerkId, ...props }) => {
+              const isActive = usersIds.includes(clerkId);
+
+              return <UserCard key={id} isActive={isActive} {...props} />;
+            })}
           </Fragment>
         ))}
       </ul>

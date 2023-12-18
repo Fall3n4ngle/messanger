@@ -6,6 +6,7 @@ export type Member = {
   id: string;
   name: string;
   image: string | null;
+  clerkId: string;
 };
 
 type Props = {

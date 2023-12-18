@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Avatar,
   AvatarFallback,
@@ -14,6 +16,9 @@ import {
   DialogTrigger,
 } from "../ui";
 import { UserForm } from "../common";
+import { useAuth } from "@clerk/nextjs";
+import { useActiveUsers } from "@/store/useActiveUsers";
+import { cn } from "@/lib/utils";
 
 type Props = {
   image: string | null;
@@ -22,13 +27,24 @@ type Props = {
 };
 
 export default function UserButton({ image, name, clerkId }: Props) {
+  const { userId } = useAuth();
+  const { usersIds } = useActiveUsers();
+  console.log(usersIds);
+  
+
+  const isActive = userId && usersIds.includes(userId);
+
   return (
     <Dialog>
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <button aria-label="open profile dialog">
+              <div
+                role="button"
+                className="relative"
+                aria-label="open profile dialog"
+              >
                 <Avatar>
                   {image && (
                     <AvatarImage
@@ -39,7 +55,13 @@ export default function UserButton({ image, name, clerkId }: Props) {
                   )}
                   <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
-              </button>
+                <div
+                  className={cn(
+                    "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-muted-foreground border-2 border-background",
+                    isActive && "bg-green-400"
+                  )}
+                />
+              </div>
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent side="right">Update profile</TooltipContent>

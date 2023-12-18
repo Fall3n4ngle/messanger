@@ -40,6 +40,7 @@ export const getUsers = async ({
       id: true,
       name: true,
       image: true,
+      clerkId: true,
     },
     cursor,
     take,

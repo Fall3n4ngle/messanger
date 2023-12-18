@@ -1,8 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
 import { Message } from "./MessagesList";
-import { useAuth } from "@clerk/nextjs";
 import { cn, formatDate } from "@/lib/utils";
 import Image from "next/image";
+
+type Props = {
+  isOwn: boolean;
+  isActive: boolean;
+} & Required<Message>;
 
 export default function MessageCard({
   id,
@@ -10,22 +14,27 @@ export default function MessageCard({
   file,
   updatedAt,
   sentBy,
-}: Message) {
-  const { userId } = useAuth();
-
-  if (!sentBy) return null;
-  const { clerkId, image, name } = sentBy;
-
-  const isOwn = clerkId === userId;
+  isOwn,
+  isActive,
+}: Props) {
+  const { image, name } = sentBy!;
 
   return (
     <div className={cn("flex gap-3", isOwn && "justify-end")}>
-      <Avatar className={cn("order-1", isOwn && "order-2")}>
-        {image && (
-          <AvatarImage src={image} alt={name} className="object-cover" />
-        )}
-        <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
-      </Avatar>
+      <div className={cn("order-1 relative", isOwn && "order-2")}>
+        <Avatar>
+          {image && (
+            <AvatarImage src={image} alt={name} className="object-cover" />
+          )}
+          <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <div
+          className={cn(
+            "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-muted-foreground border-2 border-background",
+            isActive && "bg-green-400"
+          )}
+        />
+      </div>
       <div
         className={cn(
           "mt-2 max-w-[450px] flex flex-col gap-2 order-2",
