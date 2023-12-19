@@ -18,7 +18,7 @@ import { UserCard } from "../../common";
 import DeleteConversationButton from "./DeleteConversationButton";
 import LeaveConversationButton from "./LeaveConversationButton";
 import { useAuth } from "@clerk/nextjs";
-import { useActiveUsers } from "@/store/useActiveUsers";
+import { useActiveUsers } from "@/store";
 import { Member } from ".";
 
 export type ChatSheetProps = {

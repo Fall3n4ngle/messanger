@@ -1,7 +1,9 @@
 import { MessageForm, ChatHeader, MessagesList } from "@/components/chat";
 import { getConversationById } from "@/lib/actions/conversation/queries";
 import { getMessages } from "@/lib/actions/messages/queries";
-import { notFound } from "next/navigation";
+import { getUserByClerkId } from "@/lib/actions/user/queries";
+import { auth } from "@clerk/nextjs";
+import { notFound, redirect } from "next/navigation";
 
 type Props = {
   params: {
@@ -12,15 +14,22 @@ type Props = {
 export default async function Conversation({
   params: { conversationId },
 }: Props) {
+  const { userId } = auth();
+
+  if (!userId) redirect("/sign-in");
+
   const conversationPromise = getConversationById(conversationId);
   const messagesPromise = getMessages({ conversationId, take: -25 });
+  const userPromise = getUserByClerkId(userId);
 
-  const [conversation, messages] = await Promise.all([
+  const [conversation, messages, user] = await Promise.all([
     conversationPromise,
     messagesPromise,
+    userPromise,
   ]);
 
   if (!conversation) notFound();
+  if (!user) redirect("/onboarding");
 
   const { id, name, image, isGroup, users } = conversation;
 
@@ -37,7 +46,7 @@ export default async function Conversation({
         />
         <MessagesList initialMessages={messages} conversationId={id} />
         <div className="max-w-[1000px] self-center w-full">
-          <MessageForm conversationId={id} />
+          <MessageForm conversationId={id} userName={user.name} />
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getUsers } from "@/lib/actions/user/queries";
 import { useAuth } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
-import { useActiveUsers } from "@/store/useActiveUsers";
+import { useActiveUsers } from "@/store";
 
 type User = {
   id: string;

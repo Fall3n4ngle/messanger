@@ -1,16 +1,52 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
+import { TypingUser } from "@/lib/actions/typingUser/mutations";
+import { pusherClient } from "@/lib/pusher/client";
+import { formatTypingUsers } from "@/lib/utils";
+import { useTypingUsers } from "@/store";
+import { useAuth } from "@clerk/nextjs";
+import { useEffect } from "react";
 
 type Props = {
   image: string | null;
   name: string;
-  description: string;
+  conversationId: string;
+  membersCount: number;
 };
 
 export default function ConversationHeading({
-  description,
   image,
   name,
+  conversationId,
+  membersCount,
 }: Props) {
+  const { add, users, remove } = useTypingUsers();
+  const { userId } = useAuth();
+
+  useEffect(() => {
+    pusherClient.subscribe(conversationId);
+
+    const handleAddUser = (user: TypingUser) => {
+      if (userId === user.clerkId) return;
+      add(user.userName);
+    };
+
+    const handleRemoveUser = ({ userName }: { userName: string }) => {
+      remove(userName);
+    };
+
+    pusherClient.bind("user:start_typing", handleAddUser);
+
+    pusherClient.bind("user:stop_typing", handleRemoveUser);
+
+    return () => {
+      pusherClient.unsubscribe(conversationId);
+      pusherClient.unbind("start_typing", handleAddUser);
+      pusherClient.unbind("user:stop_typing", handleRemoveUser);
+    };
+  }, [conversationId, add, userId, remove]);
+
   return (
     <div className="flex gap-3 items-center">
       <Avatar>
@@ -22,7 +58,13 @@ export default function ConversationHeading({
           {name}
         </h4>
         <p className="text-sm text-muted-foreground whitespace-nowrap">
-          {description}
+          {users.length > 0 ? (
+            <span className="animate-pulse text-primary">
+              {formatTypingUsers(users)}
+            </span>
+          ) : (
+            `${membersCount} members`
+          )}
         </p>
       </div>
     </div>

@@ -32,7 +32,8 @@ export default function ChatHeader({
         <ConversationHeading
           name={name}
           image={image}
-          description={isGroup ? `${usersCount} members` : ""}
+          membersCount={members.length}
+          conversationId={conversationId}
         />
         <div className="flex items-center gap-1">
           <MediaRoomButton conversationId={conversationId} />

@@ -11,7 +11,7 @@ import { Fragment, useEffect, useRef } from "react";
 import MessageCard from "./MessageCard";
 import { pusherClient } from "@/lib/pusher/client";
 import { useAuth } from "@clerk/nextjs";
-import { useActiveUsers } from "@/store/useActiveUsers";
+import { useActiveUsers } from "@/store";
 
 export type Message = {
   id: string;

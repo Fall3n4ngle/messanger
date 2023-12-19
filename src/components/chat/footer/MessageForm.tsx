@@ -17,7 +17,11 @@ import {
 import { UploadButton, UploadImage } from "@/components/upload";
 import { deleteFiles } from "@/lib/actions/files";
 import { upsertMessage } from "@/lib/actions/messages/mutations";
-import { useToast } from "@/lib/hooks";
+import {
+  useDebouncedCallback,
+  useThrottledCallback,
+  useToast,
+} from "@/lib/hooks";
 import { messageSchema } from "@/lib/validations/message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image as ImageIcon, Loader2, SendHorizontal } from "lucide-react";
@@ -27,15 +31,20 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import TextareaAutosize from "react-textarea-autosize";
 import { cn } from "@/lib/utils";
+import {
+  addTypingUser,
+  removeTypingUser,
+} from "@/lib/actions/typingUser/mutations";
 
 type Props = {
   conversationId: string;
+  userName: string;
 };
 
 const formSchema = messageSchema.pick({ content: true, file: true });
 type FormFields = z.infer<typeof formSchema>;
 
-export default function MessageForm({ conversationId }: Props) {
+export default function MessageForm({ conversationId, userName }: Props) {
   const { toast } = useToast();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
@@ -86,6 +95,20 @@ export default function MessageForm({ conversationId }: Props) {
     }
   };
 
+  const handleTypeStart = useThrottledCallback(async () => {
+    await addTypingUser({
+      conversationId,
+      userName,
+    });
+  }, 200);
+
+  const handleTypeEnd = useDebouncedCallback(async () => {
+    await removeTypingUser({
+      conversationId,
+      userName,
+    });
+  }, 1500);
+
   const { isSubmitting } = form.formState;
   const url = form.watch("file");
 
@@ -122,7 +145,7 @@ export default function MessageForm({ conversationId }: Props) {
                 <FormLabel className="sr-only">Attach image</FormLabel>
                 <TooltipProvider delayDuration={300}>
                   <Tooltip>
-                    <TooltipTrigger >
+                    <TooltipTrigger>
                       <UploadButton
                         className="rounded-full !mt-0"
                         onUploadError={handleUploadError}
@@ -165,6 +188,10 @@ export default function MessageForm({ conversationId }: Props) {
                       inputClassName,
                       "!m-0 resize-none bg-secondary dark:bg-secondary/50 border-none"
                     )}
+                    onKeyDown={() => {
+                      handleTypeStart();
+                      handleTypeEnd();
+                    }}
                     {...field}
                   />
                 </FormControl>

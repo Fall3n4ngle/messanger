@@ -1,6 +1,6 @@
 "use client";
 
-import { useDebounce, useQueryParams } from "@/lib/hooks";
+import { useDebouncedValue, useQueryParams } from "@/lib/hooks";
 import { Input, InputProps } from "../ui";
 import { useEffect, useState } from "react";
 
@@ -12,7 +12,7 @@ export default function Search({ label, id, ...props }: Props) {
   const { setQueryParams, queryParams } = useQueryParams();
   const [query, setQuery] = useState(queryParams.get("query"));
 
-  const debouncedQuery = useDebounce(query);
+  const debouncedQuery = useDebouncedValue(query);
 
   useEffect(() => {
     setQueryParams({ query: debouncedQuery });

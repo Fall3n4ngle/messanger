@@ -29,8 +29,6 @@ type Props = {
 export default function UserButton({ image, name, clerkId }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
-  console.log(usersIds);
-  
 
   const isActive = userId && usersIds.includes(userId);
 
