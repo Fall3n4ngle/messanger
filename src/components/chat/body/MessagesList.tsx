@@ -18,11 +18,13 @@ export type Message = {
   content: string | null;
   file: string | null;
   updatedAt: Date;
-  sentBy: {
-    image: string | null;
-    name: string;
-    clerkId: string;
-  } | null;
+  member: {
+    user: {
+      image: string | null;
+      name: string;
+      clerkId: string;
+    };
+  };
 };
 
 type Props = {
@@ -83,8 +85,8 @@ export default function MessagesList({
         {data?.pages.map((group, id) => (
           <Fragment key={id}>
             {group.map((message) => {
-              if (!message.sentBy) return;
-              const { clerkId } = message.sentBy;
+              if (!message.member.user) return;
+              const { clerkId } = message.member.user;
               const isOwn = clerkId === userId;
               const isActive = usersIds.includes(clerkId);
 

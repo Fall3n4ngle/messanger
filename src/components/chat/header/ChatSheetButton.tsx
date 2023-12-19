@@ -19,12 +19,12 @@ import DeleteConversationButton from "./DeleteConversationButton";
 import LeaveConversationButton from "./LeaveConversationButton";
 import { useAuth } from "@clerk/nextjs";
 import { useActiveUsers } from "@/store";
-import { Member } from ".";
+import { TMember } from ".";
 
 export type ChatSheetProps = {
   conversationId: string;
   name: string;
-  members: Member[];
+  members: TMember[];
 };
 
 export default function ChatSheetButton({
@@ -58,7 +58,8 @@ export default function ChatSheetButton({
         </SheetHeader>
         <div className="pt-6">
           <ul className="flex flex-col gap-2 mb-6">
-            {members.map(({ id, clerkId, ...props }) => {
+            {members.map(({ id, user }) => {
+              const { clerkId, ...props } = user;
               const isActive = usersIds.includes(clerkId);
 
               return (

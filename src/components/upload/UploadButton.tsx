@@ -58,7 +58,7 @@ export default function UploadButton({
           size: "icon",
           variant: "secondary",
         }),
-        "cursor-pointer",
+        "cursor-pointer !mt-0",
         disabled && "cursor-default opacity-50",
         className
       )}

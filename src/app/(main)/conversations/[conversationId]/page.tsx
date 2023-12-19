@@ -16,7 +16,7 @@ export default async function Conversation({
 }: Props) {
   const { userId } = auth();
 
-  if (!userId) redirect("/sign-in");
+  if (!userId) redirect("/sign-in")
 
   const conversationPromise = getConversationById(conversationId);
   const messagesPromise = getMessages({ conversationId, take: -25 });
@@ -31,7 +31,7 @@ export default async function Conversation({
   if (!conversation) notFound();
   if (!user) redirect("/onboarding");
 
-  const { id, name, image, isGroup, users } = conversation;
+  const { id, name, image, isGroup, members } = conversation;
 
   return (
     <div className="w-full h-screen">
@@ -41,8 +41,8 @@ export default async function Conversation({
           name={name}
           image={image}
           isGroup={isGroup}
-          usersCount={users.length}
-          members={users}
+          usersCount={members.length}
+          members={members}
         />
         <MessagesList initialMessages={messages} conversationId={id} />
         <div className="max-w-[1000px] self-center w-full">

@@ -6,6 +6,7 @@ import { getUserAuth } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import { getUserByClerkId } from "../user/queries";
 import { revalidatePath } from "next/cache";
+import { MemberRole } from "@prisma/client";
 
 export const upsertConversation = async (fields: ConversationFields) => {
   const result = conversationSchema.safeParse(fields);
@@ -21,21 +22,30 @@ export const upsertConversation = async (fields: ConversationFields) => {
       const currentUser = await getUserByClerkId(session.user.id);
       if (!currentUser) redirect("/onboarding");
 
+      const mappedMembers = members
+        .map((member) => ({
+          userId: member.id,
+          role: "VIEW" as MemberRole,
+        }))
+        .concat({
+          userId: currentUser.id,
+          role: "ADMIN",
+        });
+
       const newConversations = await db.conversation.upsert({
         where: { id },
         create: {
           isGroup,
-          creatorId: currentUser.id,
+          userId: currentUser.id,
           ...values,
-          users: {
-            connect: members.concat({ id: currentUser.id }),
+          members: {
+            createMany: {
+              data: mappedMembers,
+            },
           },
         },
         update: {
           ...values,
-          users: {
-            connect: members.concat({ id: currentUser.id }),
-          },
         },
       });
 
@@ -80,20 +90,32 @@ export const leaveConversation = async ({
   userClerkId,
 }: Props) => {
   try {
-    const user = await db.user.update({
-      where: { clerkId: userClerkId },
+    const user = await getUserByClerkId(userClerkId);
+    if (!user) redirect("/onboarding");
+
+    const member = await db.member.findFirst({
+      where: {
+        userId: user.id,
+        conversationId: conversationId,
+      },
+    });
+
+    if (!member) {
+      return { succes: false, error: "Member not found" };
+    }
+
+    const updatedMember = await db.member.update({
+      where: {
+        id: member.id,
+      },
       data: {
-        conversation: {
-          disconnect: {
-            id: conversationId,
-          },
-        },
+        conversationId: null,
       },
     });
 
     revalidatePath("/conversations");
 
-    return { success: true, data: user };
+    return { success: true, data: updatedMember };
   } catch (error) {
     const message = (error as Error).message ?? "Failed to delete conversation";
     console.log(message);

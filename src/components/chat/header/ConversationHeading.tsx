@@ -28,7 +28,7 @@ export default function ConversationHeading({
     pusherClient.subscribe(conversationId);
 
     const handleAddUser = (user: TypingUser) => {
-      if (userId === user.clerkId) return;
+      if (user.clerkId === userId) return;
       add(user.userName);
     };
 
@@ -45,7 +45,7 @@ export default function ConversationHeading({
       pusherClient.unbind("start_typing", handleAddUser);
       pusherClient.unbind("user:stop_typing", handleRemoveUser);
     };
-  }, [conversationId, add, userId, remove]);
+  }, [conversationId, add, remove, userId]);
 
   return (
     <div className="flex gap-3 items-center">

@@ -1,12 +1,14 @@
+import { Member } from "@prisma/client";
 import ChatSheetButton from "./ChatSheetButton";
 import ConversationHeading from "./ConversationHeading";
 import MediaRoomButton from "./MediaRoomButton";
 
-export type Member = {
-  id: string;
-  name: string;
-  image: string | null;
-  clerkId: string;
+export type TMember = Member & {
+  user: {
+    name: string;
+    image: string | null;
+    clerkId: string;
+  };
 };
 
 type Props = {
@@ -15,7 +17,7 @@ type Props = {
   usersCount: number;
   image: string | null;
   isGroup: boolean;
-  members: Member[];
+  members: TMember[];
 };
 
 export default function ChatHeader({

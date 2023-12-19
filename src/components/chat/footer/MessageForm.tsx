@@ -145,9 +145,9 @@ export default function MessageForm({ conversationId, userName }: Props) {
                 <FormLabel className="sr-only">Attach image</FormLabel>
                 <TooltipProvider delayDuration={300}>
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                       <UploadButton
-                        className="rounded-full !mt-0"
+                        className="rounded-full"
                         onUploadError={handleUploadError}
                         onBeforeUploadBegin={(files) => {
                           setIsUploading(true);

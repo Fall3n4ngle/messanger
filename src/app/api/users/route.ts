@@ -1,5 +1,5 @@
 import { getUsers } from "@/lib/actions/user/queries";
-import { getUserAuth } from "@/lib/utils";
+import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -8,10 +8,10 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get("query") ?? "";
 
-    const { session } = await getUserAuth();
-    if (!session) redirect("/sign-in");
+    const { userId } = auth();
+    if (!userId) redirect("/sign-in");
 
-    const data = await getUsers({ query, currentUserClerkId: session.user.id });
+    const data = await getUsers({ query, currentUserClerkId: userId });
 
     return NextResponse.json(data);
   } catch (error) {

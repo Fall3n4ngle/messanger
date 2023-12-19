@@ -21,24 +21,45 @@ export const upsertMessage = async (fields: MessageFields) => {
       const currentUser = await getUserByClerkId(session.user.id);
       if (!currentUser) redirect("/onboarding");
 
+      if (!currentUser) redirect("/onboarding");
+
+      const conversation = await db.conversation.findFirst({
+        where: { id: conversationId },
+        include: {
+          members: true,
+        },
+      });
+
+      if (!conversation) {
+        return { success: false, error: "Conversation not found" };
+      }
+
+      const member = conversation.members.find(
+        (member) => member.userId === currentUser.id
+      );
+
+      if (!member) {
+        return { success: false, error: "Member not found" };
+      }
+
       const upsertedMessage = await db.message.upsert({
         where: { id: id ?? "" },
-        create: { ...data, conversationId, senderId: currentUser.id },
+        create: {
+          conversationId,
+          memberId: member.id,
+          ...data,
+        },
         update: data,
-        select: {
-          content: true,
-          file: true,
-          id: true,
-          seenBy: {
-            select: {
-              id: true,
-            },
-          },
-          sentBy: {
-            select: {
-              name: true,
-              image: true,
-              clerkId: true,
+        include: {
+          member: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                  image: true,
+                  clerkId: true,
+                },
+              },
             },
           },
         },
@@ -53,7 +74,7 @@ export const upsertMessage = async (fields: MessageFields) => {
         },
         include: {
           messages: true,
-          users: true,
+          members: true,
         },
       });
 

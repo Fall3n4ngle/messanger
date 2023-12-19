@@ -19,11 +19,25 @@ export const getMessages = async ({
     where: {
       conversationId,
     },
+    select: {
+      id: true,
+      content: true,
+      file: true,
+      updatedAt: true,
+      member: {
+        select: {
+          user: {
+            select: {
+              image: true,
+              name: true,
+              clerkId: true,
+            },
+          },
+        },
+      },
+    },
     orderBy: {
       createdAt: "asc",
-    },
-    include: {
-      sentBy: true,
     },
     cursor,
     take,

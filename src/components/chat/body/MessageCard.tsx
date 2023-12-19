@@ -13,11 +13,11 @@ export default function MessageCard({
   content,
   file,
   updatedAt,
-  sentBy,
+  member,
   isOwn,
   isActive,
 }: Props) {
-  const { image, name } = sentBy!;
+  const { image, name } = member.user;
 
   return (
     <div className={cn("flex gap-3", isOwn && "justify-end")}>

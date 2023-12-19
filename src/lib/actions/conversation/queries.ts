@@ -19,15 +19,15 @@ export const getUserConversations = async ({
 
   const convsersations = await db.conversation.findMany({
     where: {
-      users: {
+      members: {
         some: {
-          id: currentUserId,
+          userId: currentUserId,
         },
       },
       name: {
         contains: query,
-        mode: "insensitive"
-      }
+        mode: "insensitive",
+      },
     },
     orderBy: {
       lastMessageAt: "desc",
@@ -48,8 +48,18 @@ export const getConversationById = async (conversationId: string) => {
       name: true,
       image: true,
       isGroup: true,
-      creatorId: true,
-      users: true,
+      userId: true,
+      members: {
+        include: {
+          user: {
+            select: {
+              name: true,
+              image: true,
+              clerkId: true,
+            },
+          },
+        },
+      },
     },
   });
 
