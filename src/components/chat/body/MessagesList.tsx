@@ -12,13 +12,18 @@ import MessageCard from "./MessageCard";
 import { pusherClient } from "@/lib/pusher/client";
 import { useAuth } from "@clerk/nextjs";
 import { useActiveUsers } from "@/store";
+import { MemberRole } from "@prisma/client";
+import MessageCardWithControls from "./MessageCardWithControls";
 
 export type Message = {
   id: string;
   content: string | null;
   file: string | null;
   updatedAt: Date;
+  conversationId: string;
   member: {
+    id: string;
+    role: MemberRole;
     user: {
       image: string | null;
       name: string;
@@ -91,7 +96,7 @@ export default function MessagesList({
               const isActive = usersIds.includes(clerkId);
 
               return (
-                <MessageCard
+                <MessageCardWithControls
                   key={message.id}
                   isOwn={isOwn}
                   isActive={isActive}
@@ -164,11 +169,40 @@ const usePusherMessages = ({ conversationId }: { conversationId: string }) => {
       );
     };
 
+    const handleDeleteMessage = ({ id }: { id: string }) => {
+      queryClient.setQueryData(
+        ["messages", conversationId],
+        (oldData: InfiniteData<Message[], unknown>) => {
+          let found = false;
+          const newData = {
+            ...oldData,
+            pages: oldData.pages.map((page) => {
+              if (found) return page;
+
+              const newPage = page.filter((message) => {
+                if (message.id === id) {
+                  found = true;
+                  return false;
+                }
+                
+                return true;
+              });
+
+              return newPage;
+            }),
+          };
+          return newData;
+        }
+      );
+    };
+
     pusherClient.bind("messages:new", handleNewMessage);
+    pusherClient.bind("messages:delete", handleDeleteMessage);
 
     return () => {
       pusherClient.unsubscribe(conversationId);
       pusherClient.unbind("messages:new", handleNewMessage);
+      pusherClient.unbind("messages:delete", handleDeleteMessage);
     };
   }, [conversationId, queryClient]);
 };

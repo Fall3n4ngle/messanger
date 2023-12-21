@@ -24,8 +24,11 @@ export const getMessages = async ({
       content: true,
       file: true,
       updatedAt: true,
+      conversationId: true,
       member: {
         select: {
+          id: true,
+          role: true,
           user: {
             select: {
               image: true,

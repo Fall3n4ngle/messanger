@@ -14,3 +14,4 @@ export * from "./alert-dialog";
 export * from "./sheet";
 export * from "./popover";
 export * from "./command";
+export * from "./context-menu";

@@ -3,7 +3,7 @@ import { Message } from "./MessagesList";
 import { cn, formatDate } from "@/lib/utils";
 import Image from "next/image";
 
-type Props = {
+export type MessageCardPorps = {
   isOwn: boolean;
   isActive: boolean;
 } & Required<Message>;
@@ -16,7 +16,7 @@ export default function MessageCard({
   member,
   isOwn,
   isActive,
-}: Props) {
+}: MessageCardPorps) {
   const { image, name } = member.user;
 
   return (

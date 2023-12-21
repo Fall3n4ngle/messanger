@@ -87,11 +87,18 @@ export const upsertMessage = async (fields: MessageFields) => {
   }
 };
 
-export const deleteMessage = async (messageId: string) => {
+type Props = {
+  id: string;
+  conversationId: string;
+};
+
+export const deleteMessage = async ({ conversationId, id }: Props) => {
   try {
     const deletedMessage = await db.message.delete({
-      where: { id: messageId },
+      where: { id },
     });
+
+    pusherServer.trigger(conversationId, "messages:delete", { id });
 
     return { success: true, data: deletedMessage };
   } catch (error) {
