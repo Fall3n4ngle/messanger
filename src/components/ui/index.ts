@@ -10,5 +10,7 @@ export * from "./form";
 export * from "./tooltip";
 export * from "./dialog";
 export * from "./scroll-area";
-export * from "./alert-dialog"
-export * from "./sheet"
+export * from "./alert-dialog";
+export * from "./sheet";
+export * from "./popover";
+export * from "./command";

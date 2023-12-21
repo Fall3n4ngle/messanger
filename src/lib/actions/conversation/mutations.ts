@@ -64,22 +64,6 @@ export const upsertConversation = async (fields: ConversationFields) => {
   }
 };
 
-export const deleteConversation = async (conversationId: string) => {
-  try {
-    const deletedConversation = await db.conversation.delete({
-      where: { id: conversationId },
-    });
-
-    revalidatePath("/conversations");
-
-    return { success: true, data: deletedConversation };
-  } catch (error) {
-    const message = (error as Error).message ?? "Failed to delete conversation";
-    console.log(message);
-    return { success: false, error: message };
-  }
-};
-
 type Props = {
   conversationId: string;
   userClerkId: string;
