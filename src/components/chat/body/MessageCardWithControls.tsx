@@ -5,8 +5,8 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui";
 import MessageCard, { MessageCardPorps } from "./MessageCard";
-import { Trash2, Pencil } from "lucide-react";
 import DeleteMessageButton from "./DeleteMessageButton";
+import EditMessageButton from "./EditMessageButton";
 
 export default function MessageCardWithControls(props: MessageCardPorps) {
   return (
@@ -24,8 +24,11 @@ export default function MessageCardWithControls(props: MessageCardPorps) {
           />
         </ContextMenuItem>
         <ContextMenuItem>
-          <Pencil className="mr-3 text-primary" />
-          Edit
+          <EditMessageButton
+            id={props.id}
+            content={props.content}
+            file={props.file}
+          />
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

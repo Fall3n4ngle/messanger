@@ -26,7 +26,7 @@ import { messageSchema } from "@/lib/validations/message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image as ImageIcon, Loader2, SendHorizontal } from "lucide-react";
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import TextareaAutosize from "react-textarea-autosize";
@@ -35,6 +35,7 @@ import {
   addTypingUser,
   removeTypingUser,
 } from "@/lib/actions/typingUser/mutations";
+import { useMessage } from "@/store/useMessage";
 
 type Props = {
   conversationId: string;
@@ -46,6 +47,9 @@ type FormFields = z.infer<typeof formSchema>;
 
 export default function MessageForm({ conversationId, userName }: Props) {
   const { toast } = useToast();
+  const {
+    message: { content, file, id },
+  } = useMessage();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -79,7 +83,11 @@ export default function MessageForm({ conversationId, userName }: Props) {
     });
 
   const onSubmit = async (fields: FormFields) => {
-    const result = await upsertMessage({ ...fields, conversationId });
+    const result = await upsertMessage({
+      ...fields,
+      conversationId,
+      id,
+    });
 
     if (result?.success) {
       form.reset();
@@ -94,6 +102,19 @@ export default function MessageForm({ conversationId, userName }: Props) {
       });
     }
   };
+
+  useEffect(() => {
+    if (content) {
+      form.setValue("content", content);
+      form.setFocus("content");
+    }
+  }, [content, form]);
+
+  useEffect(() => {
+    if (file) {
+      form.setValue("file", file);
+    }
+  }, [file, form]);
 
   const handleTypeStart = useThrottledCallback(async () => {
     await addTypingUser({

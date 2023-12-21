@@ -14,6 +14,8 @@ import { useAuth } from "@clerk/nextjs";
 import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
 import MessageCardWithControls from "./MessageCardWithControls";
+import { UpdateMessage } from "@/lib/actions/messages/mutations";
+import { useMessage } from "@/store/useMessage";
 
 export type Message = {
   id: string;
@@ -151,6 +153,7 @@ const useInfiniteMessages = ({ conversationId, initialMessages }: Props) => {
 
 const usePusherMessages = ({ conversationId }: { conversationId: string }) => {
   const queryClient = useQueryClient();
+  const { setMessage } = useMessage();
 
   useEffect(() => {
     pusherClient.subscribe(conversationId);
@@ -174,6 +177,7 @@ const usePusherMessages = ({ conversationId }: { conversationId: string }) => {
         ["messages", conversationId],
         (oldData: InfiniteData<Message[], unknown>) => {
           let found = false;
+
           const newData = {
             ...oldData,
             pages: oldData.pages.map((page) => {
@@ -184,7 +188,7 @@ const usePusherMessages = ({ conversationId }: { conversationId: string }) => {
                   found = true;
                   return false;
                 }
-                
+
                 return true;
               });
 
@@ -196,13 +200,49 @@ const usePusherMessages = ({ conversationId }: { conversationId: string }) => {
       );
     };
 
+    const handleUpdateMessage = ({ id, content, file }: UpdateMessage) => {
+      queryClient.setQueryData(
+        ["messages", conversationId],
+        (oldData: InfiniteData<Message[], unknown>) => {
+          let found = false;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => {
+              if (found) return page;
+
+              const newPage = page.map((message) => {
+                if (message.id === id) {
+                  found = true;
+
+                  return {
+                    ...message,
+                    file,
+                    content,
+                  } as Message;
+                }
+
+                return message;
+              });
+
+              return newPage;
+            }),
+          };
+        }
+      );
+
+      setMessage({ id: undefined, file: "", content: "" });
+    };
+
     pusherClient.bind("messages:new", handleNewMessage);
     pusherClient.bind("messages:delete", handleDeleteMessage);
+    pusherClient.bind("messages:update", handleUpdateMessage);
 
     return () => {
       pusherClient.unsubscribe(conversationId);
       pusherClient.unbind("messages:new", handleNewMessage);
       pusherClient.unbind("messages:delete", handleDeleteMessage);
+      pusherClient.unbind("messages:update", handleUpdateMessage);
     };
-  }, [conversationId, queryClient]);
+  }, [conversationId, queryClient, setMessage]);
 };

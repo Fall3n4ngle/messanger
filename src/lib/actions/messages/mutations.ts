@@ -7,6 +7,12 @@ import { getUserByClerkId } from "../user/queries";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 
+export type UpdateMessage = {
+  id?: string;
+  content: string | null;
+  file: string | null;
+};
+
 export const upsertMessage = async (fields: MessageFields) => {
   const result = messageSchema.safeParse(fields);
 
@@ -65,7 +71,15 @@ export const upsertMessage = async (fields: MessageFields) => {
         },
       });
 
-      pusherServer.trigger(conversationId, "messages:new", upsertedMessage);
+      if (id) {
+        pusherServer.trigger(conversationId, "messages:update", {
+          id: upsertedMessage.id,
+          file: upsertedMessage.file,
+          content: upsertedMessage.content,
+        } as UpdateMessage);
+      } else {
+        pusherServer.trigger(conversationId, "messages:new", upsertedMessage);
+      }
 
       const updatedConversation = await db.conversation.update({
         where: { id: conversationId },
@@ -80,7 +94,7 @@ export const upsertMessage = async (fields: MessageFields) => {
 
       return { success: true, data: upsertedMessage };
     } catch (error) {
-      const message = (error as Error).message ?? "Failed to create message";
+      const message = (error as Error).message ?? "Failed to upsert message";
       console.log(message);
       return { success: false, error: message };
     }
