@@ -5,8 +5,8 @@ import {
   MediaRoomButton,
 } from "@/components/chat/header";
 import { getConversationById } from "@/lib/actions/conversation/queries";
+import { getUserMember } from "@/lib/actions/member/queries";
 import { getMessages } from "@/lib/actions/messages/queries";
-import { getUserByClerkId } from "@/lib/actions/user/queries";
 import { auth } from "@clerk/nextjs";
 import { notFound, redirect } from "next/navigation";
 
@@ -19,22 +19,22 @@ type Props = {
 export default async function Conversation({
   params: { conversationId },
 }: Props) {
-  const { userId } = auth();
+  const { userId: clerkId } = auth();
 
-  if (!userId) redirect("/sign-in");
+  if (!clerkId) redirect("/sign-in");
 
   const conversationPromise = getConversationById(conversationId);
   const messagesPromise = getMessages({ conversationId, take: -25 });
-  const userPromise = getUserByClerkId(userId);
+  const userMemberPromise = getUserMember({ conversationId, clerkId });
 
-  const [conversation, messages, user] = await Promise.all([
+  const [conversation, messages, userMember] = await Promise.all([
     conversationPromise,
     messagesPromise,
-    userPromise,
+    userMemberPromise,
   ]);
 
   if (!conversation) notFound();
-  if (!user) redirect("/onboarding");
+  if (!userMember) redirect("/onboarding");
 
   const {
     id,
@@ -44,6 +44,11 @@ export default async function Conversation({
     members,
     userId: conversationAdminId,
   } = conversation;
+
+  const {
+    role,
+    user: { id: userId, name: userName },
+  } = userMember;
 
   return (
     <div className="w-full h-screen">
@@ -62,15 +67,19 @@ export default async function Conversation({
                 members={members}
                 name={name}
                 conversationId={conversationId}
-                currentUserId={user.id}
+                currentUserId={userId}
                 conversationAdminId={conversationAdminId}
               />
             </div>
           </div>
         </div>
-        <MessagesList initialMessages={messages} conversationId={id} />
+        <MessagesList
+          initialMessages={messages}
+          conversationId={id}
+          memberRole={role}
+        />
         <div className="max-w-[1000px] self-center w-full">
-          <MessageForm conversationId={id} userName={user.name} />
+          <MessageForm conversationId={id} userName={userName} />
         </div>
       </div>
     </div>

@@ -26,7 +26,7 @@ import { messageSchema } from "@/lib/validations/message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image as ImageIcon, Loader2, SendHorizontal } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import TextareaAutosize from "react-textarea-autosize";

@@ -37,6 +37,7 @@ export type Message = {
 type Props = {
   initialMessages: Message[];
   conversationId: string;
+  memberRole: MemberRole;
 };
 
 const take = 25;
@@ -44,6 +45,7 @@ const take = 25;
 export default function MessagesList({
   conversationId,
   initialMessages,
+  memberRole,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -97,8 +99,19 @@ export default function MessagesList({
               const isOwn = clerkId === userId;
               const isActive = usersIds.includes(clerkId);
 
+              if (memberRole !== "VIEW" || isOwn) {
+                return (
+                  <MessageCardWithControls
+                    key={message.id}
+                    isOwn={isOwn}
+                    isActive={isActive}
+                    {...message}
+                  />
+                );
+              }
+
               return (
-                <MessageCardWithControls
+                <MessageCard
                   key={message.id}
                   isOwn={isOwn}
                   isActive={isActive}
@@ -114,7 +127,10 @@ export default function MessagesList({
   );
 }
 
-const useInfiniteMessages = ({ conversationId, initialMessages }: Props) => {
+const useInfiniteMessages = ({
+  conversationId,
+  initialMessages,
+}: Omit<Props, "memberRole">) => {
   const getData = async ({ pageParam }: { pageParam?: string }) => {
     const messages = await getMessages({
       conversationId,
