@@ -6,16 +6,20 @@ import ConversationCard from "./ConversationCard";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { getUserConversations } from "@/lib/actions/conversation/queries";
 import { Fragment, useEffect } from "react";
+import { pusherClient } from "@/lib/pusher/client";
 
 type Conversation = {
   id: string;
   name: string;
   image: string | null;
   lastMessageAt: Date;
-  createdAt: Date;
 };
 
 type Props = {
@@ -37,33 +41,13 @@ export default function ConversationsList({
     threshold: 0,
   });
 
-  const getData = async ({ pageParam }: { pageParam?: Date }) => {
-    const conversations = await getUserConversations({
-      currentUserId,
-      query: query ?? "",
-      lastCursor: pageParam,
-      take,
-    });
-
-    return conversations;
-  };
-
-  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
-    queryKey: ["conversations", query],
-    queryFn: getData,
-    initialPageParam: undefined,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length < take) {
-        return;
-      }
-
-      return lastPage[lastPage.length - 1].createdAt;
-    },
-    initialData: {
-      pages: [intialConversations],
-      pageParams: [undefined],
-    },
+  const { data, fetchNextPage, hasNextPage } = useInfiniteConversations({
+    currentUserId,
+    query,
+    intialConversations,
   });
+
+  usePusherConversations({ currentUserId, query });
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -103,3 +87,80 @@ export default function ConversationsList({
     </ScrollArea>
   );
 }
+
+type UseInfiniteConversationsProps = {
+  currentUserId: string;
+  query: string | null;
+  intialConversations: Conversation[];
+};
+
+const useInfiniteConversations = ({
+  query,
+  currentUserId,
+  intialConversations,
+}: UseInfiniteConversationsProps) => {
+  const getData = async ({ pageParam }: { pageParam?: Date }) => {
+    const conversations = await getUserConversations({
+      currentUserId,
+      query: query ?? "",
+      lastCursor: pageParam,
+      take,
+    });
+
+    return conversations;
+  };
+
+  return useInfiniteQuery({
+    queryKey: ["conversations", query],
+    queryFn: getData,
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.length < take) {
+        return;
+      }
+
+      return lastPage[lastPage.length - 1].lastMessageAt;
+    },
+    initialData: {
+      pages: [intialConversations],
+      pageParams: [undefined],
+    },
+  });
+};
+
+type UsePusherConversationsProps = {
+  currentUserId: string;
+  query: string | null;
+};
+
+const usePusherConversations = ({
+  currentUserId,
+  query,
+}: UsePusherConversationsProps) => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    pusherClient.subscribe(currentUserId);
+
+    const handleNewConversation = (newConversation: Conversation) => {
+      queryClient.setQueryData(
+        ["conversations", query],
+        ({ pageParams, pages }: InfiniteData<Conversation[], unknown>) => {
+          return {
+            pages: pages.map((page, index) =>
+              index === pages.length - 1 ? [...page, newConversation] : page
+            ),
+            pageParams,
+          };
+        }
+      );
+    };
+
+    pusherClient.bind("conversation:new", handleNewConversation);
+
+    return () => {
+      pusherClient.unsubscribe(currentUserId);
+      pusherClient.unbind("conversation:new", handleNewConversation);
+    };
+  }, [currentUserId, queryClient, query]);
+};

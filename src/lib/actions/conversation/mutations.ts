@@ -7,13 +7,14 @@ import { redirect } from "next/navigation";
 import { getUserByClerkId } from "../user/queries";
 import { revalidatePath } from "next/cache";
 import { MemberRole } from "@prisma/client";
+import { pusherServer } from "@/lib/pusher/server";
 
 export const upsertConversation = async (fields: ConversationFields) => {
   const result = conversationSchema.safeParse(fields);
 
   if (result.success) {
     const {
-      data: { id, members, isGroup, ...values },
+      data: { id, members: newMembers, ...values },
     } = result;
     try {
       const { session } = await getUserAuth();
@@ -22,7 +23,7 @@ export const upsertConversation = async (fields: ConversationFields) => {
       const currentUser = await getUserByClerkId(session.user.id);
       if (!currentUser) redirect("/onboarding");
 
-      const mappedMembers = members
+      const mappedMembers = newMembers
         .map((member) => ({
           userId: member.id,
           role: "VIEW" as MemberRole,
@@ -32,10 +33,9 @@ export const upsertConversation = async (fields: ConversationFields) => {
           role: "ADMIN",
         });
 
-      const newConversations = await db.conversation.upsert({
+      const upsertedConversation = await db.conversation.upsert({
         where: { id },
         create: {
-          isGroup,
           userId: currentUser.id,
           ...values,
           members: {
@@ -47,11 +47,34 @@ export const upsertConversation = async (fields: ConversationFields) => {
         update: {
           ...values,
         },
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          lastMessageAt: true,
+          members: {
+            select: {
+              userId: true,
+            },
+          },
+        },
       });
 
-      revalidatePath("/conversations");
+      const { members, ...conversation } = upsertedConversation;
 
-      return { success: true, data: newConversations };
+      const notifyMembers = (key: string) => {
+        members.forEach((member) => {
+          pusherServer.trigger(member.userId, key, conversation);
+        });
+      };
+
+      if (id) {
+        notifyMembers("conversation:update");
+      } else {
+        notifyMembers("conversation:new");
+      }
+
+      return { success: true, data: conversation };
     } catch (error) {
       const message = (error as Error).message ?? "Failed to upsert user";
       console.log(message);
