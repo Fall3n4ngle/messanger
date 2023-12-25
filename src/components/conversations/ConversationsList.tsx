@@ -6,28 +6,16 @@ import ConversationCard from "./ConversationCard";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useInView } from "react-intersection-observer";
-import {
-  InfiniteData,
-  useInfiniteQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { getUserConversations } from "@/lib/actions/conversation/queries";
+import { Conversation } from "./lib/types";
+import { useInfiniteConversations } from "./lib/hooks/useInfiniteConversations";
+import { usePusherConversations } from "./lib/hooks/usePusherConversations";
 import { Fragment, useEffect } from "react";
-import { pusherClient } from "@/lib/pusher/client";
-
-type Conversation = {
-  id: string;
-  name: string;
-  image: string | null;
-  lastMessageAt: Date;
-};
+import { getLastMessageContent } from "./lib/utils/getLastMessageContent";
 
 type Props = {
   intialConversations: Conversation[];
   currentUserId: string;
 };
-
-const take = 25;
 
 export default function ConversationsList({
   intialConversations,
@@ -64,9 +52,13 @@ export default function ConversationsList({
       <ul className="flex flex-col gap-3">
         {data.pages.map((group, id) => (
           <Fragment key={id}>
-            {group.map(({ id, lastMessageAt, ...props }) => {
-              const date = formatDate(lastMessageAt);
+            {group.map(({ id, lastMessage, updatedAt, isGroup, ...props }) => {
+              const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
               const isActive = pathname.includes(id);
+              const lastMessageContent = getLastMessageContent({
+                isGroup,
+                lastMessage,
+              });
 
               return (
                 <li key={id}>
@@ -74,6 +66,7 @@ export default function ConversationsList({
                     <ConversationCard
                       isActive={isActive}
                       lastMessageAt={date}
+                      lastMessageContent={lastMessageContent}
                       {...props}
                     />
                   </Link>
@@ -87,80 +80,3 @@ export default function ConversationsList({
     </ScrollArea>
   );
 }
-
-type UseInfiniteConversationsProps = {
-  currentUserId: string;
-  query: string | null;
-  intialConversations: Conversation[];
-};
-
-const useInfiniteConversations = ({
-  query,
-  currentUserId,
-  intialConversations,
-}: UseInfiniteConversationsProps) => {
-  const getData = async ({ pageParam }: { pageParam?: Date }) => {
-    const conversations = await getUserConversations({
-      currentUserId,
-      query: query ?? "",
-      lastCursor: pageParam,
-      take,
-    });
-
-    return conversations;
-  };
-
-  return useInfiniteQuery({
-    queryKey: ["conversations", query],
-    queryFn: getData,
-    initialPageParam: undefined,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length < take) {
-        return;
-      }
-
-      return lastPage[lastPage.length - 1].lastMessageAt;
-    },
-    initialData: {
-      pages: [intialConversations],
-      pageParams: [undefined],
-    },
-  });
-};
-
-type UsePusherConversationsProps = {
-  currentUserId: string;
-  query: string | null;
-};
-
-const usePusherConversations = ({
-  currentUserId,
-  query,
-}: UsePusherConversationsProps) => {
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    pusherClient.subscribe(currentUserId);
-
-    const handleNewConversation = (newConversation: Conversation) => {
-      queryClient.setQueryData(
-        ["conversations", query],
-        ({ pageParams, pages }: InfiniteData<Conversation[], unknown>) => {
-          return {
-            pages: pages.map((page, index) =>
-              index === pages.length - 1 ? [...page, newConversation] : page
-            ),
-            pageParams,
-          };
-        }
-      );
-    };
-
-    pusherClient.bind("conversation:new", handleNewConversation);
-
-    return () => {
-      pusherClient.unsubscribe(currentUserId);
-      pusherClient.unbind("conversation:new", handleNewConversation);
-    };
-  }, [currentUserId, queryClient, query]);
-};

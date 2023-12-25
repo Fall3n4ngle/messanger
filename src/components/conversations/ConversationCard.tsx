@@ -6,6 +6,7 @@ type Props = {
   image: string | null;
   isActive: boolean;
   lastMessageAt: string;
+  lastMessageContent: JSX.Element;
 };
 
 export default function ConversationCard({
@@ -13,6 +14,7 @@ export default function ConversationCard({
   image,
   isActive,
   lastMessageAt,
+  lastMessageContent
 }: Props) {
   return (
     <div
@@ -33,7 +35,7 @@ export default function ConversationCard({
           {name}
         </h4>
         <p className="text-sm text-muted-foreground whitespace-nowrap">
-          Last message content
+          {lastMessageContent}
         </p>
       </div>
       <time

@@ -29,8 +29,34 @@ export const getUserConversations = async ({
         mode: "insensitive",
       },
     },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      updatedAt: true,
+      isGroup: true,
+      lastMessage: {
+        select: {
+          id: true,
+          content: true,
+          updatedAt: true,
+          file: true,
+          member: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     orderBy: {
-      lastMessageAt: "desc",
+      lastMessage: {
+        updatedAt: "desc",
+      },
     },
     cursor,
     take,

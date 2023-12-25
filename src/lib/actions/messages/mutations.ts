@@ -13,6 +13,20 @@ export type UpdateMessage = {
   file: string | null;
 };
 
+export type NewMessage = {
+  id: string;
+  lastMessage: {
+    id: string;
+    content: string | null;
+    updatedAt: Date;
+    member: {
+      user: {
+        name: string;
+      };
+    };
+  } | null;
+};
+
 export const upsertMessage = async (fields: MessageFields) => {
   const result = messageSchema.safeParse(fields);
 
@@ -84,12 +98,38 @@ export const upsertMessage = async (fields: MessageFields) => {
       const updatedConversation = await db.conversation.update({
         where: { id: conversationId },
         data: {
-          lastMessageAt: new Date(),
+          lastMessageId: upsertedMessage.id,
         },
-        include: {
-          messages: true,
-          members: true,
+        select: {
+          id: true,
+          lastMessage: {
+            select: {
+              id: true,
+              content: true,
+              updatedAt: true,
+              member: {
+                select: {
+                  user: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          members: {
+            select: {
+              userId: true,
+            },
+          },
         },
+      });
+
+      const { members, ...values } = updatedConversation;
+
+      members.forEach((member) => {
+        pusherServer.trigger(member.userId, "conversation:new_message", values);
       });
 
       return { success: true, data: upsertedMessage };

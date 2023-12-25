@@ -1,6 +1,6 @@
 "use client";
 
-import { upsertConversation } from "@/lib/actions/conversation/mutations";
+import { upsertGroup } from "@/lib/actions/conversation/mutations";
 import { useToast } from "@/lib/hooks";
 import { conversationSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -64,7 +64,7 @@ export default function GroupForm({
   });
 
   async function onSubmit(fields: FormFields) {
-    const result = await upsertConversation({ ...fields, id, isGroup: true });
+    const result = await upsertGroup({ ...fields, id, isGroup: true });
 
     if (result?.success) {
       toast({

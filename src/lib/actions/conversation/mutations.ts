@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 import { MemberRole } from "@prisma/client";
 import { pusherServer } from "@/lib/pusher/server";
 
-export const upsertConversation = async (fields: ConversationFields) => {
+export const upsertGroup = async (fields: ConversationFields) => {
   const result = conversationSchema.safeParse(fields);
 
   if (result.success) {
@@ -51,7 +51,7 @@ export const upsertConversation = async (fields: ConversationFields) => {
           id: true,
           name: true,
           image: true,
-          lastMessageAt: true,
+          lastMessage: true,
           members: {
             select: {
               userId: true,
@@ -124,8 +124,13 @@ export const leaveConversation = async ({
 
     return { success: true, data: updatedMember };
   } catch (error) {
-    const message = (error as Error).message ?? "Failed to delete conversation";
+    const message = (error as Error).message ?? "Failed to leave conversation";
     console.log(message);
     return { success: false, error: message };
   }
+};
+
+const createConversation = async ({ companionId }: { companionId: string }) => {
+  try {
+  } catch (error) {}
 };
