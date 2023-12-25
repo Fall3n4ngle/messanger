@@ -1,8 +1,8 @@
 "use client";
 
-import { useLinks } from "@/lib/hooks";
 import NavigationItem from "./NavigationItem";
 import UserButton from "./UserButton";
+import { useLinks } from "./lib/hooks/useLinks";
 
 type Props = {
   name: string;

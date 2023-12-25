@@ -1,2 +1,2 @@
 export * from "./useActiveUsers";
-export * from "./useTypingUsers";
+export * from "./useMessage";

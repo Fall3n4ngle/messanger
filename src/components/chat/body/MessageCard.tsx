@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
-import { Message } from "./MessagesList";
 import { cn, formatDate } from "@/lib/utils";
 import Image from "next/image";
+import { Message } from "./lib/types";
 
 export type MessageCardPorps = {
   isOwn: boolean;
@@ -9,7 +9,6 @@ export type MessageCardPorps = {
 } & Required<Message>;
 
 export default function MessageCard({
-  id,
   content,
   file,
   updatedAt,

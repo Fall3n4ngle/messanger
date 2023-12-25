@@ -1,9 +1,10 @@
-import { MessageForm, MessagesList } from "@/components/chat";
 import {
+  MessageForm,
+  MessagesList,
   ChatSheetButton,
   ConversationHeading,
   MediaRoomButton,
-} from "@/components/chat/header";
+} from "@/components/chat";
 import { getConversationById } from "@/lib/actions/conversation/queries";
 import { getUserMember } from "@/lib/actions/member/queries";
 import { getMessages } from "@/lib/actions/messages/queries";

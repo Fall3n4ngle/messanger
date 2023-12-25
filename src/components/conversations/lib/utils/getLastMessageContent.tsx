@@ -9,9 +9,7 @@ type Props = {
 export const getLastMessageContent = ({ isGroup, lastMessage }: Props) => {
   if (!lastMessage) {
     return (
-      <span className="text-muted-foreground">
-        Conversation was started
-      </span>
+      <span className="text-muted-foreground">Conversation was started</span>
     );
   }
 
@@ -21,7 +19,9 @@ export const getLastMessageContent = ({ isGroup, lastMessage }: Props) => {
   const { content, file, member } = lastMessage;
 
   if (isGroup) {
-    sender = <span className="text-primary">{member.user.name}:</span>;
+    sender = (
+      <span className="text-primary font-semibold">{member.user.name}:</span>
+    );
   }
 
   if (file) {

@@ -4,11 +4,10 @@ import { Fragment, useEffect } from "react";
 import { UserCard } from "../common";
 import { ScrollArea } from "../ui";
 import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { getUsers } from "@/lib/actions/user/queries";
 import { useAuth } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import { useActiveUsers } from "@/store";
+import { useInfiniteUsers } from "./lib/hooks/useInfiniteUsers";
 
 type User = {
   id: string;
@@ -22,8 +21,6 @@ type Props = {
   query?: string;
 };
 
-const take = 25;
-
 export default function UsersList({ initialUsers, query }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
@@ -32,33 +29,11 @@ export default function UsersList({ initialUsers, query }: Props) {
     threshold: 1,
   });
 
-  const getData = async ({ pageParam }: { pageParam?: string }) => {
-    const users = await getUsers({
-      currentUserClerkId: userId!,
-      lastCursor: pageParam,
-      query,
-      take,
-    });
-
-    return users;
-  };
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ["users", query],
-      queryFn: getData,
-      initialPageParam: undefined,
-      getNextPageParam: (lastPage) => {
-        if (lastPage.length < take) {
-          return;
-        }
-
-        return lastPage[lastPage.length - 1].id;
-      },
-      initialData: {
-        pages: [initialUsers],
-        pageParams: [undefined],
-      },
+    useInfiniteUsers({
+      userId: userId!,
+      initialUsers,
+      query,
     });
 
   useEffect(() => {

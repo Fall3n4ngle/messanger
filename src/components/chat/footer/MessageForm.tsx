@@ -128,7 +128,7 @@ export default function MessageForm({ conversationId, userName }: Props) {
       conversationId,
       userName,
     });
-  }, 1500);
+  }, 500);
 
   const { isSubmitting } = form.formState;
   const url = form.watch("file");
