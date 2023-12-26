@@ -1,12 +1,13 @@
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui";
+import { ReactNode } from "react";
 
 type Props = {
   name: string;
   image: string | null;
   isActive: boolean;
   lastMessageAt: string;
-  lastMessageContent: JSX.Element;
+  lastMessageContent: ReactNode;
 };
 
 export default function ConversationCard({
@@ -14,7 +15,7 @@ export default function ConversationCard({
   image,
   isActive,
   lastMessageAt,
-  lastMessageContent
+  lastMessageContent,
 }: Props) {
   return (
     <div

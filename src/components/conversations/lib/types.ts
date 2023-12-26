@@ -5,6 +5,7 @@ export type LastMessage = {
   file: string | null;
   member: {
     user: {
+      clerkId: string;
       name: string;
     };
   };

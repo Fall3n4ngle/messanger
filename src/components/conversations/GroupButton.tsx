@@ -42,8 +42,8 @@ export default function GroupButton() {
           </DialogDescription>
         </DialogHeader>
         <GroupForm
-          successMessage="Conversation created successfully"
-          errorMessage="Failed to create conversation"
+          successMessage="Group created successfully"
+          errorMessage="Failed to create group"
         />
       </DialogContent>
     </Dialog>

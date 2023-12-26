@@ -15,6 +15,7 @@ export interface CompleteMessage extends z.infer<typeof messageSchema> {
   conversation: CompleteConversation
   lastMessageOf?: CompleteConversation | null
   member: CompleteMember
+  seenBy: CompleteMember[]
 }
 
 /**
@@ -26,4 +27,5 @@ export const relatedMessageSchema: z.ZodSchema<CompleteMessage> = z.lazy(() => m
   conversation: relatedConversationSchema,
   lastMessageOf: relatedConversationSchema.nullish(),
   member: relatedMemberSchema,
+  seenBy: relatedMemberSchema.array(),
 }))

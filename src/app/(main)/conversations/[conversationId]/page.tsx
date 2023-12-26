@@ -37,18 +37,11 @@ export default async function Conversation({
   if (!conversation) notFound();
   if (!userMember) redirect("/onboarding");
 
-  const {
-    id,
-    name,
-    image,
-    isGroup,
-    members,
-    userId: conversationAdminId,
-  } = conversation;
+  const { id, name, image, isGroup, members } = conversation;
 
   const {
     role,
-    user: { id: userId, name: userName },
+    user: { name: userName },
   } = userMember;
 
   return (
@@ -68,8 +61,9 @@ export default async function Conversation({
                 members={members}
                 name={name}
                 conversationId={conversationId}
-                currentUserId={userId}
-                conversationAdminId={conversationAdminId}
+                isGroup={isGroup}
+                memberRole={role}
+                image={image}
               />
             </div>
           </div>

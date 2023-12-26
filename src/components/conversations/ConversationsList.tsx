@@ -11,6 +11,7 @@ import { useInfiniteConversations } from "./lib/hooks/useInfiniteConversations";
 import { usePusherConversations } from "./lib/hooks/usePusherConversations";
 import { Fragment, useEffect } from "react";
 import { getLastMessageContent } from "./lib/utils/getLastMessageContent";
+import { useAuth } from "@clerk/nextjs";
 
 type Props = {
   intialConversations: Conversation[];
@@ -24,6 +25,7 @@ export default function ConversationsList({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
+  const { userId } = useAuth();
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 0,
@@ -58,6 +60,7 @@ export default function ConversationsList({
               const lastMessageContent = getLastMessageContent({
                 isGroup,
                 lastMessage,
+                currentUserClerkId: userId,
               });
 
               return (

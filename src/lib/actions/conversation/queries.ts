@@ -45,6 +45,7 @@ export const getUserConversations = async ({
             select: {
               user: {
                 select: {
+                  clerkId: true,
                   name: true,
                 },
               },
@@ -74,11 +75,11 @@ export const getConversationById = async (conversationId: string) => {
       name: true,
       image: true,
       isGroup: true,
-      userId: true,
       members: {
         include: {
           user: {
             select: {
+              id: true,
               name: true,
               image: true,
               clerkId: true,

@@ -122,6 +122,27 @@ export const leaveConversation = async ({
 
     revalidatePath("/conversations");
 
+    const conversation = await db.conversation.findFirst({
+      where: {
+        id: conversationId,
+      },
+      select: {
+        members: {
+          select: {
+            _count: true,
+          },
+        },
+      },
+    });
+
+    if (conversation?.members.length === 0) {
+      await db.conversation.delete({
+        where: {
+          id: conversationId,
+        },
+      });
+    }
+
     return { success: true, data: updatedMember };
   } catch (error) {
     const message = (error as Error).message ?? "Failed to leave conversation";

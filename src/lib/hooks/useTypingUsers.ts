@@ -14,25 +14,28 @@ export const useTypingUsers = ({ conversationId }: Props) => {
   useEffect(() => {
     pusherClient.subscribe(conversationId);
 
-    const handleAddUser = (user: TypingUser) => {
-      if (user.clerkId === userId) return;
-      setTypingUsers((prev) => [...prev, user.userName]);
+    const handleStartTyping = (user: TypingUser) => {
+      if (!userId || user.clerkId === userId) return;
+      setTypingUsers((prev) => {
+        if (prev.find((u) => u === user.userName)) return prev;
+        return [...prev, user.userName];
+      });
     };
 
-    const handleRemoveUser = ({ userName }: { userName: string }) => {
+    const handleStopTyping = ({ userName }: { userName: string }) => {
       setTypingUsers((prev) => prev.filter((u) => u !== userName));
     };
 
-    pusherClient.bind("user:start_typing", handleAddUser);
+    pusherClient.bind("user:start_typing", handleStartTyping);
 
-    pusherClient.bind("user:stop_typing", handleRemoveUser);
+    pusherClient.bind("user:stop_typing", handleStopTyping);
 
     return () => {
       pusherClient.unsubscribe(conversationId);
-      pusherClient.unbind("start_typing", handleAddUser);
-      pusherClient.unbind("user:stop_typing", handleRemoveUser);
+      pusherClient.unbind("start_typing", handleStartTyping);
+      pusherClient.unbind("user:stop_typing", handleStopTyping);
     };
-  }, [conversationId, userId]);
+  }, [conversationId, userId, typingUsers]);
 
   return typingUsers;
 };

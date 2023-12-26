@@ -22,9 +22,11 @@ import { useActiveUsers } from "@/store";
 import MemberRoles from "./MemberRoles";
 import { Member, MemberRole } from "@prisma/client";
 import { memberRoles } from "@/lib/const/memberRoles";
+import EditGroupButton from "./EditGroupButton";
 
 type TMember = Member & {
   user: {
+    id: string;
     name: string;
     image: string | null;
     clerkId: string;
@@ -35,16 +37,18 @@ export type ChatSheetProps = {
   conversationId: string;
   name: string;
   members: TMember[];
-  currentUserId: string;
-  conversationAdminId: string;
+  isGroup: boolean;
+  memberRole: MemberRole;
+  image: string | null;
 };
 
 export default function ChatSheetButton({
   members,
   name,
   conversationId,
-  currentUserId,
-  conversationAdminId,
+  isGroup,
+  memberRole,
+  image,
 }: ChatSheetProps) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
@@ -56,7 +60,7 @@ export default function ChatSheetButton({
 
     if (role === "ADMIN") {
       rightSide = <div className="w-[100px] text-center">Admin</div>;
-    } else if (currentUserId === conversationAdminId) {
+    } else if (memberRole === "ADMIN") {
       rightSide = (
         <MemberRoles id={id} role={role} conversationId={conversationId} />
       );
@@ -67,6 +71,16 @@ export default function ChatSheetButton({
 
     return rightSide;
   };
+
+  const defaultMembers = members
+    .filter((member) => member.role !== "ADMIN")
+    .map((member) => ({
+      value: member.user.id,
+      label: member.user.name,
+      image: member.user.image ?? "",
+    }));
+
+  const canEdit = isGroup && memberRole === "ADMIN";
 
   return (
     <Sheet>
@@ -108,11 +122,19 @@ export default function ChatSheetButton({
               })}
             </ul>
           </ScrollArea>
-          <div>
+          <div className="flex items-center gap-3">
             <LeaveConversationButton
               conversationId={conversationId}
               userClerkId={userId}
             />
+            {canEdit && (
+              <EditGroupButton
+                name={name}
+                image={image}
+                members={defaultMembers}
+                conversationId={conversationId}
+              />
+            )}
           </div>
         </div>
       </SheetContent>

@@ -19,6 +19,7 @@ export type NewMessage = {
     id: string;
     content: string | null;
     updatedAt: Date;
+    file: string | null;
     member: {
       user: {
         name: string;
@@ -111,6 +112,7 @@ export const upsertMessage = async (fields: MessageFields) => {
                 select: {
                   user: {
                     select: {
+                      clerkId: true,
                       name: true,
                     },
                   },

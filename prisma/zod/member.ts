@@ -12,7 +12,8 @@ export const memberSchema = z.object({
 export interface CompleteMember extends z.infer<typeof memberSchema> {
   user: CompleteUser
   conversation?: CompleteConversation | null
-  messages: CompleteMessage[]
+  sentMessages: CompleteMessage[]
+  seenMessages: CompleteMessage[]
 }
 
 /**
@@ -23,5 +24,6 @@ export interface CompleteMember extends z.infer<typeof memberSchema> {
 export const relatedMemberSchema: z.ZodSchema<CompleteMember> = z.lazy(() => memberSchema.extend({
   user: relatedUserSchema,
   conversation: relatedConversationSchema.nullish(),
-  messages: relatedMessageSchema.array(),
+  sentMessages: relatedMessageSchema.array(),
+  seenMessages: relatedMessageSchema.array(),
 }))

@@ -21,7 +21,7 @@ import FileInput from "../upload/FileInput";
 import UsersSelect from "./UsersSelect";
 import { z } from "zod";
 
-type Member = {
+export type Member = {
   value: string;
   label: string;
   image: string;
@@ -124,6 +124,7 @@ export default function GroupForm({
               <UsersSelect
                 isMulti
                 id="selectMembers"
+                defaultValue={members}
                 onChange={(data) => {
                   const members = data.map(({ value }) => ({ id: value }));
                   field.onChange(members);
