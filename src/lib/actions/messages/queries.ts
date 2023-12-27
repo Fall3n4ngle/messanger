@@ -14,6 +14,7 @@ export const getMessages = async ({
   take,
 }: Props) => {
   const cursor = lastCursor ? { id: lastCursor } : undefined;
+  
 
   const messages = await db.message.findMany({
     where: {
@@ -38,6 +39,17 @@ export const getMessages = async ({
           },
         },
       },
+      seenBy: {
+        select: {
+          id: true,
+          user: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: "asc",
@@ -46,6 +58,7 @@ export const getMessages = async ({
     take,
     skip: cursor ? 1 : 0,
   });
+
 
   return messages;
 };

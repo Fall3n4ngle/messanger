@@ -1,5 +1,13 @@
 import { MemberRole } from "@prisma/client";
 
+type SeenBy = {
+  id: string;
+  user: {
+    name: string;
+    image: string | null;
+  };
+};
+
 export type Message = {
   id: string;
   content: string | null;
@@ -15,4 +23,5 @@ export type Message = {
       clerkId: string;
     };
   };
+  seenBy: SeenBy[];
 };

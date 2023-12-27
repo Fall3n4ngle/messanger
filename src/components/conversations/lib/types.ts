@@ -11,11 +11,16 @@ export type LastMessage = {
   };
 } | null;
 
+type Message = {
+  id: string;
+};
+
 export type Conversation = {
   id: string;
   name: string;
   image: string | null;
   updatedAt: Date;
   lastMessage: LastMessage;
+  messages: Message[];
   isGroup: boolean;
 };

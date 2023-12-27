@@ -24,7 +24,7 @@ export const getLastMessageContent = ({
 
   if (content) {
     const formattedContent = shortenSentence({
-      maxLength: 17,
+      maxLength: 18,
       sentence: content,
     });
 

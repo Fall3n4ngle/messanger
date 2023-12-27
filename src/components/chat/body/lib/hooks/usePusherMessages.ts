@@ -1,9 +1,7 @@
 import { pusherClient } from "@/lib/pusher/client";
 import { useMessage } from "@/store/useMessage";
-import { InfiniteData, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { Message } from "../types";
-import { UpdateMessage } from "@/lib/actions/messages/mutations";
 
 export const usePusherMessages = ({
   conversationId,
@@ -16,91 +14,31 @@ export const usePusherMessages = ({
   useEffect(() => {
     pusherClient.subscribe(conversationId);
 
-    const handleNewMessage = (newMessage: Message) => {
-      queryClient.setQueryData(
-        ["messages", conversationId],
-        ({ pageParams, pages }: InfiniteData<Message[], unknown>) => {
-          return {
-            pages: pages.map((page, index) =>
-              index === pages.length - 1 ? [...page, newMessage] : page
-            ),
-            pageParams,
-          };
-        }
-      );
+    const handleMessageEvent = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["messages", conversationId],
+      });
     };
 
-    const handleDeleteMessage = ({ id }: { id: string }) => {
-      queryClient.setQueryData(
-        ["messages", conversationId],
-        (oldData: InfiniteData<Message[], unknown>) => {
-          let found = false;
-
-          const newData = {
-            ...oldData,
-            pages: oldData.pages.map((page) => {
-              if (found) return page;
-
-              const newPage = page.filter((message) => {
-                if (message.id === id) {
-                  found = true;
-                  return false;
-                }
-
-                return true;
-              });
-
-              return newPage;
-            }),
-          };
-          return newData;
-        }
-      );
-    };
-
-    const handleUpdateMessage = ({ id, content, file }: UpdateMessage) => {
-      queryClient.setQueryData(
-        ["messages", conversationId],
-        (oldData: InfiniteData<Message[], unknown>) => {
-          let found = false;
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => {
-              if (found) return page;
-
-              const newPage = page.map((message) => {
-                if (message.id === id) {
-                  found = true;
-
-                  return {
-                    ...message,
-                    file,
-                    content,
-                  } as Message;
-                }
-
-                return message;
-              });
-
-              return newPage;
-            }),
-          };
-        }
-      );
+    const handleUpdateMessage = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["messages", conversationId],
+      });
 
       setMessage({ id: undefined, file: "", content: "" });
     };
 
-    pusherClient.bind("messages:new", handleNewMessage);
-    pusherClient.bind("messages:delete", handleDeleteMessage);
+    pusherClient.bind("messages:new", handleMessageEvent);
+    pusherClient.bind("messages:delete", handleMessageEvent);
     pusherClient.bind("messages:update", handleUpdateMessage);
+    pusherClient.bind("messages:seen", handleUpdateMessage);
 
     return () => {
       pusherClient.unsubscribe(conversationId);
-      pusherClient.unbind("messages:new", handleNewMessage);
-      pusherClient.unbind("messages:delete", handleDeleteMessage);
+      pusherClient.unbind("messages:new", handleMessageEvent);
+      pusherClient.unbind("messages:delete", handleMessageEvent);
       pusherClient.unbind("messages:update", handleUpdateMessage);
+      pusherClient.unbind("messages:seen", handleUpdateMessage);
     };
   }, [conversationId, queryClient, setMessage]);
 };

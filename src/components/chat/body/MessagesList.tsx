@@ -2,10 +2,9 @@
 
 import { Button, ScrollArea } from "@/components/ui";
 import { Fragment, useEffect, useRef } from "react";
-import MessageCard from "./MessageCard";
 import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
-import MessageCardWithControls from "./MessageCardWithControls";
+import { MessageCard, WithControls, WithSeenOnScroll } from "./messageCard";
 import { Message } from "./lib/types";
 import { useInfiniteMessages } from "./lib/hooks/useInfinteMessages";
 import { usePusherMessages } from "./lib/hooks/usePusherMessages";
@@ -15,12 +14,14 @@ type Props = {
   initialMessages: Message[];
   conversationId: string;
   memberRole: MemberRole;
+  memberId: string;
 };
 
 export default function MessagesList({
   conversationId,
   initialMessages,
   memberRole,
+  memberId,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -38,9 +39,9 @@ export default function MessagesList({
 
   usePusherMessages({ conversationId });
 
-  useEffect(() => {
-    scrollToBottom();
-  }, []);
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, []);
 
   if (!data.pages[0].length) {
     return (
@@ -68,32 +69,57 @@ export default function MessagesList({
       <div className="flex-1 flex flex-col gap-6">
         {data?.pages.map((group, id) => (
           <Fragment key={id}>
-            {group.map((message) => {
-              if (!message.member.user) return;
-              const { clerkId } = message.member.user;
-              const isOwn = clerkId === userId;
-              const isActive = usersIds.includes(clerkId);
+            {group.map(
+              ({ id, member, seenBy, conversationId, updatedAt, ...props }) => {
+                if (!member.user || !userId) return;
+                const { clerkId } = member.user;
+                const isOwn = clerkId === userId;
+                const isActive = usersIds.includes(clerkId);
+                const seenByMember = seenBy.find((m) => m.id === member.id)
+                  ? true
+                  : false;
 
-              if (memberRole !== "VIEW" || isOwn) {
-                return (
-                  <MessageCardWithControls
-                    key={message.id}
+                let result = (
+                  <MessageCard
+                    key={id}
                     isOwn={isOwn}
                     isActive={isActive}
-                    {...message}
+                    updatedAt={updatedAt}
+                    member={member}
+                    {...props}
                   />
                 );
-              }
 
-              return (
-                <MessageCard
-                  key={message.id}
-                  isOwn={isOwn}
-                  isActive={isActive}
-                  {...message}
-                />
-              );
-            })}
+                if (isOwn || memberRole !== "VIEW") {
+                  result = (
+                    <WithControls
+                      conversationId={conversationId}
+                      messageId={id}
+                      key={id}
+                      {...props}
+                    >
+                      {result}
+                    </WithControls>
+                  );
+                }
+
+                if (!isOwn && !seenByMember) {
+                  result = (
+                    <WithSeenOnScroll
+                      memberId={memberId}
+                      messageId={id}
+                      seen={seenByMember}
+                      conversationId={conversationId}
+                      key={id}
+                    >
+                      {result}
+                    </WithSeenOnScroll>
+                  );
+                }
+
+                return result;
+              }
+            )}
           </Fragment>
         ))}
       </div>

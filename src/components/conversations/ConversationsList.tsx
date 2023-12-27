@@ -54,28 +54,39 @@ export default function ConversationsList({
       <ul className="flex flex-col gap-3">
         {data.pages.map((group, id) => (
           <Fragment key={id}>
-            {group.map(({ id, lastMessage, updatedAt, isGroup, ...props }) => {
-              const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
-              const isActive = pathname.includes(id);
-              const lastMessageContent = getLastMessageContent({
-                isGroup,
+            {group.map(
+              ({
+                id,
                 lastMessage,
-                currentUserClerkId: userId,
-              });
+                messages: unreadMessages,
+                updatedAt,
+                isGroup,
+                ...props
+              }) => {
+                const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
+                const isActive = pathname.includes(id);
+                const unreadMessagesCount = unreadMessages.length;
+                const lastMessageContent = getLastMessageContent({
+                  isGroup,
+                  lastMessage,
+                  currentUserClerkId: userId,
+                });
 
-              return (
-                <li key={id}>
-                  <Link href={`/conversations/${id}`}>
-                    <ConversationCard
-                      isActive={isActive}
-                      lastMessageAt={date}
-                      lastMessageContent={lastMessageContent}
-                      {...props}
-                    />
-                  </Link>
-                </li>
-              );
-            })}
+                return (
+                  <li key={id}>
+                    <Link href={`/conversations/${id}`}>
+                      <ConversationCard
+                        isActive={isActive}
+                        lastMessageAt={date}
+                        lastMessageContent={lastMessageContent}
+                        unreadMessagesCount={unreadMessagesCount}
+                        {...props}
+                      />
+                    </Link>
+                  </li>
+                );
+              }
+            )}
           </Fragment>
         ))}
       </ul>

@@ -13,8 +13,13 @@ export type UpdateMessage = {
   file: string | null;
 };
 
+type Message = {
+  id: string;
+};
+
 export type NewMessage = {
   id: string;
+  messages: Message[];
   lastMessage: {
     id: string;
     content: string | null;
@@ -22,6 +27,7 @@ export type NewMessage = {
     file: string | null;
     member: {
       user: {
+        clerkId: string;
         name: string;
       };
     };
@@ -71,14 +77,32 @@ export const upsertMessage = async (fields: MessageFields) => {
           ...data,
         },
         update: data,
-        include: {
+        select: {
+          id: true,
+          content: true,
+          file: true,
+          updatedAt: true,
+          conversationId: true,
           member: {
-            include: {
+            select: {
+              id: true,
+              role: true,
+              user: {
+                select: {
+                  image: true,
+                  name: true,
+                  clerkId: true,
+                },
+              },
+            },
+          },
+          seenBy: {
+            select: {
+              id: true,
               user: {
                 select: {
                   name: true,
                   image: true,
-                  clerkId: true,
                 },
               },
             },
@@ -94,45 +118,49 @@ export const upsertMessage = async (fields: MessageFields) => {
         } as UpdateMessage);
       } else {
         pusherServer.trigger(conversationId, "messages:new", upsertedMessage);
-      }
 
-      const updatedConversation = await db.conversation.update({
-        where: { id: conversationId },
-        data: {
-          lastMessageId: upsertedMessage.id,
-        },
-        select: {
-          id: true,
-          lastMessage: {
-            select: {
-              id: true,
-              content: true,
-              updatedAt: true,
-              member: {
-                select: {
-                  user: {
-                    select: {
-                      clerkId: true,
-                      name: true,
+        const updatedConversation = await db.conversation.update({
+          where: { id: conversationId },
+          data: {
+            lastMessageId: upsertedMessage.id,
+          },
+          select: {
+            id: true,
+            lastMessage: {
+              select: {
+                id: true,
+                content: true,
+                updatedAt: true,
+                member: {
+                  select: {
+                    user: {
+                      select: {
+                        clerkId: true,
+                        name: true,
+                      },
                     },
                   },
                 },
               },
             },
-          },
-          members: {
-            select: {
-              userId: true,
+            members: {
+              select: {
+                userId: true,
+              },
             },
           },
-        },
-      });
+        });
 
-      const { members, ...values } = updatedConversation;
+        const { members, ...values } = updatedConversation;
 
-      members.forEach((member) => {
-        pusherServer.trigger(member.userId, "conversation:new_message", values);
-      });
+        members.forEach((member) => {
+          pusherServer.trigger(
+            member.userId,
+            "conversation:new_message",
+            values
+          );
+        });
+      }
 
       return { success: true, data: upsertedMessage };
     } catch (error) {
@@ -157,6 +185,39 @@ export const deleteMessage = async ({ conversationId, id }: Props) => {
     pusherServer.trigger(conversationId, "messages:delete", { id });
 
     return { success: true, data: deletedMessage };
+  } catch (error) {
+    const message = (error as Error).message ?? "Failed to delete message";
+    console.log(message);
+    return { success: false, error: message };
+  }
+};
+
+export type MarkAsSeenProps = {
+  messageId: string;
+  memberId: string;
+  conversationId: string;
+};
+
+export const markAsSeen = async ({
+  memberId,
+  messageId,
+  conversationId,
+}: MarkAsSeenProps) => {
+  try {
+    const updatedMessage = await db.message.update({
+      where: { id: messageId },
+      data: {
+        seenBy: {
+          connect: {
+            id: memberId,
+          },
+        },
+      },
+    });
+
+    pusherServer.trigger(conversationId, "messages:seen", null);
+
+    return { success: true, data: updatedMessage };
   } catch (error) {
     const message = (error as Error).message ?? "Failed to delete message";
     console.log(message);

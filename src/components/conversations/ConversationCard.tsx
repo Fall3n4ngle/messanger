@@ -8,6 +8,7 @@ type Props = {
   isActive: boolean;
   lastMessageAt: string;
   lastMessageContent: ReactNode;
+  unreadMessagesCount: number;
 };
 
 export default function ConversationCard({
@@ -16,11 +17,12 @@ export default function ConversationCard({
   isActive,
   lastMessageAt,
   lastMessageContent,
+  unreadMessagesCount,
 }: Props) {
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-3 cursor-pointer p-2 dark:hover:bg-secondary/70 hover:bg-secondary/80 rounded-md transition-colors",
+        "flex relative items-center justify-between gap-3 cursor-pointer p-2 dark:hover:bg-secondary/70 hover:bg-secondary/80 rounded-md transition-colors",
         isActive &&
           "bg-secondary hover:bg-secondary/100 dark:hover:bg-secondary/100 cursor-default"
       )}
@@ -32,19 +34,21 @@ export default function ConversationCard({
         </AvatarFallback>
       </Avatar>
       <div className="grow">
-        <h4 className="scroll-m-20 font-semibold tracking-tight whitespace-nowrap mb-1">
+        <h4 className="scroll-m-20 font-semibold tracking-tight whitespace-nowrap mb-1.5">
           {name}
         </h4>
         <p className="text-sm text-muted-foreground whitespace-nowrap">
           {lastMessageContent}
         </p>
       </div>
-      <time
-        dateTime={lastMessageAt}
-        className="self-start text-sm mt-[0.1rem]  text-muted-foreground"
-      >
+      <time className="absolute top-2.5 right-2 text-sm text-muted-foreground">
         {lastMessageAt}
       </time>
+      {unreadMessagesCount > 0 ? (
+        <div className="self-end text-xs text-center p-[3px] bg-primary rounded-full min-w-[21px] relative bottom-0.5">
+          {unreadMessagesCount}
+        </div>
+      ) : null}
     </div>
   );
 }

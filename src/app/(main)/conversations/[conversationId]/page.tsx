@@ -40,6 +40,7 @@ export default async function Conversation({
   const { id, name, image, isGroup, members } = conversation;
 
   const {
+    id: memberId,
     role,
     user: { name: userName },
   } = userMember;
@@ -72,6 +73,7 @@ export default async function Conversation({
           initialMessages={messages}
           conversationId={id}
           memberRole={role}
+          memberId={memberId}
         />
         <div className="max-w-[1000px] self-center w-full">
           <MessageForm conversationId={id} userName={userName} />

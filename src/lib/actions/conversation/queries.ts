@@ -35,6 +35,25 @@ export const getUserConversations = async ({
       image: true,
       updatedAt: true,
       isGroup: true,
+      messages: {
+        where: {
+          AND: {
+            seenBy: {
+              none: {
+                userId: currentUserId,
+              },
+            },
+            member: {
+              userId: {
+                not: currentUserId,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+        },
+      },
       lastMessage: {
         select: {
           id: true,
@@ -55,9 +74,7 @@ export const getUserConversations = async ({
       },
     },
     orderBy: {
-      lastMessage: {
-        updatedAt: "desc",
-      },
+      updatedAt: "desc",
     },
     cursor,
     take,
