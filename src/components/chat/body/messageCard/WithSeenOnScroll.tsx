@@ -1,17 +1,12 @@
 "use client";
 
 import { FormMessage } from "@/components/common";
-import { Conversation } from "@/components/conversations/lib/types";
 import { markAsSeen } from "@/lib/actions/messages/mutations";
 import { useToast } from "@/lib/hooks";
-import {
-  InfiniteData,
-  Query,
-  QueryKey,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { PropsWithChildren, useCallback, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { PropsWithChildren, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
+import { useMarkAsSeen } from "../lib/hooks/useMarkAsSeen";
 
 type Props = {
   messageId: string;
@@ -19,8 +14,6 @@ type Props = {
   seen: boolean;
   conversationId: string;
 } & PropsWithChildren;
-
-let previousCache: Query<unknown, Error, unknown, QueryKey>[];
 
 export default function WithSeenOnScroll({
   memberId,
@@ -35,55 +28,10 @@ export default function WithSeenOnScroll({
     threshold: 1,
   });
 
-  const updateCache = useCallback(() => {
-    const queryCache = queryClient.getQueryCache();
-    let found = false;
-    let updatedConversation: Conversation;
-    let newPages: Conversation[][] = [];
-    const prev = queryCache.findAll({
-      queryKey: ["conversations"],
-    });
-
-    previousCache = prev;
-
-    prev.forEach(({ queryKey }) => {
-      const oldData = queryClient.getQueryData(queryKey) as InfiniteData<
-        Conversation[],
-        unknown
-      >;
-      if (!found) {
-        newPages = oldData.pages.map((page) => {
-          if (found) return page;
-
-          return page.map((conversation) => {
-            if (conversation.id === conversationId) {
-              found = true;
-
-              updatedConversation = {
-                ...conversation,
-                messages: [
-                  ...conversation.messages.filter(
-                    (message) => message.id !== messageId
-                  ),
-                ],
-              };
-
-              return updatedConversation;
-            }
-
-            return conversation;
-          });
-        });
-      }
-
-      if (found) {
-        queryClient.setQueryData(queryKey, {
-          ...oldData,
-          pages: newPages,
-        });
-      }
-    });
-  }, [conversationId, messageId, queryClient]);
+  const { previousCache, updateCache } = useMarkAsSeen({
+    conversationId,
+    messageId,
+  });
 
   useEffect(() => {
     if (inView && !seen) {
@@ -97,7 +45,7 @@ export default function WithSeenOnScroll({
         });
 
         if (response.error) {
-          queryClient.setQueryData(["conversations"], previousCache);
+          queryClient.setQueryData(["conversations"], previousCache.current);
 
           toast({
             description: (
@@ -119,6 +67,7 @@ export default function WithSeenOnScroll({
     updateCache,
     queryClient,
     toast,
+    previousCache,
   ]);
 
   return <div ref={ref}>{children}</div>;

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, ScrollArea } from "@/components/ui";
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useRef } from "react";
 import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
 import { MessageCard, WithControls, WithSeenOnScroll } from "./messageCard";
@@ -23,10 +23,10 @@ export default function MessagesList({
   memberRole,
   memberId,
 }: Props) {
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
+  
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -39,10 +39,6 @@ export default function MessagesList({
 
   usePusherMessages({ conversationId });
 
-  // useEffect(() => {
-  //   scrollToBottom();
-  // }, []);
-
   if (!data.pages[0].length) {
     return (
       <div className="flex items-center justify-center h-full w-full">
@@ -54,7 +50,7 @@ export default function MessagesList({
   }
 
   return (
-    <ScrollArea className="flex-1 px-6 pb-6 pt-3" ref={listRef}>
+    <ScrollArea className="flex-1 px-6 pb-6 pt-3">
       {hasPreviousPage && (
         <div className="flex justify-center">
           <Button
@@ -70,7 +66,10 @@ export default function MessagesList({
         {data?.pages.map((group, id) => (
           <Fragment key={id}>
             {group.map(
-              ({ id, member, seenBy, conversationId, updatedAt, ...props }) => {
+              (
+                { id, member, seenBy, conversationId, updatedAt, ...props },
+                index
+              ) => {
                 if (!member.user || !userId) return;
                 const { clerkId } = member.user;
                 const isOwn = clerkId === userId;
@@ -103,7 +102,7 @@ export default function MessagesList({
                   );
                 }
 
-                if (!isOwn && !seenByMember) {
+                if (!isOwn || !seenByMember) {
                   result = (
                     <WithSeenOnScroll
                       memberId={memberId}

@@ -27,7 +27,7 @@ export default function WithControls({
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
       <ContextMenuContent className="w-[200px]">
         <ContextMenuItem onSelect={(e) => e.preventDefault()}>
-          <DeleteMessageButton id={messageId} conversationId={conversationId} />
+          <DeleteMessageButton messageId={messageId} conversationId={conversationId} />
         </ContextMenuItem>
         <ContextMenuItem>
           <EditMessageButton id={messageId} content={content} file={file} />

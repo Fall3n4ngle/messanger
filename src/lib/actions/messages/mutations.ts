@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { getUserByClerkId } from "../user/queries";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
+import { auth } from "@clerk/nextjs";
 
 export type UpdateMessage = {
   id?: string;
@@ -172,17 +173,45 @@ export const upsertMessage = async (fields: MessageFields) => {
 };
 
 type Props = {
-  id: string;
+  messageId: string;
   conversationId: string;
 };
 
-export const deleteMessage = async ({ conversationId, id }: Props) => {
+export type DeleteMessage = {
+  messageId: string;
+  clerkId: string;
+};
+
+export const deleteMessage = async ({ conversationId, messageId }: Props) => {
   try {
+    const { userId } = auth();
+
+    if (!userId) {
+      return;
+    }
+
     const deletedMessage = await db.message.delete({
-      where: { id },
+      where: { id: messageId },
+      select: {
+        id: true,
+        member: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    pusherServer.trigger(conversationId, "messages:delete", { id });
+    if (userId) {
+      pusherServer.trigger(conversationId, "messages:delete", {
+        messageId,
+        clerkId: userId,
+      } as DeleteMessage);
+    }
 
     return { success: true, data: deletedMessage };
   } catch (error) {
@@ -198,11 +227,7 @@ export type MarkAsSeenProps = {
   conversationId: string;
 };
 
-export const markAsSeen = async ({
-  memberId,
-  messageId,
-  conversationId,
-}: MarkAsSeenProps) => {
+export const markAsSeen = async ({ memberId, messageId }: MarkAsSeenProps) => {
   try {
     const updatedMessage = await db.message.update({
       where: { id: messageId },
@@ -214,8 +239,6 @@ export const markAsSeen = async ({
         },
       },
     });
-
-    pusherServer.trigger(conversationId, "messages:seen", null);
 
     return { success: true, data: updatedMessage };
   } catch (error) {

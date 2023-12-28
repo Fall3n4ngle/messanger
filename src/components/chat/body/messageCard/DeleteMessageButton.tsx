@@ -12,42 +12,61 @@ import {
 } from "@/components/ui";
 import { deleteMessage } from "@/lib/actions/messages/mutations";
 import { useToast } from "@/lib/hooks";
-import { Loader2, Trash2 } from "lucide-react";
-import { ReactNode, useState, useTransition } from "react";
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useDeleteMessage } from "../lib/hooks/useDeleteMessage";
+import { useAuth } from "@clerk/nextjs";
 
 type Props = {
-  id: string;
-  children?: ReactNode;
+  messageId: string;
   conversationId: string;
 };
 
-export default function DeleteMessageButton(props: Props) {
+export default function DeleteMessageButton({
+  conversationId,
+  messageId,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const { revertCache, updateCache } = useDeleteMessage();
+  const { userId } = useAuth();
 
-  const handleClick = () =>
-    startTransition(async () => {
-      const result = await deleteMessage(props);
+  const handleClick = async () => {
+    if (!userId) {
+      toast({
+        description: <FormMessage type="error" message="Missing userId" />,
+      });
 
-      if (result.success) {
-        setIsOpen(false);
+      return;
+    }
 
-        toast({
-          description: (
-            <FormMessage type="success" message="Message was deleted" />
-          ),
-        });
-      }
-
-      if (result.error) {
-        toast({
-          description: (
-            <FormMessage type="error" message="Error deleting message" />
-          ),
-        });
-      }
+    updateCache({
+      conversationId,
+      messageId,
     });
+
+    setIsOpen(false);
+
+    toast({
+      description: <FormMessage type="success" message="Message was deleted" />,
+    });
+
+    const result = await deleteMessage({
+      conversationId,
+      messageId,
+      clerkId: userId,
+    });
+
+    if (result.error) {
+      revertCache({ conversationId });
+
+      toast({
+        description: (
+          <FormMessage type="error" message="Error deleting message" />
+        ),
+      });
+    }
+  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -66,13 +85,8 @@ export default function DeleteMessageButton(props: Props) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button
-            variant="destructive"
-            disabled={isPending}
-            onClick={handleClick}
-          >
+          <Button variant="destructive" onClick={handleClick}>
             Delete
-            {isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
