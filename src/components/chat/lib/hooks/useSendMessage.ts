@@ -4,40 +4,27 @@ import {
   QueryKey,
   useQueryClient,
 } from "@tanstack/react-query";
+import { Message } from "../../body/lib/types";
 import { useCallback, useRef } from "react";
-import { Message } from "../types";
 
 type Props = {
-  messageId: string;
   conversationId: string;
+  newMessage: Message;
 };
 
-export const useDeleteMessage = () => {
+export const useSendMessage = () => {
   const queryClient = useQueryClient();
   const previousCache = useRef<Query<unknown, Error, unknown, QueryKey>[]>();
 
   const updateCache = useCallback(
-    ({ conversationId, messageId }: Props) => {
+    ({ conversationId, newMessage }: Props) => {
       queryClient.setQueryData(
         ["messages", conversationId],
-        ({ pages, pageParams }: InfiniteData<Message[], unknown>) => {
-          let found = false;
-
-          const newPages = pages.map((page) => {
-            if (found) return page;
-
-            return page.filter((message) => {
-              if (message.id === messageId) {
-                found = true;
-                return false;
-              }
-
-              return true;
-            });
-          });
-
+        ({ pageParams, pages }: InfiniteData<Message[], unknown>) => {
           return {
-            pages: newPages,
+            pages: pages.map((page, index) =>
+              index === pages.length - 1 ? [...page, newMessage] : page
+            ),
             pageParams,
           };
         }
@@ -53,7 +40,7 @@ export const useDeleteMessage = () => {
         previousCache.current
       );
     },
-    [previousCache, queryClient]
+    [queryClient]
   );
 
   return {

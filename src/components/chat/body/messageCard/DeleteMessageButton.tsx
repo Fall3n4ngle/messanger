@@ -54,7 +54,6 @@ export default function DeleteMessageButton({
     const result = await deleteMessage({
       conversationId,
       messageId,
-      clerkId: userId,
     });
 
     if (result.error) {

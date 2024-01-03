@@ -35,7 +35,7 @@ import {
   addTypingUser,
   removeTypingUser,
 } from "@/lib/actions/typingUser/mutations";
-import { useMessage } from "@/store/useMessage";
+import { useMessageForm } from "../lib/store/useMessageForm";
 
 type Props = {
   conversationId: string;
@@ -49,7 +49,7 @@ export default function MessageForm({ conversationId, userName }: Props) {
   const { toast } = useToast();
   const {
     message: { content, file, id },
-  } = useMessage();
+  } = useMessageForm();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

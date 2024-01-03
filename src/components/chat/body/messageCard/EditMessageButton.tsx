@@ -1,5 +1,5 @@
-import { useMessage } from "@/store/useMessage";
 import { Pencil } from "lucide-react";
+import { useMessageForm } from "../../lib/store/useMessageForm";
 
 type Props = {
   id: string;
@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default function EditMessageButton(props: Props) {
-  const { setMessage } = useMessage();
+  const { setMessage } = useMessageForm();
 
   const handleClick = () => {
     setMessage(props);

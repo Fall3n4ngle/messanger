@@ -186,9 +186,7 @@ export const deleteMessage = async ({ conversationId, messageId }: Props) => {
   try {
     const { userId } = auth();
 
-    if (!userId) {
-      return;
-    }
+    if (!userId) redirect("/sign-in");
 
     const deletedMessage = await db.message.delete({
       where: { id: messageId },

@@ -14,7 +14,6 @@ export const getMessages = async ({
   take,
 }: Props) => {
   const cursor = lastCursor ? { id: lastCursor } : undefined;
-  
 
   const messages = await db.message.findMany({
     where: {
