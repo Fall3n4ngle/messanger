@@ -8,7 +8,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  inputClassName,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -17,25 +16,16 @@ import {
 import { UploadButton, UploadImage } from "@/components/upload";
 import { deleteFiles } from "@/lib/actions/files";
 import { upsertMessage } from "@/lib/actions/messages/mutations";
-import {
-  useDebouncedCallback,
-  useThrottledCallback,
-  useToast,
-} from "@/lib/hooks";
+import { useToast } from "@/lib/hooks";
 import { messageSchema } from "@/lib/validations/message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image as ImageIcon, Loader2, SendHorizontal } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import TextareaAutosize from "react-textarea-autosize";
-import { cn } from "@/lib/utils";
-import {
-  addTypingUser,
-  removeTypingUser,
-} from "@/lib/actions/typingUser/mutations";
-import { useMessageForm } from "../lib/store/useMessageForm";
+import MessageFormInput from "./MessageFormInput";
+import { useNewMessage } from "../lib/hooks/useNewMessage";
 
 type Props = {
   conversationId: string;
@@ -47,9 +37,7 @@ type FormFields = z.infer<typeof formSchema>;
 
 export default function MessageForm({ conversationId, userName }: Props) {
   const { toast } = useToast();
-  const {
-    message: { content, file, id },
-  } = useMessageForm();
+  const { revertCache, updateCache } = useNewMessage();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -86,7 +74,6 @@ export default function MessageForm({ conversationId, userName }: Props) {
     const result = await upsertMessage({
       ...fields,
       conversationId,
-      id,
     });
 
     if (result?.success) {
@@ -102,33 +89,6 @@ export default function MessageForm({ conversationId, userName }: Props) {
       });
     }
   };
-
-  useEffect(() => {
-    if (content) {
-      form.setValue("content", content);
-      form.setFocus("content");
-    }
-  }, [content, form]);
-
-  useEffect(() => {
-    if (file) {
-      form.setValue("file", file);
-    }
-  }, [file, form]);
-
-  const handleTypeStart = useThrottledCallback(async () => {
-    await addTypingUser({
-      conversationId,
-      userName,
-    });
-  }, 200);
-
-  const handleTypeEnd = useDebouncedCallback(async () => {
-    await removeTypingUser({
-      conversationId,
-      userName,
-    });
-  }, 500);
 
   const { isSubmitting } = form.formState;
   const url = form.watch("file");
@@ -202,17 +162,9 @@ export default function MessageForm({ conversationId, userName }: Props) {
               <FormItem className="grow">
                 <FormLabel className="sr-only">Write a message</FormLabel>
                 <FormControl>
-                  <TextareaAutosize
-                    id="message"
-                    placeholder="Write a message..."
-                    className={cn(
-                      inputClassName,
-                      "!m-0 resize-none bg-secondary dark:bg-secondary/50 border-none"
-                    )}
-                    onKeyDown={() => {
-                      handleTypeStart();
-                      handleTypeEnd();
-                    }}
+                  <MessageFormInput
+                    conversationId={conversationId}
+                    userName={userName}
                     {...field}
                   />
                 </FormControl>

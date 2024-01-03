@@ -4,9 +4,8 @@ import { useEffect } from "react";
 import { useDeleteMessage } from "./useDeleteMessage";
 import { DeleteMessage } from "@/lib/actions/messages/mutations";
 import { useAuth } from "@clerk/nextjs";
-import { useMessageForm } from "@/components/chat/lib/store/useMessageForm";
-import { useReceiveMessage } from "./useReceiveMessage";
 import { Message } from "../types";
+import { useNewMessage } from "@/components/chat/lib/hooks/useNewMessage";
 
 export const usePusherMessages = ({
   conversationId,
@@ -17,17 +16,15 @@ export const usePusherMessages = ({
   const queryClient = useQueryClient();
 
   const { updateCache: deleteMessage } = useDeleteMessage();
-  const { updateCache: receiveMessage } = useReceiveMessage();
-
-  const { setMessage } = useMessageForm();
+  const { updateCache: receiveMessage } = useNewMessage();
 
   useEffect(() => {
     pusherClient.subscribe(conversationId);
 
-    const handleNewMessage = (message: Message) => {
+    const handleNewMessage = (newMessage: Message) => {
       receiveMessage({
         conversationId,
-        message,
+        newMessage,
       });
     };
 
@@ -44,8 +41,6 @@ export const usePusherMessages = ({
       queryClient.invalidateQueries({
         queryKey: ["messages", conversationId],
       });
-
-      setMessage({ id: undefined, file: "", content: "" });
     };
 
     pusherClient.bind("messages:new", handleNewMessage);
@@ -60,12 +55,5 @@ export const usePusherMessages = ({
       pusherClient.unbind("messages:update", handleUpdateMessage);
       pusherClient.unbind("messages:seen", handleUpdateMessage);
     };
-  }, [
-    conversationId,
-    queryClient,
-    setMessage,
-    deleteMessage,
-    userId,
-    receiveMessage,
-  ]);
+  }, [conversationId, queryClient, deleteMessage, userId, receiveMessage]);
 };

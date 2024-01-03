@@ -29,7 +29,7 @@ export default function WithControls({
         <ContextMenuItem onSelect={(e) => e.preventDefault()}>
           <DeleteMessageButton messageId={messageId} conversationId={conversationId} />
         </ContextMenuItem>
-        <ContextMenuItem>
+        <ContextMenuItem onSelect={(e) => e.preventDefault()}>
           <EditMessageButton id={messageId} content={content} file={file} />
         </ContextMenuItem>
       </ContextMenuContent>

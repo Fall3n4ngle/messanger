@@ -1,5 +1,5 @@
 import { Search } from "../common";
-import GroupButton from "./GroupButton";
+import { CreateGroupButton } from "./CreateGroupForm";
 
 export default function ConversationsHeader() {
   return (
@@ -7,7 +7,7 @@ export default function ConversationsHeader() {
       <div className="grow">
         <Search label="Search conversations" />
       </div>
-      <GroupButton />
+      <CreateGroupButton />
     </div>
   );
 }

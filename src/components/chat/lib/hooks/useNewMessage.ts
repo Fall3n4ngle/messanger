@@ -12,7 +12,7 @@ type Props = {
   newMessage: Message;
 };
 
-export const useSendMessage = () => {
+export const useNewMessage = () => {
   const queryClient = useQueryClient();
   const previousCache = useRef<Query<unknown, Error, unknown, QueryKey>[]>();
 
