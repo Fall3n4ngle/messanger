@@ -35,8 +35,8 @@ const steps: Step[] = [
 ];
 
 export default function CreateGroupButton() {
-  const [step, setStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [step, setStep] = useState(0);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -48,34 +48,31 @@ export default function CreateGroupButton() {
     mode: "onChange",
   });
 
-  const resetState = () => {
-    setIsOpen(false);
-    form.reset();
-    setStep(0);
-  };
-
   async function onSubmit(fields: FormFields) {
+    const { members, ...data } = fields;
+
     const result = await upsertGroup({
-      ...fields,
+      ...data,
       id: "",
       isGroup: true,
+      members: members.map(({ value }) => ({ id: value })),
     });
 
     if (result?.success) {
       toast({
         description: (
-          <ToastMessage type="success" message={"Group created successfully"} />
+          <ToastMessage type="success" message="Group created successfully" />
         ),
       });
 
-      resetState();
+      setIsOpen(false);
       router.push(`/conversations/${result.data?.id}`);
     }
 
     if (result?.error) {
       toast({
         description: (
-          <ToastMessage type="error" message={"Error creating group"} />
+          <ToastMessage type="error" message="Error creating group" />
         ),
       });
     }
@@ -99,19 +96,10 @@ export default function CreateGroupButton() {
     setStep((prev) => prev + 1);
   };
 
-  const handleOpenChange = (open: boolean) => {
-    if (open) {
-      setIsOpen(true);
-      return;
-    }
-
-    resetState();
-  };
-
   const { isSubmitting } = form.formState;
 
   return (
-    <Dialog onOpenChange={handleOpenChange} open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Trigger />
       <DialogContent className="min-h-[400px] flex flex-col gap-4">
         <Header />

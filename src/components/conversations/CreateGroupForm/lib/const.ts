@@ -1,10 +1,20 @@
 import { conversationSchema } from "@/lib/validations";
 import { z } from "zod";
 
-export const formSchema = conversationSchema.pick({
+const fieldsSchema = conversationSchema.pick({
   name: true,
   image: true,
-  members: true,
 });
+
+const memberSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
+const membersSchema = z.object({
+  members: z.array(memberSchema),
+});
+
+export const formSchema = fieldsSchema.merge(membersSchema);
 
 export type FormFields = z.infer<typeof formSchema>;

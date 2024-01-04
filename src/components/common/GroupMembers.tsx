@@ -20,7 +20,11 @@ export default function GroupMembersForm() {
               id="selectMembers"
               defaultValue={getValues("members")}
               onChange={(data) => {
-                const members = data.map(({ value }) => ({ id: value }));
+                const members = data.map(({ value, label }) => ({
+                  value,
+                  label,
+                }));
+
                 field.onChange(members);
               }}
             />
