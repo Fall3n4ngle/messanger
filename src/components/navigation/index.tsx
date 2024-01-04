@@ -5,6 +5,7 @@ import UserButton from "./UserButton";
 import { useLinks } from "./lib/hooks/useLinks";
 
 type Props = {
+  id: string;
   name: string;
   image: string | null;
   clerkId: string;

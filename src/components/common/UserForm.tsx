@@ -21,20 +21,24 @@ import FileInput from "../upload/FileInput";
 import ToastMessage from "./FormMessage";
 
 type Props = {
+  id?: string;
   name?: string;
   image?: string | null;
   clerkId: string;
   errorMessage?: string;
   successMessage?: string;
+  onCloseModal?: Function;
 };
 
 const formSchema = userSchema.pick({ image: true, name: true });
 type FormFields = z.infer<typeof formSchema>;
 
 export default function UserForm({
+  id,
   name,
   image,
   clerkId,
+  onCloseModal,
   successMessage = "Profile updated successfully",
   errorMessage = "Error updating profile",
 }: Props) {
@@ -49,17 +53,21 @@ export default function UserForm({
   });
 
   async function onSubmit(values: FormFields) {
-    const result = await upsertUser({ ...values, clerkId });
+    const result = await upsertUser({ ...values, clerkId, id });
 
     if (result?.success) {
       toast({
         description: <ToastMessage type="success" message={successMessage} />,
       });
+
+      if (onCloseModal) {
+        onCloseModal();
+      }
     }
 
     if (result?.error) {
       console.log(result.error);
-      
+
       toast({
         description: <ToastMessage type="error" message={errorMessage} />,
       });
