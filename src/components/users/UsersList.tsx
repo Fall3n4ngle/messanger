@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useTransition } from "react";
 import { UserCard } from "../common";
 import { ScrollArea } from "../ui";
 import { useInView } from "react-intersection-observer";
@@ -24,6 +24,7 @@ type Props = {
 export default function UsersList({ initialUsers, query }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
+  const [isPending, startTransition] = useTransition();
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,
@@ -35,6 +36,8 @@ export default function UsersList({ initialUsers, query }: Props) {
       initialUsers,
       query,
     });
+
+  const handleClick = () => startTransition(async () => {});
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -54,7 +57,11 @@ export default function UsersList({ initialUsers, query }: Props) {
             {group.map(({ id, clerkId, ...props }) => {
               const isActive = usersIds.includes(clerkId);
 
-              return <UserCard key={id} isActive={isActive} {...props} />;
+              return (
+                <li key={id}>
+                  <UserCard isActive={isActive} {...props} />
+                </li>
+              );
             })}
           </Fragment>
         ))}

@@ -1,21 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Button,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  Form,
-} from "../../ui";
-import { ChevronRight, Loader2, UserPlus } from "lucide-react";
+import { FormEvent, useState } from "react";
+import { Button, Dialog, DialogContent, Form } from "../../ui";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { FormFields, formSchema } from "./lib/const";
 import { useToast } from "@/lib/hooks";
 import { useForm } from "react-hook-form";
@@ -24,6 +11,9 @@ import { upsertGroup } from "@/lib/actions/conversation/mutations";
 import ToastMessage from "@/components/common/FormMessage";
 import { ChevronLeft } from "lucide-react";
 import { GroupInfo, GroupMembers } from "@/components/common";
+import { Header } from "./Header";
+import { Trigger } from "./Trigger";
+import { useRouter } from "next/navigation";
 
 type Step = {
   id: string;
@@ -46,14 +36,23 @@ const steps: Step[] = [
 
 export default function CreateGroupButton() {
   const [step, setStep] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       members: [],
     },
+    mode: "onChange",
   });
+
+  const resetState = () => {
+    setIsOpen(false);
+    form.reset();
+    setStep(0);
+  };
 
   async function onSubmit(fields: FormFields) {
     const result = await upsertGroup({
@@ -69,7 +68,8 @@ export default function CreateGroupButton() {
         ),
       });
 
-      form.reset();
+      resetState();
+      router.push(`/conversations/${result.data?.id}`);
     }
 
     if (result?.error) {
@@ -81,11 +81,14 @@ export default function CreateGroupButton() {
     }
   }
 
-  const handlePreviousClick = () => {
+  const handlePreviousClick = (e: FormEvent) => {
+    e.preventDefault();
     setStep((prev) => prev - 1);
   };
 
-  const handleNextClick = async () => {
+  const handleNextClick = async (e: FormEvent) => {
+    e.preventDefault();
+
     const fields = steps[step].fields;
 
     const output = await form.trigger(fields as (keyof FormFields)[], {
@@ -96,10 +99,19 @@ export default function CreateGroupButton() {
     setStep((prev) => prev + 1);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setIsOpen(true);
+      return;
+    }
+
+    resetState();
+  };
+
   const { isSubmitting } = form.formState;
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleOpenChange} open={isOpen}>
       <Trigger />
       <DialogContent className="min-h-[400px] flex flex-col gap-4">
         <Header />
@@ -114,11 +126,16 @@ export default function CreateGroupButton() {
                 onClick={handlePreviousClick}
                 variant="secondary"
                 disabled={step === 0}
+                type="button"
               >
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back
               </Button>
               {step < steps.length - 1 ? (
-                <Button onClick={handleNextClick} variant="secondary">
+                <Button
+                  onClick={handleNextClick}
+                  variant="secondary"
+                  type="button"
+                >
                   Next <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
@@ -136,34 +153,3 @@ export default function CreateGroupButton() {
     </Dialog>
   );
 }
-
-const Trigger = () => (
-  <TooltipProvider delayDuration={300}>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <DialogTrigger asChild>
-          <Button
-            variant="secondary"
-            size="icon"
-            aria-label="Create group conversation"
-            className="rounded-full"
-          >
-            <UserPlus className="w-4 h-4" />
-          </Button>
-        </DialogTrigger>
-      </TooltipTrigger>
-      <TooltipContent>Create group</TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-);
-
-const Header = () => {
-  return (
-    <DialogHeader>
-      <DialogTitle>Create group</DialogTitle>
-      <DialogDescription>
-        Choose group name, image and add other users
-      </DialogDescription>
-    </DialogHeader>
-  );
-};

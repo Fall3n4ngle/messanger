@@ -5,7 +5,7 @@ import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui";
 import { useFormContext } from "react-hook-form";
 
 export default function GroupMembersForm() {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
 
   return (
     <FormField
@@ -18,6 +18,7 @@ export default function GroupMembersForm() {
             <UsersSelect
               isMulti
               id="selectMembers"
+              defaultValue={getValues("members")}
               onChange={(data) => {
                 const members = data.map(({ value }) => ({ id: value }));
                 field.onChange(members);

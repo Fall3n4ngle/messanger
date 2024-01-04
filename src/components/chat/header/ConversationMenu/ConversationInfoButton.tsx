@@ -1,6 +1,12 @@
 "use client";
 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui";
 import { Info } from "lucide-react";
 
 export default function ConversationInfoButton() {
@@ -12,7 +18,11 @@ export default function ConversationInfoButton() {
           View group info
         </div>
       </DialogTrigger>
-      <DialogContent>dwqdwq</DialogContent>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Group info</DialogTitle>
+        </DialogHeader>
+      </DialogContent>
     </Dialog>
   );
 }

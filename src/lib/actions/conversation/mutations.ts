@@ -133,8 +133,3 @@ export const leaveConversation = async ({
     return { success: false, error: message };
   }
 };
-
-const createConversation = async ({ companionId }: { companionId: string }) => {
-  try {
-  } catch (error) {}
-};
