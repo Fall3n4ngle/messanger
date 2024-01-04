@@ -1,9 +1,9 @@
 import {
   MessageForm,
   MessagesList,
-  ChatSheetButton,
   ConversationHeading,
   MediaRoomButton,
+  ConversationMenuButton,
 } from "@/components/chat";
 import { getConversationById } from "@/lib/actions/conversation/queries";
 import { getUserMember } from "@/lib/actions/member/queries";
@@ -58,14 +58,7 @@ export default async function Conversation({
             />
             <div className="flex items-center gap-1">
               <MediaRoomButton conversationId={conversationId} />
-              <ChatSheetButton
-                members={members}
-                name={name}
-                conversationId={conversationId}
-                isGroup={isGroup}
-                memberRole={role}
-                image={image}
-              />
+              <ConversationMenuButton />
             </div>
           </div>
         </div>

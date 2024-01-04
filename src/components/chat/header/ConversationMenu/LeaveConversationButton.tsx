@@ -16,7 +16,7 @@ import { useTransition, useState } from "react";
 import { leaveConversation } from "@/lib/actions/conversation/mutations";
 import { useRouter } from "next/navigation";
 import { FormMessage } from "@/components/common";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 
 type Props = {
   conversationId: string;
@@ -66,7 +66,10 @@ export default function LeaveConversationButton({
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive">Leave</Button>
+        <div className="flex items-center gap-3">
+          <Trash2 className="h-4 w-4 text-destructive" />
+          Leave
+        </div>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

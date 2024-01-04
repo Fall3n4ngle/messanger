@@ -16,13 +16,12 @@ import {
 } from "../../ui";
 import { MoreVertical } from "lucide-react";
 import { UserCard } from "../../common";
-import LeaveConversationButton from "./LeaveConversationButton";
+import LeaveConversationButton from "./ConversationMenu/LeaveConversationButton";
 import { useAuth } from "@clerk/nextjs";
 import { useActiveUsers } from "@/store";
 import MemberRoles from "./MemberRoles";
 import { Member, MemberRole } from "@prisma/client";
 import { memberRoles } from "@/lib/const/memberRoles";
-import EditGroupButton from "./EditGroupButton";
 
 type TMember = Member & {
   user: {
@@ -127,14 +126,6 @@ export default function ChatSheetButton({
               conversationId={conversationId}
               userClerkId={userId}
             />
-            {canEdit && (
-              <EditGroupButton
-                name={name}
-                image={image}
-                members={defaultMembers}
-                conversationId={conversationId}
-              />
-            )}
           </div>
         </div>
       </SheetContent>
