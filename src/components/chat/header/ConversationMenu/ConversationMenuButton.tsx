@@ -14,10 +14,28 @@ import {
 import { MoreVertical } from "lucide-react";
 import ConversationInfoButton from "./ConversationInfoButton";
 import LeaveConversationButton from "./LeaveConversationButton";
-import ManageMembersButton from "./ManageMembersButton";
+import { ManageMembersButton } from "./ManageMembersButton";
 import EditConversationButton from "./EditConversationButton";
+import { MemberRole } from "@prisma/client";
+import { TMember } from "./lib/types";
 
-export default function ConversationMenuButton() {
+type Props = {
+  memberRole: MemberRole;
+  isGroup: boolean;
+  members: TMember[];
+  conversationId: string;
+  userMemberId: string;
+};
+
+export default function ConversationMenuButton({
+  isGroup,
+  memberRole,
+  members,
+  conversationId,
+  userMemberId,
+}: Props) {
+  const canEdit = isGroup && memberRole === "ADMIN";
+
   return (
     <DropdownMenu>
       <TooltipProvider delayDuration={300}>
@@ -36,14 +54,24 @@ export default function ConversationMenuButton() {
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <ConversationInfoButton />
         </DropdownMenuItem>
+        {canEdit && (
+          <>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <EditConversationButton />
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <ManageMembersButton
+                members={members}
+                conversationId={conversationId}
+              />
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <EditConversationButton />
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <ManageMembersButton />
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <LeaveConversationButton conversationId="" userClerkId="" />
+          <LeaveConversationButton
+            conversationId={conversationId}
+            memberId={userMemberId}
+          />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

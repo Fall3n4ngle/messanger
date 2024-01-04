@@ -28,6 +28,9 @@ export default function WithSeenOnScroll({
     threshold: 1,
   });
 
+  console.log({seen});
+  
+
   const { previousCache, updateCache } = useMarkAsSeen({
     conversationId,
     messageId,

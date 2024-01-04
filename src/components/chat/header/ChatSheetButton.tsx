@@ -19,7 +19,7 @@ import { UserCard } from "../../common";
 import LeaveConversationButton from "./ConversationMenu/LeaveConversationButton";
 import { useAuth } from "@clerk/nextjs";
 import { useActiveUsers } from "@/store";
-import MemberRoles from "./MemberRoles";
+import MemberRoles from "./ConversationMenu/ManageMembersButton/MemberRoles";
 import { Member, MemberRole } from "@prisma/client";
 import { memberRoles } from "@/lib/const/memberRoles";
 

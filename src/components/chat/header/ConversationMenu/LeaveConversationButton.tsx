@@ -17,26 +17,28 @@ import { leaveConversation } from "@/lib/actions/conversation/mutations";
 import { useRouter } from "next/navigation";
 import { FormMessage } from "@/components/common";
 import { Loader2, Trash2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   conversationId: string;
-  userClerkId: string;
+  memberId: string;
 };
 
 export default function LeaveConversationButton({
   conversationId,
-  userClerkId,
+  memberId,
 }: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const queryClient = useQueryClient();
 
   const handleClick = () =>
     startTransition(async () => {
       const result = await leaveConversation({
         conversationId,
-        userClerkId,
+        memberId,
       });
 
       if (result.success) {
@@ -49,6 +51,10 @@ export default function LeaveConversationButton({
               message="You left conversation successfully"
             />
           ),
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["conversations"],
         });
 
         router.push("/conversations");

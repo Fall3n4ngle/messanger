@@ -58,7 +58,13 @@ export default async function Conversation({
             />
             <div className="flex items-center gap-1">
               <MediaRoomButton conversationId={conversationId} />
-              <ConversationMenuButton />
+              <ConversationMenuButton
+                memberRole={role}
+                isGroup={isGroup}
+                members={members}
+                conversationId={conversationId}
+                userMemberId={memberId}
+              />
             </div>
           </div>
         </div>

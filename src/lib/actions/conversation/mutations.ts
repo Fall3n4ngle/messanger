@@ -88,35 +88,18 @@ export const upsertGroup = async (fields: ConversationFields) => {
 };
 
 type Props = {
+  memberId: string;
   conversationId: string;
-  userClerkId: string;
 };
 
 export const leaveConversation = async ({
+  memberId,
   conversationId,
-  userClerkId,
 }: Props) => {
   try {
-    const user = await getUserByClerkId(userClerkId);
-    if (!user) redirect("/onboarding");
-
-    const member = await db.member.findFirst({
+    const deletedMember = await db.member.delete({
       where: {
-        userId: user.id,
-        conversationId: conversationId,
-      },
-    });
-
-    if (!member) {
-      return { succes: false, error: "Member not found" };
-    }
-
-    const updatedMember = await db.member.update({
-      where: {
-        id: member.id,
-      },
-      data: {
-        conversationId: null,
+        id: memberId,
       },
     });
 
@@ -143,7 +126,7 @@ export const leaveConversation = async ({
       });
     }
 
-    return { success: true, data: updatedMember };
+    return { success: true, data: deletedMember };
   } catch (error) {
     const message = (error as Error).message ?? "Failed to leave conversation";
     console.log(message);

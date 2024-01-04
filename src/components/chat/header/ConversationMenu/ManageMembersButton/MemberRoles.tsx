@@ -62,7 +62,7 @@ export default function MemberRoles({ id, role, conversationId }: Props) {
   )?.label;
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen} modal>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
