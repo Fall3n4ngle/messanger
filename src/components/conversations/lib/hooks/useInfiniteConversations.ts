@@ -27,7 +27,7 @@ export const useInfiniteConversations = ({
   };
 
   return useInfiniteQuery({
-    queryKey: ["conversations", "list", query],
+    queryKey: ["conversations", query],
     queryFn: getData,
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => {

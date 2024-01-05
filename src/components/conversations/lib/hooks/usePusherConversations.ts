@@ -1,6 +1,8 @@
 import { pusherClient } from "@/lib/pusher/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useNewConversation } from "./useNewConversation";
+import { Conversation } from "../types";
 
 type UsePusherConversationsProps = {
   currentUserId: string;
@@ -12,16 +14,17 @@ export const usePusherConversations = ({
   query,
 }: UsePusherConversationsProps) => {
   const queryClient = useQueryClient();
+  const { updateCache: addConversation } = useNewConversation();
 
   useEffect(() => {
     pusherClient.subscribe(currentUserId);
 
-    const handleNewConversation = () => {
-      queryClient.invalidateQueries({ queryKey: ["conversations", "list"] });
+    const handleNewConversation = (newConversation: Conversation) => {
+      addConversation(newConversation);
     };
 
     const handleNewMessage = () => {
-      queryClient.invalidateQueries({ queryKey: ["conversations", "list"] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
     };
 
     pusherClient.bind("conversation:new", handleNewConversation);
@@ -32,5 +35,5 @@ export const usePusherConversations = ({
       pusherClient.unbind("conversation:new", handleNewConversation);
       pusherClient.unbind("conversation:new_message", handleNewMessage);
     };
-  }, [currentUserId, queryClient, query]);
+  }, [currentUserId, queryClient, query, addConversation]);
 };

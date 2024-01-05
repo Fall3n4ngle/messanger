@@ -13,11 +13,9 @@ import {
   Button,
 } from "@/components/ui";
 import { useTransition, useState } from "react";
-import { leaveConversation } from "@/lib/actions/conversation/mutations";
-import { useRouter } from "next/navigation";
 import { FormMessage } from "@/components/common";
 import { Loader2, Trash2 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { deleteMember } from "@/lib/actions/member/mutations";
 
 type Props = {
   conversationId: string;
@@ -28,15 +26,13 @@ export default function LeaveConversationButton({
   conversationId,
   memberId,
 }: Props) {
-  const router = useRouter();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const queryClient = useQueryClient();
 
   const handleClick = () =>
     startTransition(async () => {
-      const result = await leaveConversation({
+      const result = await deleteMember({
         conversationId,
         memberId,
       });
@@ -52,12 +48,6 @@ export default function LeaveConversationButton({
             />
           ),
         });
-
-        queryClient.invalidateQueries({
-          queryKey: ["conversations"],
-        });
-
-        router.push("/conversations");
       }
 
       if (result.error) {

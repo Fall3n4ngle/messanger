@@ -55,7 +55,45 @@ export const createGroup = async (fields: ConversationFields) => {
           id: true,
           name: true,
           image: true,
-          lastMessage: true,
+          updatedAt: true,
+          isGroup: true,
+          messages: {
+            where: {
+              AND: {
+                seenBy: {
+                  none: {
+                    userId: currentUser.id,
+                  },
+                },
+                member: {
+                  userId: {
+                    not: currentUser.id,
+                  },
+                },
+              },
+            },
+            select: {
+              id: true,
+            },
+          },
+          lastMessage: {
+            select: {
+              id: true,
+              content: true,
+              updatedAt: true,
+              file: true,
+              member: {
+                select: {
+                  user: {
+                    select: {
+                      clerkId: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
           members: {
             select: {
               userId: true,
@@ -166,52 +204,5 @@ export const addMembers = async (fields: AddMembersFields) => {
 
   if (result.error) {
     return { success: false, error: result.error.format() };
-  }
-};
-
-type Props = {
-  memberId: string;
-  conversationId: string;
-};
-
-export const leaveConversation = async ({
-  memberId,
-  conversationId,
-}: Props) => {
-  try {
-    const deletedMember = await db.member.delete({
-      where: {
-        id: memberId,
-      },
-    });
-
-    revalidatePath("/conversations");
-
-    const conversation = await db.conversation.findFirst({
-      where: {
-        id: conversationId,
-      },
-      select: {
-        members: {
-          select: {
-            _count: true,
-          },
-        },
-      },
-    });
-
-    if (conversation?.members.length === 0) {
-      await db.conversation.delete({
-        where: {
-          id: conversationId,
-        },
-      });
-    }
-
-    return { success: true, data: deletedMember };
-  } catch (error) {
-    const message = (error as Error).message ?? "Failed to leave conversation";
-    console.log(message);
-    return { success: false, error: message };
   }
 };

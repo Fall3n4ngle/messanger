@@ -30,17 +30,15 @@ export default function ManageMembersButton({
           Manage members
         </div>
       </DialogTrigger>
-      <DialogContent className="min-h-[450px] flex flex-col gap-5">
+      <DialogContent className="h-[500px] max-w-[600px] flex flex-col gap-5">
         <DialogHeader>
           <DialogTitle>Manage members ({members.length - 1})</DialogTitle>
           <DialogDescription>
             Edit roles, add or delete members
           </DialogDescription>
         </DialogHeader>
-        <div className="grow">
-          <MembersList conversationId={conversationId} members={members} />
-        </div>
-        <div className="self-end">
+        <MembersList conversationId={conversationId} members={members} />
+        <div className="self-end mt-auto">
           <AddMembersButton
             conversationId={conversationId}
             currentMembers={currentMembers}
