@@ -5,14 +5,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  ScrollArea,
 } from "@/components/ui";
 import { SlidersHorizontal } from "lucide-react";
 import { TMember } from "../lib/types";
-import { useActiveUsers } from "@/store";
-import DeleteMemberButton from "./DeleteMemberButton";
-import MemberRoles from "./MemberRoles";
-import { UserCard } from "@/components/common";
+import { MembersList } from "./MembersList";
+import { AddMembersButton } from "./AddMembersButton";
 
 type Props = {
   members: TMember[];
@@ -20,14 +17,10 @@ type Props = {
 };
 
 export default function ManageMembersButton({
-  members,
   conversationId,
+  members,
 }: Props) {
-  const { usersIds } = useActiveUsers();
-
-  const membersWithoutAdmin = members.filter(
-    (members) => members.role !== "ADMIN"
-  );
+  const currentMembers = members.map((member) => member.user.id);
 
   return (
     <Dialog>
@@ -39,40 +32,20 @@ export default function ManageMembersButton({
       </DialogTrigger>
       <DialogContent className="min-h-[450px] flex flex-col gap-5">
         <DialogHeader>
-          <DialogTitle>Manage members ({members.length})</DialogTitle>
+          <DialogTitle>Manage members ({members.length - 1})</DialogTitle>
           <DialogDescription>
             Edit roles, add or delete members
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea>
-          <ul className="flex flex-col gap-2">
-            {membersWithoutAdmin.map(({ id, role, user }) => {
-              const { clerkId, ...props } = user;
-              const isActive = usersIds.includes(clerkId);
-
-              const rightSide = (
-                <div className="flex items-center gap-2">
-                  <DeleteMemberButton />
-                  <MemberRoles
-                    id={id}
-                    role={role}
-                    conversationId={conversationId}
-                  />
-                </div>
-              );
-
-              return (
-                <li key={id}>
-                  <UserCard
-                    isActive={isActive}
-                    {...props}
-                    rightSide={rightSide}
-                  />
-                </li>
-              );
-            })}
-          </ul>
-        </ScrollArea>
+        <div className="grow">
+          <MembersList conversationId={conversationId} members={members} />
+        </div>
+        <div className="self-end">
+          <AddMembersButton
+            conversationId={conversationId}
+            currentMembers={currentMembers}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

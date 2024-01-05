@@ -4,8 +4,17 @@ import UsersSelect from "@/components/common/UsersSelect";
 import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui";
 import { useFormContext } from "react-hook-form";
 
-export default function GroupMembersForm() {
+type Props = {
+  excludedUsers?: string[];
+};
+
+export default function GroupMembersForm({ excludedUsers }: Props) {
   const { control, getValues } = useFormContext();
+
+  const filterOption = (option: { value: string }) => {
+    if (excludedUsers?.length === 0) return true;
+    return !excludedUsers?.includes(option.value);
+  };
 
   return (
     <FormField
@@ -19,6 +28,7 @@ export default function GroupMembersForm() {
               isMulti
               id="selectMembers"
               defaultValue={getValues("members")}
+              filterOption={filterOption}
               onChange={(data) => {
                 const members = data.map(({ value, label }) => ({
                   value,

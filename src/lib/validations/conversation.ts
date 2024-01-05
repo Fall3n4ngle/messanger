@@ -14,8 +14,25 @@ export const conversationSchema = z.object({
       message: "Name must be at least 2 characters",
     }),
   image: z.string().optional().nullable(),
-  members: memberSchema.array().optional(),
+  members: memberSchema.array().min(1, {
+    message: "Add at least on member"
+  }),
   isGroup: z.boolean().default(false).optional(),
 });
 
 export type ConversationFields = z.infer<typeof conversationSchema>;
+
+export const updateGroupSchema = conversationSchema.pick({
+  name: true,
+  image: true,
+  id: true,
+});
+
+export type UpdateGroupFields = z.infer<typeof updateGroupSchema>;
+
+export const addMembersSchema = conversationSchema.pick({
+  members: true,
+  id: true,
+});
+
+export type AddMembersFields = z.infer<typeof addMembersSchema>;

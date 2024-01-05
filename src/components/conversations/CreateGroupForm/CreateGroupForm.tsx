@@ -1,14 +1,15 @@
 import { GroupInfo, GroupMembers } from "@/components/common";
-import { FormFields, formSchema } from "./lib/const";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useState } from "react";
 import ToastMessage from "@/components/common/FormMessage";
 import { useToast } from "@/lib/hooks";
 import { useRouter } from "next/navigation";
-import { upsertGroup } from "@/lib/actions/conversation/mutations";
+import { createGroup } from "@/lib/actions/conversation/mutations";
 import { Button, Form } from "@/components/ui";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { conversationSchema, membersSchema } from "@/lib/validations";
+import { z } from "zod";
 
 type Step = {
   id: string;
@@ -28,6 +29,15 @@ const steps: Step[] = [
     component: <GroupMembers />,
   },
 ];
+
+const fieldsSchema = conversationSchema.pick({
+  name: true,
+  image: true,
+});
+
+export const formSchema = fieldsSchema.merge(membersSchema);
+
+export type FormFields = z.infer<typeof formSchema>;
 
 type Props = {
   onDialogClose: Function;
@@ -49,7 +59,7 @@ export default function CreateGroupForm({ onDialogClose }: Props) {
   async function onSubmit(fields: FormFields) {
     const { members, ...data } = fields;
 
-    const result = await upsertGroup({
+    const result = await createGroup({
       ...data,
       id: "",
       isGroup: true,

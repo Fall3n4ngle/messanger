@@ -1,20 +1,16 @@
-import { conversationSchema } from "@/lib/validations";
 import { Conversation } from "./lib/types";
-import { z } from "zod";
 import { useToast } from "@/lib/hooks";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { upsertGroup } from "@/lib/actions/conversation/mutations";
+import { updateGroup } from "@/lib/actions/conversation/mutations";
 import ToastMessage from "@/components/common/FormMessage";
 import { Button, Form } from "@/components/ui";
 import { GroupInfo } from "@/components/common";
 import { Loader2 } from "lucide-react";
+import { updateGroupSchema } from "@/lib/validations";
+import { z } from "zod";
 
-const formSchema = conversationSchema.pick({
-  name: true,
-  image: true,
-});
-
+const formSchema = updateGroupSchema.pick({ name: true, image: true });
 type FormFields = z.infer<typeof formSchema>;
 
 type Props = Conversation & {
@@ -38,7 +34,7 @@ export default function EditConversationForm({
   });
 
   async function onSubmit(fields: FormFields) {
-    const result = await upsertGroup({
+    const result = await updateGroup({
       id,
       ...fields,
     });

@@ -1,6 +1,13 @@
 "use server";
 
-import { ConversationFields, conversationSchema } from "@/lib/validations";
+import {
+  AddMembersFields,
+  ConversationFields,
+  UpdateGroupFields,
+  addMembersSchema,
+  conversationSchema,
+  updateGroupSchema,
+} from "@/lib/validations";
 import { db } from "@/lib/db";
 import { getUserAuth } from "@/lib/utils";
 import { redirect } from "next/navigation";
@@ -9,13 +16,14 @@ import { revalidatePath } from "next/cache";
 import { MemberRole } from "@prisma/client";
 import { pusherServer } from "@/lib/pusher/server";
 
-export const upsertGroup = async (fields: ConversationFields) => {
+export const createGroup = async (fields: ConversationFields) => {
   const result = conversationSchema.safeParse(fields);
 
   if (result.success) {
     const {
       data: { id, members: newMembers, ...values },
     } = result;
+
     try {
       const { session } = await getUserAuth();
       if (!session) redirect("/sign-in");
@@ -24,20 +32,17 @@ export const upsertGroup = async (fields: ConversationFields) => {
       if (!currentUser) redirect("/onboarding");
 
       const mappedMembers = newMembers
-        ? newMembers
-            .map((member) => ({
-              userId: member.id,
-              role: "VIEW" as MemberRole,
-            }))
-            .concat({
-              userId: currentUser.id,
-              role: "ADMIN",
-            })
-        : [];
+        .map((member) => ({
+          userId: member.id,
+          role: "VIEW" as MemberRole,
+        }))
+        .concat({
+          userId: currentUser.id,
+          role: "ADMIN",
+        });
 
-      const upsertedConversation = await db.conversation.upsert({
-        where: { id },
-        create: {
+      const createdGroup = await db.conversation.create({
+        data: {
           userId: currentUser.id,
           ...values,
           members: {
@@ -45,9 +50,6 @@ export const upsertGroup = async (fields: ConversationFields) => {
               data: mappedMembers,
             },
           },
-        },
-        update: {
-          ...values,
         },
         select: {
           id: true,
@@ -62,24 +64,101 @@ export const upsertGroup = async (fields: ConversationFields) => {
         },
       });
 
-      const { members, ...conversation } = upsertedConversation;
+      const { members, ...conversation } = createdGroup;
 
-      const notifyMembers = (key: string) => {
-        members.forEach((member) => {
-          pusherServer.trigger(member.userId, key, conversation);
-        });
-      };
-
-      if (id) {
-        notifyMembers("conversation:update");
-        revalidatePath(`/conversations/${id}`);
-      } else {
-        notifyMembers("conversation:new");
-      }
+      members.forEach((member) => {
+        pusherServer.trigger(member.userId, "conversation:new", conversation);
+      });
 
       return { success: true, data: conversation };
     } catch (error) {
-      const message = (error as Error).message ?? "Failed to upsert user";
+      const message = (error as Error).message ?? "Failed to create group";
+      console.log(message);
+      return { success: false, error: message };
+    }
+  }
+
+  if (result.error) {
+    return { success: false, error: result.error.format() };
+  }
+};
+
+export const updateGroup = async (fields: UpdateGroupFields) => {
+  const result = updateGroupSchema.safeParse(fields);
+
+  if (result.success) {
+    const { id, ...fields } = result.data;
+
+    try {
+      const updatedGroup = await db.conversation.update({
+        where: { id },
+        data: fields,
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          lastMessage: true,
+          members: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      });
+
+      const { members, ...conversation } = updatedGroup;
+
+      members.forEach((member) => {
+        pusherServer.trigger(
+          member.userId,
+          "conversation:update",
+          conversation
+        );
+      });
+
+      revalidatePath(`/conversations/${id}`);
+
+      return { success: true, data: conversation };
+    } catch (error) {
+      const message = (error as Error).message ?? "Failed to create group";
+      console.log(message);
+      return { success: false, error: message };
+    }
+  }
+
+  if (result.error) {
+    return { success: false, error: result.error.format() };
+  }
+};
+
+export const addMembers = async (fields: AddMembersFields) => {
+  const result = addMembersSchema.safeParse(fields);
+
+  if (result.success) {
+    try {
+      const { members: newMembers, id } = result.data;
+
+      const mappedMembers = newMembers.map((member) => ({
+        userId: member.id,
+        role: "VIEW" as MemberRole,
+      }));
+
+      const updatedGroup = await db.conversation.update({
+        where: { id },
+        data: {
+          members: {
+            createMany: {
+              data: mappedMembers,
+            },
+          },
+        },
+      });
+
+      revalidatePath(`/conversations/${id}`);
+
+      return { success: true, data: updatedGroup };
+    } catch (error) {
+      const message = (error as Error).message ?? "Failed to create group";
       console.log(message);
       return { success: false, error: message };
     }
