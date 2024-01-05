@@ -24,14 +24,16 @@ export const upsertGroup = async (fields: ConversationFields) => {
       if (!currentUser) redirect("/onboarding");
 
       const mappedMembers = newMembers
-        .map((member) => ({
-          userId: member.id,
-          role: "VIEW" as MemberRole,
-        }))
-        .concat({
-          userId: currentUser.id,
-          role: "ADMIN",
-        });
+        ? newMembers
+            .map((member) => ({
+              userId: member.id,
+              role: "VIEW" as MemberRole,
+            }))
+            .concat({
+              userId: currentUser.id,
+              role: "ADMIN",
+            })
+        : [];
 
       const upsertedConversation = await db.conversation.upsert({
         where: { id },
@@ -70,6 +72,7 @@ export const upsertGroup = async (fields: ConversationFields) => {
 
       if (id) {
         notifyMembers("conversation:update");
+        revalidatePath(`/conversations/${id}`);
       } else {
         notifyMembers("conversation:new");
       }

@@ -15,7 +15,7 @@ import { MoreVertical } from "lucide-react";
 import ConversationInfoButton from "./ConversationInfoButton";
 import LeaveConversationButton from "./LeaveConversationButton";
 import { ManageMembersButton } from "./ManageMembersButton";
-import EditConversationButton from "./EditConversationButton";
+import { EditConversationButton } from "./EditConversationButton";
 import { MemberRole } from "@prisma/client";
 import { TMember } from "./lib/types";
 
@@ -24,6 +24,8 @@ type Props = {
   isGroup: boolean;
   members: TMember[];
   conversationId: string;
+  name: string;
+  image: string | null;
   userMemberId: string;
 };
 
@@ -33,6 +35,8 @@ export default function ConversationMenuButton({
   members,
   conversationId,
   userMemberId,
+  image,
+  name,
 }: Props) {
   const canEdit = isGroup && memberRole === "ADMIN";
 
@@ -57,7 +61,11 @@ export default function ConversationMenuButton({
         {canEdit && (
           <>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <EditConversationButton />
+              <EditConversationButton
+                id={conversationId}
+                name={name}
+                image={image}
+              />
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <ManageMembersButton

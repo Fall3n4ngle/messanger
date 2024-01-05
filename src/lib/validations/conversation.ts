@@ -14,10 +14,8 @@ export const conversationSchema = z.object({
       message: "Name must be at least 2 characters",
     }),
   image: z.string().optional().nullable(),
-  members: memberSchema.array().min(1, {
-    message: "Add at least one member",
-  }),
-  isGroup: z.boolean().default(false),
+  members: memberSchema.array().optional(),
+  isGroup: z.boolean().default(false).optional(),
 });
 
 export type ConversationFields = z.infer<typeof conversationSchema>;

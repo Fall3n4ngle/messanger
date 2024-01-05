@@ -12,7 +12,9 @@ const memberSchema = z.object({
 });
 
 const membersSchema = z.object({
-  members: z.array(memberSchema),
+  members: z.array(memberSchema).min(1, {
+    message: "Add at least one member",
+  }),
 });
 
 export const formSchema = fieldsSchema.merge(membersSchema);

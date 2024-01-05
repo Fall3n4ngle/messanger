@@ -64,6 +64,8 @@ export default async function Conversation({
                 members={members}
                 conversationId={conversationId}
                 userMemberId={memberId}
+                name={name}
+                image={image}
               />
             </div>
           </div>
