@@ -14,7 +14,7 @@ import {
 import { ChevronsUpDown } from "lucide-react";
 import { MemberRole } from "@prisma/client";
 import { useState } from "react";
-import { memberRoles } from "@/lib/const/memberRoles";
+import { availableMemberRoles } from "@/lib/const/memberRoles";
 import { changeMemberRole } from "@/lib/actions/member/mutations";
 import { useToast } from "@/lib/hooks";
 import { FormMessage } from "@/components/common";
@@ -55,7 +55,7 @@ export default function MemberRoles({ id, role, conversationId }: Props) {
     }
   };
 
-  const currentRoleLabel = memberRoles.find(
+  const currentRoleLabel = availableMemberRoles.find(
     (r) => r.value === optimisticRole
   )?.label;
 
@@ -77,7 +77,7 @@ export default function MemberRoles({ id, role, conversationId }: Props) {
           <CommandInput placeholder="Select a role..." />
           <CommandEmpty>No roles found.</CommandEmpty>
           <CommandGroup>
-            {memberRoles.map((r) => (
+            {availableMemberRoles.map((r) => (
               <CommandItem
                 key={r.value}
                 className={cn(

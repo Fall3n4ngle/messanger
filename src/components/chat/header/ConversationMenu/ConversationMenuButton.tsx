@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui";
 import { MoreVertical } from "lucide-react";
-import ConversationInfoButton from "./ConversationInfoButton";
+import { ConversationInfoButton } from "./ConversationInfoButton";
 import { ManageMembersButton } from "./ManageMembersButton";
 import { EditConversationButton } from "./EditConversationButton";
 import { MemberRole } from "@prisma/client";
@@ -56,7 +56,7 @@ export default function ConversationMenuButton({
       </TooltipProvider>
       <DropdownMenuContent className="p-1.5 space-y-0.5">
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <ConversationInfoButton />
+          <ConversationInfoButton name={name} image={image} members={members} />
         </DropdownMenuItem>
         {canEdit && (
           <>

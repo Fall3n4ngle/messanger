@@ -6,7 +6,7 @@ type Role = {
   description: string;
 };
 
-export const memberRoles: Role[] = [
+export const availableMemberRoles: Role[] = [
   {
     label: "Editor",
     value: "EDIT",
@@ -16,5 +16,14 @@ export const memberRoles: Role[] = [
     label: "Viewer",
     value: "VIEW",
     description: "Can edit his own messages",
+  },
+];
+
+export const allMemberRoles: Role[] = [
+  ...availableMemberRoles,
+  {
+    label: "Admin",
+    value: "ADMIN",
+    description: "The owner of a group",
   },
 ];
