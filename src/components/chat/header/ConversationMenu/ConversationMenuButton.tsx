@@ -13,11 +13,11 @@ import {
 } from "@/components/ui";
 import { MoreVertical } from "lucide-react";
 import ConversationInfoButton from "./ConversationInfoButton";
-import LeaveConversationButton from "./LeaveConversationButton";
 import { ManageMembersButton } from "./ManageMembersButton";
 import { EditConversationButton } from "./EditConversationButton";
 import { MemberRole } from "@prisma/client";
 import { TMember } from "./lib/types";
+import LeaveConversationDialog from "./LeaveConversationDialog";
 
 type Props = {
   memberRole: MemberRole;
@@ -76,7 +76,7 @@ export default function ConversationMenuButton({
           </>
         )}
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <LeaveConversationButton
+          <LeaveConversationDialog
             conversationId={conversationId}
             memberId={userMemberId}
           />

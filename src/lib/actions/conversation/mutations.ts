@@ -206,3 +206,7 @@ export const addMembers = async (fields: AddMembersFields) => {
     return { success: false, error: result.error.format() };
   }
 };
+
+export const revalidateConversationPath = async (conversationId: string) => {
+  return revalidatePath(`/conversations/${conversationId}`);
+};

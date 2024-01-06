@@ -3,6 +3,7 @@
 import { MemberRole } from "@prisma/client";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { pusherServer } from "@/lib/pusher/server";
 
 type ChangeMemberRoleProps = {
   id: string;
@@ -38,17 +39,16 @@ type DeleteMemberProps = {
   conversationId: string;
 };
 
+export type DeleteMemberEvent = {
+  conversationId: string;
+  userId: string;
+};
+
 export const deleteMember = async ({
   memberId,
   conversationId,
 }: DeleteMemberProps) => {
   try {
-    const deletedMember = await db.member.delete({
-      where: {
-        id: memberId,
-      },
-    });
-
     const conversation = await db.conversation.findFirst({
       where: {
         id: conversationId,
@@ -56,19 +56,27 @@ export const deleteMember = async ({
       select: {
         members: {
           select: {
-            _count: true,
+            userId: true,
           },
         },
       },
     });
 
-    if (conversation?.members.length === 0) {
-      await db.conversation.delete({
-        where: {
-          id: conversationId,
-        },
-      });
-    }
+    const deletedMember = await db.member.delete({
+      where: {
+        id: memberId,
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    conversation?.members.forEach((member) => {
+      pusherServer.trigger(member.userId, "member:delete", {
+        conversationId,
+        userId: deletedMember.userId,
+      } as DeleteMemberEvent);
+    });
 
     return { success: true, data: deletedMember };
   } catch (error) {

@@ -1,7 +1,7 @@
 import { useActiveUsers } from "@/store";
 import { TMember } from "../../lib/types";
 import { ScrollArea } from "@/components/ui";
-import DeleteMemberButton from "./DeleteMemberButton";
+import DeleteMemberDialog from "./DeleteMemberDialog";
 import MemberRoles from "./MemberRoles";
 import { UserCard } from "@/components/common";
 
@@ -26,7 +26,10 @@ export default function MembersList({ conversationId, members }: Props) {
 
           const rightSide = (
             <div className="flex items-center gap-2">
-              <DeleteMemberButton />
+              <DeleteMemberDialog
+                conversationId={conversationId}
+                memberId={id}
+              />
               <MemberRoles
                 id={id}
                 role={role}
