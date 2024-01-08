@@ -1,12 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { Conversation } from "../types";
+import { UpdateConversationEvent } from "@/lib/actions/conversation/mutations";
 
-export const useDeleteConversation = () => {
+export const useUpdateConversation = () => {
   const queryClient = useQueryClient();
 
   const updateCache = useCallback(
-    (conversationId: string) => {
+    ({ id, ...data }: UpdateConversationEvent) => {
       queryClient.setQueriesData(
         {
           queryKey: ["conversations"],
@@ -23,22 +24,20 @@ export const useDeleteConversation = () => {
             };
           }
 
-          const { pageParams, pages } = oldData;
-
           return {
-            pageParams,
-            pages: pages.map((page) => {
+            pageParams: oldData.pageParams,
+            pages: oldData.pages.map((page) => {
               let found = false;
 
               if (found) return page;
 
-              return page.filter((conversation) => {
-                if (conversation.id === conversationId) {
+              return page.map((conversation) => {
+                if (conversation.id === id) {
                   found = true;
-                  return false;
+                  return { ...conversation, ...data };
                 }
 
-                return true;
+                return conversation;
               });
             }),
           };

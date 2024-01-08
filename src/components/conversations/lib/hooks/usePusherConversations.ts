@@ -6,7 +6,12 @@ import { Conversation } from "../types";
 import { useDeleteConversation } from "./useDeleteConversation";
 import { usePathname, useRouter } from "next/navigation";
 import { DeleteMemberEvent } from "@/lib/actions/member/mutations";
-import { revalidateConversationPath } from "@/lib/actions/conversation/mutations";
+import {
+  AddMembersEvent,
+  UpdateConversationEvent,
+  revalidateConversationPath,
+} from "@/lib/actions/conversation/mutations";
+import { useUpdateConversation } from "./useUpdateConversation";
 
 type UsePusherConversationsProps = {
   currentUserId: string;
@@ -19,9 +24,12 @@ export const usePusherConversations = ({
 }: UsePusherConversationsProps) => {
   const router = useRouter();
   const pathname = usePathname();
+
   const queryClient = useQueryClient();
+
   const { updateCache: addConversation } = useNewConversation();
   const { updateCache: deleteConversation } = useDeleteConversation();
+  const { updateCache: updateConversation } = useUpdateConversation();
 
   useEffect(() => {
     pusherClient.subscribe(currentUserId);
@@ -46,19 +54,34 @@ export const usePusherConversations = ({
       }
     };
 
+    const handleConversationUpdate = async (
+      updatedConversation: UpdateConversationEvent
+    ) => {
+      updateConversation(updatedConversation);
+      await revalidateConversationPath(updatedConversation.id);
+    };
+
+    const handleAddMembers = async ({ conversationId }: AddMembersEvent) => {
+      await revalidateConversationPath(conversationId);
+    };
+
     const handleNewMessage = () => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     };
 
     pusherClient.bind("conversation:new", handleNewConversation);
-    pusherClient.bind("conversation:new_message", handleNewMessage);
     pusherClient.bind("member:delete", handleDeleteMember);
+    pusherClient.bind("conversation:update", handleConversationUpdate);
+    pusherClient.bind("conversation:new_message", handleNewMessage);
+    pusherClient.bind("conversation:add_members", handleAddMembers);
 
     return () => {
       pusherClient.unsubscribe(currentUserId);
       pusherClient.unbind("conversation:new", handleNewConversation);
       pusherClient.unbind("conversation:new_message", handleNewMessage);
       pusherClient.unbind("member:delete", handleDeleteMember);
+      pusherClient.unbind("conversation:update", handleConversationUpdate);
+      pusherClient.unbind("conversation:add_members", handleAddMembers);
     };
   }, [
     currentUserId,
@@ -68,5 +91,6 @@ export const usePusherConversations = ({
     deleteConversation,
     pathname,
     router,
+    updateConversation,
   ]);
 };

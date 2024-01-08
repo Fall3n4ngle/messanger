@@ -10,8 +10,8 @@ import { Conversation } from "./lib/types";
 import { useInfiniteConversations } from "./lib/hooks/useInfiniteConversations";
 import { usePusherConversations } from "./lib/hooks/usePusherConversations";
 import { Fragment, useEffect } from "react";
-import { getLastMessageContent } from "./lib/utils/getLastMessageContent";
 import { useAuth } from "@clerk/nextjs";
+import { getLastMessageData } from "./lib/utils/getLastMessage";
 
 type Props = {
   intialConversations: Conversation[];
@@ -45,8 +45,12 @@ export default function ConversationsList({
     }
   }, [inView, hasNextPage, fetchNextPage]);
 
+  if (!userId) {
+    return null;
+  }
+
   if (!data.pages[0].length) {
-    return <p className="ml-3">No conversations found</p>;
+    return <p className="pl-3">No conversations found</p>;
   }
 
   return (
@@ -66,10 +70,10 @@ export default function ConversationsList({
                 const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
                 const isActive = pathname.includes(id);
                 const unreadMessagesCount = unreadMessages.length;
-                const lastMessageContent = getLastMessageContent({
+                const { message, seen } = getLastMessageData({
+                  currentUserClerkId: userId,
                   isGroup,
                   lastMessage,
-                  currentUserClerkId: userId,
                 });
 
                 return (
@@ -78,8 +82,9 @@ export default function ConversationsList({
                       <ConversationCard
                         isActive={isActive}
                         lastMessageAt={date}
-                        lastMessageContent={lastMessageContent}
+                        lastMessageContent={message}
                         unreadMessagesCount={unreadMessagesCount}
+                        seen={seen}
                         {...props}
                       />
                     </Link>

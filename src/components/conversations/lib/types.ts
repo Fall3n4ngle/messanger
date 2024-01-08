@@ -9,6 +9,9 @@ export type LastMessage = {
       name: string;
     };
   };
+  _count: {
+    seenBy: number;
+  };
 } | null;
 
 type Message = {

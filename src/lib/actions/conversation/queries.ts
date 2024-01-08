@@ -70,6 +70,11 @@ export const getUserConversations = async ({
               },
             },
           },
+          _count: {
+            select: {
+              seenBy: true
+            }
+          }
         },
       },
     },

@@ -121,6 +121,12 @@ export const createGroup = async (fields: ConversationFields) => {
   }
 };
 
+export type UpdateConversationEvent = {
+  id: string;
+  name?: string;
+  image?: string | null;
+};
+
 export const updateGroup = async (fields: UpdateGroupFields) => {
   const result = updateGroupSchema.safeParse(fields);
 
@@ -135,7 +141,6 @@ export const updateGroup = async (fields: UpdateGroupFields) => {
           id: true,
           name: true,
           image: true,
-          lastMessage: true,
           members: {
             select: {
               userId: true,
@@ -150,11 +155,9 @@ export const updateGroup = async (fields: UpdateGroupFields) => {
         pusherServer.trigger(
           member.userId,
           "conversation:update",
-          conversation
+          conversation as UpdateConversationEvent
         );
       });
-
-      revalidatePath(`/conversations/${id}`);
 
       return { success: true, data: conversation };
     } catch (error) {
@@ -168,6 +171,10 @@ export const updateGroup = async (fields: UpdateGroupFields) => {
     return { success: false, error: result.error.format() };
   }
 };
+
+export type AddMembersEvent = {
+  conversationId: string;
+}
 
 export const addMembers = async (fields: AddMembersFields) => {
   const result = addMembersSchema.safeParse(fields);
@@ -190,9 +197,20 @@ export const addMembers = async (fields: AddMembersFields) => {
             },
           },
         },
+        select: {
+          members: {
+            select: {
+              userId: true,
+            },
+          },
+        },
       });
 
-      revalidatePath(`/conversations/${id}`);
+      updatedGroup.members.forEach((member) => {
+        pusherServer.trigger(member.userId, "conversation:add_members", {
+          conversationId: id,
+        });
+      });
 
       return { success: true, data: updatedGroup };
     } catch (error) {

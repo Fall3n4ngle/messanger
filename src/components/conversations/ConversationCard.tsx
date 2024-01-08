@@ -9,6 +9,7 @@ type Props = {
   lastMessageAt: string;
   lastMessageContent: ReactNode;
   unreadMessagesCount: number;
+  seen: ReactNode;
 };
 
 export default function ConversationCard({
@@ -18,6 +19,7 @@ export default function ConversationCard({
   lastMessageAt,
   lastMessageContent,
   unreadMessagesCount,
+  seen
 }: Props) {
   return (
     <div
@@ -41,9 +43,12 @@ export default function ConversationCard({
           {lastMessageContent}
         </p>
       </div>
-      <time className="absolute top-2.5 right-2 text-sm text-muted-foreground">
-        {lastMessageAt}
-      </time>
+      <div className="absolute top-[9px] right-2 text-sm text-muted-foreground flex items-center gap-1">
+        {seen}
+        <time>
+          {lastMessageAt}
+        </time>
+      </div>
       {unreadMessagesCount > 0 ? (
         <div className="self-end text-xs text-center p-[3px] bg-primary rounded-full min-w-[21px] relative bottom-0.5">
           {unreadMessagesCount}
