@@ -1,4 +1,3 @@
-import { FormMessage } from "@/components/common";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -10,12 +9,9 @@ import {
   AlertDialogTrigger,
   Button,
 } from "@/components/ui";
-import { deleteMessage } from "@/lib/actions/messages/mutations";
-import { useToast } from "@/lib/hooks";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useDeleteMessage } from "../lib/hooks/useDeleteMessage";
-import { useAuth } from "@clerk/nextjs";
 
 type Props = {
   messageId: string;
@@ -27,44 +23,11 @@ export default function DeleteMessageButton({
   messageId,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast();
-  const { revertCache, updateCache } = useDeleteMessage();
-  const { userId } = useAuth();
+  const { mutate } = useDeleteMessage();
 
   const handleClick = async () => {
-    if (!userId) {
-      toast({
-        description: <FormMessage type="error" message="Missing userId" />,
-      });
-
-      return;
-    }
-
-    updateCache({
-      conversationId,
-      messageId,
-    });
-
+    mutate({ conversationId, messageId });
     setIsOpen(false);
-
-    toast({
-      description: <FormMessage type="success" message="Message was deleted" />,
-    });
-
-    const result = await deleteMessage({
-      conversationId,
-      messageId,
-    });
-
-    if (result.error) {
-      revertCache({ conversationId });
-
-      toast({
-        description: (
-          <FormMessage type="error" message="Error deleting message" />
-        ),
-      });
-    }
   };
 
   return (
