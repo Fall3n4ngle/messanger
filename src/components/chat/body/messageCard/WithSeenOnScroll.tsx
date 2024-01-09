@@ -1,9 +1,5 @@
 "use client";
 
-import { FormMessage } from "@/components/common";
-import { markAsSeen } from "@/lib/actions/messages/mutations";
-import { useToast } from "@/lib/hooks";
-import { useQueryClient } from "@tanstack/react-query";
 import { PropsWithChildren, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { useMarkAsSeen } from "../lib/hooks/useMarkAsSeen";
@@ -22,56 +18,21 @@ export default function WithSeenOnScroll({
   children,
   conversationId,
 }: Props) {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
   const { ref, inView } = useInView({
     threshold: 1,
   });
 
-  console.log({seen});
-  
-
-  const { previousCache, updateCache } = useMarkAsSeen({
-    conversationId,
-    messageId,
-  });
+  const { mutate } = useMarkAsSeen();
 
   useEffect(() => {
     if (inView && !seen) {
-      updateCache();
-
-      (async function () {
-        const response = await markAsSeen({
-          memberId,
-          messageId,
-          conversationId,
-        });
-
-        if (response.error) {
-          queryClient.setQueryData(["conversations"], previousCache.current);
-
-          toast({
-            description: (
-              <FormMessage
-                type="error"
-                message="Failed to mark message as seen"
-              />
-            ),
-          });
-        }
-      })();
+      mutate({
+        memberId,
+        conversationId,
+        messageId,
+      });
     }
-  }, [
-    inView,
-    seen,
-    memberId,
-    messageId,
-    conversationId,
-    updateCache,
-    queryClient,
-    toast,
-    previousCache,
-  ]);
+  }, [inView, seen, memberId, messageId, conversationId, mutate]);
 
   return <div ref={ref}>{children}</div>;
 }

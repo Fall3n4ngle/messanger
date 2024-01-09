@@ -9,6 +9,7 @@ import { Message } from "../lib/types";
 import { useInfiniteMessages } from "./lib/hooks/useInfinteMessages";
 import { usePusherMessages } from "./lib/hooks/usePusherMessages";
 import { useAuth } from "@clerk/nextjs";
+import { getMessageSeen } from "@/lib/utils";
 
 type Props = {
   initialMessages: Message[];
@@ -31,7 +32,7 @@ export default function MessagesList({
     initialMessages,
   });
 
-  usePusherMessages({ memberId, conversationId });
+  usePusherMessages();
 
   if (!data.pages[0].length) {
     return (
@@ -60,13 +61,15 @@ export default function MessagesList({
         {data?.pages.map((group, id) => (
           <Fragment key={id}>
             {group.map(
-              (
-                { id, member, seenBy, conversationId, updatedAt, ...props },
-              ) => {
+              ({ id, member, seenBy, conversationId, updatedAt, ...props }) => {
                 if (!member.user || !userId) return;
                 const { clerkId } = member.user;
                 const isOwn = clerkId === userId;
                 const isActive = usersIds.includes(clerkId);
+                const seen = getMessageSeen({
+                  isOwn,
+                  isSeen: seenBy.length > 0,
+                });
                 const seenByMember = seenBy.find((m) => m.id === member.id)
                   ? true
                   : false;
@@ -78,6 +81,7 @@ export default function MessagesList({
                     isActive={isActive}
                     updatedAt={updatedAt}
                     member={member}
+                    seen={seen}
                     {...props}
                   />
                 );
@@ -95,7 +99,7 @@ export default function MessagesList({
                   );
                 }
 
-                if (!isOwn || !seenByMember) {
+                if (!isOwn && !seenByMember) {
                   result = (
                     <WithSeenOnScroll
                       memberId={memberId}

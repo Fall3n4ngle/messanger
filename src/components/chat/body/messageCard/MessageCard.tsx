@@ -1,16 +1,20 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
 import { cn, formatDate } from "@/lib/utils";
 import Image from "next/image";
-import { forwardRef } from "react";
+import { ReactNode, forwardRef } from "react";
 import { Message } from "../../lib/types";
 
 export type MessageCardPorps = {
   isOwn: boolean;
   isActive: boolean;
+  seen: ReactNode;
 } & Pick<Message, "content" | "file" | "updatedAt" | "member">;
 
 const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
-  ({ content, file, updatedAt, member, isOwn, isActive, ...props }, ref) => {
+  (
+    { content, file, updatedAt, member, isOwn, isActive, seen, ...props },
+    ref
+  ) => {
     const { image, name } = member.user;
 
     return (
@@ -40,10 +44,13 @@ const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
           )}
         >
           <div className={cn("flex gap-2", isOwn && "justify-end")}>
-            <span className=" font-semibold text-foreground/[85%]">{name}</span>
+            <span className=" font-semibold text-foreground/[85%]">
+              {isOwn ? "You" : name}
+            </span>
             <span className="text-sm mt-[3px] text-muted-foreground">
               {formatDate(updatedAt)}
             </span>
+            <span className="mt-[4.5px]">{seen}</span>
           </div>
           {file && (
             <div className="relative w-44 pt-[92%] mb-2 self-end">

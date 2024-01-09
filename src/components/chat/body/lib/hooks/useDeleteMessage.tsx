@@ -4,7 +4,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Message } from "../types";
+import { Message } from "../../../lib/types";
 import { useToast } from "@/lib/hooks";
 import { FormMessage } from "@/components/common";
 

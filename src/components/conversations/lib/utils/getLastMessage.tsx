@@ -1,22 +1,6 @@
 import { shortenSentence } from "@/lib/utils/shortenSentence";
-import { CheckCheck } from "lucide-react";
 import { LastMessage } from "../types";
-import { cn } from "@/lib/utils";
-
-type GetLastMessageSeen = {
-  isOwn: boolean;
-  isSeen: boolean;
-};
-
-const getLastMessageSeen = ({ isOwn, isSeen }: GetLastMessageSeen) => {
-  if (!isOwn) return null;
-
-  return (
-    <CheckCheck
-      className={cn("text-muted-foreground w-4 h-4", isSeen && "text-primary")}
-    />
-  );
-};
+import { getMessageSeen } from "@/lib/utils";
 
 type GetLastMessageContent = {
   isOwn: boolean;
@@ -86,7 +70,7 @@ export const getLastMessageData = ({
 
   const isOwn = user.clerkId === currentUserClerkId;
 
-  const seen = getLastMessageSeen({
+  const seen = getMessageSeen({
     isOwn,
     isSeen: _count.seenBy > 0,
   });

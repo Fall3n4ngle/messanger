@@ -41,12 +41,6 @@ export const getMessages = async ({
       seenBy: {
         select: {
           id: true,
-          user: {
-            select: {
-              name: true,
-              image: true,
-            },
-          },
         },
       },
     },
@@ -57,7 +51,6 @@ export const getMessages = async ({
     take,
     skip: cursor ? 1 : 0,
   });
-
 
   return messages;
 };

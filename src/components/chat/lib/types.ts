@@ -2,10 +2,6 @@ import { MemberRole } from "@prisma/client";
 
 type SeenBy = {
   id: string;
-  user: {
-    name: string;
-    image: string | null;
-  };
 };
 
 export type Message = {

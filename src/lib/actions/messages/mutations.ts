@@ -1,9 +1,7 @@
 "use server";
 
-import { getUserAuth } from "@/lib/utils";
 import { MessageFields, sendMessageSchema } from "@/lib/validations";
 import { redirect } from "next/navigation";
-import { getUserByClerkId } from "../user/queries";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { auth } from "@clerk/nextjs";
@@ -97,8 +95,8 @@ export const sendMessage = async (fields: MessageFields) => {
 
   updatedConversation.members.forEach((member) => {
     if (member.user.clerkId !== userId) {
-      pusherServer.trigger(member.id, "messages:new", {
-        createdMessage,
+      pusherServer.trigger(member.user.clerkId, "messages:new", {
+        conversationId: createdMessage.conversationId,
       });
     }
   });
@@ -155,9 +153,9 @@ export const deleteMessage = async ({ conversationId, messageId }: Props) => {
 
   conversation?.members.forEach((member) => {
     if (member.user.clerkId !== userId) {
-      pusherServer.trigger(member.id, "messages:delete", {
-        messageId,
-      } as DeleteMessage);
+      pusherServer.trigger(member.user.clerkId, "messages:delete", {
+        conversationId,
+      });
     }
   });
 
@@ -170,23 +168,36 @@ export type MarkAsSeenProps = {
   conversationId: string;
 };
 
-export const markAsSeen = async ({ memberId, messageId }: MarkAsSeenProps) => {
-  try {
-    const updatedMessage = await db.message.update({
-      where: { id: messageId },
-      data: {
-        seenBy: {
-          connect: {
-            id: memberId,
+export const markAsSeen = async ({
+  memberId,
+  messageId,
+  conversationId,
+}: MarkAsSeenProps) => {
+  const updatedMessage = await db.message.update({
+    where: { id: messageId },
+    data: {
+      seenBy: {
+        connect: {
+          id: memberId,
+        },
+      },
+    },
+    select: {
+      member: {
+        select: {
+          user: {
+            select: {
+              clerkId: true,
+            },
           },
         },
       },
-    });
+    },
+  });
 
-    return { success: true, data: updatedMessage };
-  } catch (error) {
-    const message = (error as Error).message ?? "Failed to delete message";
-    console.log(message);
-    return { success: false, error: message };
-  }
+  pusherServer.trigger(updatedMessage.member.user.clerkId, "messages:seen", {
+    conversationId,
+  });
+
+  return { success: true, data: updatedMessage };
 };
