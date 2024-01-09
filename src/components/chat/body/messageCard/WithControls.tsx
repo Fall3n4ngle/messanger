@@ -12,7 +12,7 @@ type Props = {
   messageId: string;
   conversationId: string;
   content: string | null;
-  file: string | null;
+  file?: string | null;
 } & PropsWithChildren;
 
 export default function WithControls({

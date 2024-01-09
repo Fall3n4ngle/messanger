@@ -1,5 +1,5 @@
 import { Pencil } from "lucide-react";
-import { Message } from "../lib/types";
+import { Message } from "../../lib/types";
 import {
   Dialog,
   DialogContent,

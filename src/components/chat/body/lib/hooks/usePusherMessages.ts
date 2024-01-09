@@ -1,59 +1,35 @@
 import { pusherClient } from "@/lib/pusher/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useDeleteMessage } from "./useDeleteMessage";
-import { DeleteMessage } from "@/lib/actions/messages/mutations";
-import { useAuth } from "@clerk/nextjs";
-import { Message } from "../types";
-import { useNewMessage } from "@/components/chat/lib/hooks/useNewMessage";
 
-export const usePusherMessages = ({
-  conversationId,
-}: {
+type Props = {
+  memberId: string;
   conversationId: string;
-}) => {
-  const { userId } = useAuth();
+};
+
+export const usePusherMessages = ({ memberId, conversationId }: Props) => {
   const queryClient = useQueryClient();
 
-  const { updateCache: deleteMessage } = useDeleteMessage();
-  const { updateCache: receiveMessage } = useNewMessage();
-
   useEffect(() => {
-    pusherClient.subscribe(conversationId);
+    pusherClient.subscribe(memberId);
 
-    const handleNewMessage = (newMessage: Message) => {
-      receiveMessage({
-        conversationId,
-        newMessage,
-      });
-    };
-
-    const handleDeleteMessage = ({ messageId, clerkId }: DeleteMessage) => {
-      if (!userId || userId === clerkId) return;
-
-      deleteMessage({
-        messageId,
-        conversationId,
-      });
-    };
-
-    const handleUpdateMessage = () => {
+    const handleMessageEvent = () => {
       queryClient.invalidateQueries({
         queryKey: ["messages", conversationId],
       });
     };
 
-    pusherClient.bind("messages:new", handleNewMessage);
-    pusherClient.bind("messages:delete", handleDeleteMessage);
-    pusherClient.bind("messages:update", handleUpdateMessage);
-    pusherClient.bind("messages:seen", handleUpdateMessage);
+    pusherClient.bind("messages:new", handleMessageEvent);
+    pusherClient.bind("messages:delete", handleMessageEvent);
+    pusherClient.bind("messages:update", handleMessageEvent);
+    pusherClient.bind("messages:seen", handleMessageEvent);
 
     return () => {
-      pusherClient.unsubscribe(conversationId);
-      pusherClient.unbind("messages:new", handleNewMessage);
-      pusherClient.unbind("messages:delete", handleDeleteMessage);
-      pusherClient.unbind("messages:update", handleUpdateMessage);
-      pusherClient.unbind("messages:seen", handleUpdateMessage);
+      pusherClient.unsubscribe(memberId);
+      pusherClient.unbind("messages:new", handleMessageEvent);
+      pusherClient.unbind("messages:delete", handleMessageEvent);
+      pusherClient.unbind("messages:update", handleMessageEvent);
+      pusherClient.unbind("messages:seen", handleMessageEvent);
     };
-  }, [conversationId, queryClient, deleteMessage, userId, receiveMessage]);
+  }, [memberId, queryClient, conversationId]);
 };

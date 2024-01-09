@@ -25,8 +25,8 @@ export default function DeleteMessageButton({
   const [isOpen, setIsOpen] = useState(false);
   const { mutate } = useDeleteMessage();
 
-  const handleClick = async () => {
-    mutate({ conversationId, messageId });
+  const handleClick = () => {
+    mutate({ conversationId, messageId })
     setIsOpen(false);
   };
 

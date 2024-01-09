@@ -11,7 +11,7 @@ type SeenBy = {
 export type Message = {
   id: string;
   content: string | null;
-  file: string | null;
+  file?: string | null;
   updatedAt: Date;
   conversationId: string;
   member: {

@@ -15,9 +15,7 @@ import {
 } from "@/components/ui";
 import { UploadButton, UploadImage } from "@/components/upload";
 import { deleteFiles } from "@/lib/actions/files";
-import { upsertMessage } from "@/lib/actions/messages/mutations";
 import { useToast } from "@/lib/hooks";
-import { messageSchema } from "@/lib/validations/message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image as ImageIcon, Loader2, SendHorizontal } from "lucide-react";
 import Image from "next/image";
@@ -25,23 +23,25 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import MessageFormInput from "./MessageFormInput";
-import { useNewMessage } from "../lib/hooks/useNewMessage";
+import { Message } from "../lib/types";
+import { sendMessageSchema } from "@/lib/validations";
+import { useSendMessage } from "./lib/hooks/useSendMessage";
+import { v4 as uuidv4 } from "uuid";
 
 type Props = {
   conversationId: string;
-  userName: string;
-};
+} & Pick<Message, "member">;
 
-const formSchema = messageSchema.pick({ content: true, file: true });
+const formSchema = sendMessageSchema.pick({ content: true, file: true });
 type FormFields = z.infer<typeof formSchema>;
 
-export default function MessageForm({ conversationId, userName }: Props) {
+export default function MessageForm({ conversationId, member }: Props) {
   const { toast } = useToast();
-  const { revertCache, updateCache } = useNewMessage();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
+  const { mutate } = useSendMessage({ member });
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -71,23 +71,16 @@ export default function MessageForm({ conversationId, userName }: Props) {
     });
 
   const onSubmit = async (fields: FormFields) => {
-    const result = await upsertMessage({
+    mutate({
       ...fields,
       conversationId,
+      memberId: member.id,
+      id: uuidv4(),
+      updatedAt: new Date(),
     });
 
-    if (result?.success) {
-      form.reset();
-      form.setValue("content", "");
-    }
-
-    if (result?.error) {
-      toast({
-        description: (
-          <ToastMessage type="error" message="Error sending message" />
-        ),
-      });
-    }
+    form.reset();
+    form.setValue("content", "");
   };
 
   const { isSubmitting } = form.formState;
@@ -164,7 +157,7 @@ export default function MessageForm({ conversationId, userName }: Props) {
                 <FormControl>
                   <MessageFormInput
                     conversationId={conversationId}
-                    userName={userName}
+                    userName={member.user.name}
                     {...field}
                   />
                 </FormControl>

@@ -1,8 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
 import { cn, formatDate } from "@/lib/utils";
 import Image from "next/image";
-import { Message } from "../lib/types";
 import { forwardRef } from "react";
+import { Message } from "../../lib/types";
 
 export type MessageCardPorps = {
   isOwn: boolean;

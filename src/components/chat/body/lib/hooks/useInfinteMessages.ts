@@ -1,6 +1,6 @@
 import { getMessages } from "@/lib/actions/messages/queries";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Message } from "../types";
+import { Message } from "../../../lib/types";
 
 type Props = {
   initialMessages: Message[];

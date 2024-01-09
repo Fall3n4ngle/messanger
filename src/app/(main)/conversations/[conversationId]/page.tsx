@@ -39,12 +39,6 @@ export default async function Conversation({
 
   const { id, name, image, isGroup, members } = conversation;
 
-  const {
-    id: memberId,
-    role,
-    user: { name: userName },
-  } = userMember;
-
   return (
     <div className="w-full h-screen">
       <div className="flex flex-col h-full">
@@ -59,11 +53,11 @@ export default async function Conversation({
             <div className="flex items-center gap-1">
               <MediaRoomButton conversationId={conversationId} />
               <ConversationMenuButton
-                memberRole={role}
+                memberRole={userMember.role}
                 isGroup={isGroup}
                 members={members}
                 conversationId={conversationId}
-                userMemberId={memberId}
+                userMemberId={userMember.id}
                 name={name}
                 image={image}
               />
@@ -73,11 +67,11 @@ export default async function Conversation({
         <MessagesList
           initialMessages={messages}
           conversationId={id}
-          memberRole={role}
-          memberId={memberId}
+          memberRole={userMember.role}
+          memberId={userMember.id}
         />
         <div className="max-w-[1000px] self-center w-full">
-          <MessageForm conversationId={id} userName={userName} />
+          <MessageForm conversationId={id} member={userMember} />
         </div>
       </div>
     </div>

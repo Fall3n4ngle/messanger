@@ -1,11 +1,11 @@
 "use client";
 
 import { Button, ScrollArea } from "@/components/ui";
-import { Fragment, useRef } from "react";
+import { Fragment } from "react";
 import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
 import { MessageCard, WithControls, WithSeenOnScroll } from "./messageCard";
-import { Message } from "./lib/types";
+import { Message } from "../lib/types";
 import { useInfiniteMessages } from "./lib/hooks/useInfinteMessages";
 import { usePusherMessages } from "./lib/hooks/usePusherMessages";
 import { useAuth } from "@clerk/nextjs";
@@ -25,19 +25,13 @@ export default function MessagesList({
 }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
-  
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   const { data, fetchPreviousPage, hasPreviousPage } = useInfiniteMessages({
     conversationId,
     initialMessages,
   });
 
-  usePusherMessages({ conversationId });
+  usePusherMessages({ memberId, conversationId });
 
   if (!data.pages[0].length) {
     return (
@@ -68,7 +62,6 @@ export default function MessagesList({
             {group.map(
               (
                 { id, member, seenBy, conversationId, updatedAt, ...props },
-                index
               ) => {
                 if (!member.user || !userId) return;
                 const { clerkId } = member.user;
@@ -122,7 +115,6 @@ export default function MessagesList({
           </Fragment>
         ))}
       </div>
-      <div ref={bottomRef} />
     </ScrollArea>
   );
 }

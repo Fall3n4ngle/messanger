@@ -20,6 +20,8 @@ export const getUserMember = async ({ conversationId, clerkId }: Props) => {
         select: {
           id: true,
           name: true,
+          image: true,
+          clerkId: true,
         },
       },
     },

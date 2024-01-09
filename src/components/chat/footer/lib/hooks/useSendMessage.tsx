@@ -1,50 +1,40 @@
-import { deleteMessage } from "@/lib/actions/messages/mutations";
+import { sendMessage } from "@/lib/actions/messages/mutations";
+import { useToast } from "@/lib/hooks";
 import {
   InfiniteData,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Message } from "../types";
-import { useToast } from "@/lib/hooks";
+import { Message } from "../../../lib/types";
 import { FormMessage } from "@/components/common";
 
-export const useDeleteMessage = () => {
+type Props = Pick<Message, "member">;
+
+export const useSendMessage = ({ member }: Props) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: deleteMessage,
-
-    onMutate: async ({ conversationId, messageId }) => {
+    mutationFn: sendMessage,
+    onMutate: async (data) => {
       await queryClient.cancelQueries({
-        queryKey: ["messages", conversationId],
+        queryKey: ["messages", data.conversationId],
       });
 
       const previousMessagesData = queryClient.getQueryData([
         "messages",
-        conversationId,
+        data.conversationId,
       ]);
 
       queryClient.setQueryData(
-        ["messages", conversationId],
+        ["messages", data.conversationId],
         ({ pages, pageParams }: InfiniteData<Message[], unknown>) => {
-          let found = false;
-
-          const newPages = pages.map((page) => {
-            if (found) return page;
-
-            return page.filter((message) => {
-              if (message.id === messageId) {
-                found = true;
-                return false;
-              }
-
-              return true;
-            });
-          });
+          const newMessage: Message = { ...data, seenBy: [], member };
 
           return {
-            pages: newPages,
+            pages: pages.map((page, index) =>
+              index === pages.length - 1 ? [...page, newMessage] : page
+            ),
             pageParams,
           };
         }
@@ -52,7 +42,6 @@ export const useDeleteMessage = () => {
 
       return { previousMessagesData };
     },
-
     onError: (_error, { conversationId }, context) => {
       queryClient.setQueryData(
         ["meesages", conversationId],
@@ -61,7 +50,7 @@ export const useDeleteMessage = () => {
 
       toast({
         description: (
-          <FormMessage type="error" message="Error deleting message" />
+          <FormMessage type="error" message="Error sending message" />
         ),
       });
     },
@@ -69,6 +58,10 @@ export const useDeleteMessage = () => {
     onSettled: (_data, _error, { conversationId }) => {
       queryClient.invalidateQueries({
         queryKey: ["messages", conversationId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
       });
     },
   });
