@@ -2,7 +2,7 @@ export type LastMessage = {
   id: string;
   content: string | null;
   updatedAt: Date;
-  file: string | null;
+  file?: string | null;
   member: {
     user: {
       clerkId: string;

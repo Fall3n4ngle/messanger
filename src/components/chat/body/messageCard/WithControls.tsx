@@ -13,6 +13,7 @@ type Props = {
   conversationId: string;
   content: string | null;
   file?: string | null;
+  previousMessageId: string | null;
 } & PropsWithChildren;
 
 export default function WithControls({
@@ -21,13 +22,18 @@ export default function WithControls({
   file,
   messageId,
   children,
+  previousMessageId
 }: Props) {
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
       <ContextMenuContent className="w-[200px]">
         <ContextMenuItem onSelect={(e) => e.preventDefault()}>
-          <DeleteMessageButton messageId={messageId} conversationId={conversationId} />
+          <DeleteMessageButton
+            messageId={messageId}
+            conversationId={conversationId}
+            previousMessageId={previousMessageId}
+          />
         </ContextMenuItem>
         <ContextMenuItem onSelect={(e) => e.preventDefault()}>
           <EditMessageButton id={messageId} content={content} file={file} />

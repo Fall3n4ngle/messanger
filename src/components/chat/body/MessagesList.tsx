@@ -4,12 +4,11 @@ import { Button, ScrollArea } from "@/components/ui";
 import { Fragment } from "react";
 import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
-import { MessageCard, WithControls, WithSeenOnScroll } from "./messageCard";
 import { Message } from "../lib/types";
 import { useInfiniteMessages } from "./lib/hooks/useInfinteMessages";
 import { usePusherMessages } from "./lib/hooks/usePusherMessages";
 import { useAuth } from "@clerk/nextjs";
-import { getMessageSeen } from "@/lib/utils";
+import { getMessageCard } from "./lib/utils/getMessageCard";
 
 type Props = {
   initialMessages: Message[];
@@ -22,7 +21,6 @@ export default function MessagesList({
   conversationId,
   initialMessages,
   memberRole,
-  memberId,
 }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
@@ -58,64 +56,37 @@ export default function MessagesList({
         </div>
       )}
       <div className="flex-1 flex flex-col gap-6">
-        {data?.pages.map((group, id) => (
-          <Fragment key={id}>
-            {group.map(
-              ({ id, member, seenBy, conversationId, updatedAt, ...props }) => {
-                if (!member.user || !userId) return;
-                const { clerkId } = member.user;
-                const isOwn = clerkId === userId;
-                const isActive = usersIds.includes(clerkId);
-                const seen = getMessageSeen({
-                  isOwn,
-                  isSeen: seenBy.length > 0,
-                });
-                const seenByMember = seenBy.find((m) => m.id === member.id)
-                  ? true
-                  : false;
+        {data?.pages.map((group, groupIndex) => (
+          <Fragment key={groupIndex}>
+            {group.map(({ member, ...props }, messageIndex) => {
+              if (!member.user || !userId) return;
+              const { clerkId } = member.user;
+              const isOwn = clerkId === userId;
+              const isActive = usersIds.includes(clerkId);
 
-                let result = (
-                  <MessageCard
-                    key={id}
-                    isOwn={isOwn}
-                    isActive={isActive}
-                    updatedAt={updatedAt}
-                    member={member}
-                    seen={seen}
-                    {...props}
-                  />
-                );
+              let previousMessageId: string | null = null;
 
-                if (isOwn || memberRole !== "VIEW") {
-                  result = (
-                    <WithControls
-                      conversationId={conversationId}
-                      messageId={id}
-                      key={id}
-                      {...props}
-                    >
-                      {result}
-                    </WithControls>
-                  );
+              if (messageIndex >= 1) {
+                previousMessageId = group[messageIndex - 1].id;
+              } else {
+                if (groupIndex >= 1) {
+                  const previousGroup = data.pages[groupIndex - 1];
+                  previousMessageId =
+                    previousGroup[previousGroup.length - 1].id;
                 }
-
-                if (!isOwn && !seenByMember) {
-                  result = (
-                    <WithSeenOnScroll
-                      memberId={memberId}
-                      messageId={id}
-                      seen={seenByMember}
-                      conversationId={conversationId}
-                      key={id}
-                    >
-                      {result}
-                    </WithSeenOnScroll>
-                  );
-                }
-
-                return result;
               }
-            )}
+
+              const card = getMessageCard({
+                ...props,
+                isActive,
+                isOwn,
+                member,
+                memberRole,
+                previousMessageId,
+              });
+
+              return card;
+            })}
           </Fragment>
         ))}
       </div>

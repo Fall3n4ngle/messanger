@@ -16,17 +16,19 @@ import { useDeleteMessage } from "../lib/hooks/useDeleteMessage";
 type Props = {
   messageId: string;
   conversationId: string;
+  previousMessageId: string | null;
 };
 
 export default function DeleteMessageButton({
   conversationId,
   messageId,
+  previousMessageId,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const { mutate } = useDeleteMessage();
 
   const handleClick = () => {
-    mutate({ conversationId, messageId })
+    mutate({ conversationId, messageId, previousMessageId });
     setIsOpen(false);
   };
 

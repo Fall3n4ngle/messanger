@@ -5,18 +5,12 @@ import { db } from "@/lib/db";
 type Props = {
   currentUserId: string;
   query?: string;
-  take?: number;
-  lastCursor?: Date;
 };
 
 export const getUserConversations = async ({
   currentUserId,
-  lastCursor,
   query = "",
-  take,
 }: Props) => {
-  const cursor = lastCursor ? { createdAt: lastCursor } : undefined;
-
   const convsersations = await db.conversation.findMany({
     where: {
       members: {
@@ -72,18 +66,15 @@ export const getUserConversations = async ({
           },
           _count: {
             select: {
-              seenBy: true
-            }
-          }
+              seenBy: true,
+            },
+          },
         },
       },
     },
     orderBy: {
       updatedAt: "desc",
     },
-    cursor,
-    take,
-    skip: cursor ? 1 : 0,
   });
 
   return convsersations;

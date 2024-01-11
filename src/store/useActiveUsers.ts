@@ -14,5 +14,5 @@ export const useActiveUsers = create<Store>((set) => ({
     set((state) => ({
       usersIds: state.usersIds.filter((id) => id !== userId),
     })),
-  set: (usersIds) => set((state) => ({ usersIds })),
+  set: (usersIds) => set(() => ({ usersIds })),
 }));

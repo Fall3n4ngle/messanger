@@ -107,6 +107,7 @@ export const sendMessage = async (fields: MessageFields) => {
 type Props = {
   messageId: string;
   conversationId: string;
+  previousMessageId: string | null;
 };
 
 export type DeleteMessage = {
@@ -114,7 +115,11 @@ export type DeleteMessage = {
   clerkId: string;
 };
 
-export const deleteMessage = async ({ conversationId, messageId }: Props) => {
+export const deleteMessage = async ({
+  conversationId,
+  messageId,
+  previousMessageId,
+}: Props) => {
   const { userId } = auth();
 
   if (!userId) redirect("/sign-in");
@@ -123,33 +128,53 @@ export const deleteMessage = async ({ conversationId, messageId }: Props) => {
     where: { id: messageId },
     select: {
       id: true,
-      member: {
+      conversation: {
         select: {
-          user: {
-            select: {
-              clerkId: true,
-            },
-          },
+          lastMessageId: true,
         },
       },
     },
   });
 
-  const conversation = await db.conversation.findFirst({
-    where: { id: conversationId },
-    select: {
-      members: {
-        select: {
-          id: true,
-          user: {
-            select: {
-              clerkId: true,
+  const isLast = deletedMessage.conversation.lastMessageId === messageId;
+  let conversation;
+
+  if (isLast) {
+    conversation = await db.conversation.update({
+      where: { id: conversationId },
+      data: {
+        lastMessageId: previousMessageId,
+      },
+      select: {
+        members: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                clerkId: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
+  } else {
+    conversation = await db.conversation.findFirst({
+      where: { id: conversationId },
+      select: {
+        members: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 
   conversation?.members.forEach((member) => {
     if (member.user.clerkId !== userId) {

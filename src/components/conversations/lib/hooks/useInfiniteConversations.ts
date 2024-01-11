@@ -1,5 +1,5 @@
 import { getUserConversations } from "@/lib/actions/conversation/queries";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Conversation } from "../types";
 
 type UseInfiniteConversationsProps = {
@@ -8,38 +8,14 @@ type UseInfiniteConversationsProps = {
   intialConversations: Conversation[];
 };
 
-const take = 25;
-
-export const useInfiniteConversations = ({
-  query,
+export const useConversations = ({
   currentUserId,
   intialConversations,
+  query,
 }: UseInfiniteConversationsProps) => {
-  const getData = async ({ pageParam }: { pageParam?: Date }) => {
-    const conversations = await getUserConversations({
-      currentUserId,
-      query: query ?? "",
-      lastCursor: pageParam,
-      take,
-    });
-
-    return conversations;
-  };
-
-  return useInfiniteQuery({
+  return useQuery({
     queryKey: ["conversations", query],
-    queryFn: getData,
-    initialPageParam: undefined,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length < take) {
-        return;
-      }
-
-      return lastPage[lastPage.length - 1].lastMessage?.updatedAt;
-    },
-    initialData: {
-      pages: [intialConversations],
-      pageParams: [undefined],
-    },
+    queryFn: () => getUserConversations({ currentUserId, query: query ?? "" }),
+    initialData: intialConversations,
   });
 };
