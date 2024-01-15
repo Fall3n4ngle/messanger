@@ -9,7 +9,7 @@ import { Conversation } from "./lib/types";
 import { usePusherConversations } from "./lib/hooks/usePusherConversations";
 import { useAuth } from "@clerk/nextjs";
 import { getLastMessageData } from "./lib/utils/getLastMessage";
-import { useConversations } from "./lib/hooks/useInfiniteConversations";
+import { useConversations } from "./lib/hooks/useConversations";
 
 type Props = {
   intialConversations: Conversation[];

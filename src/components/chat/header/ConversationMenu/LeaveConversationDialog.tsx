@@ -10,7 +10,7 @@ import {
 } from "@/components/ui";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import DeleteMemberButton from "./DeleteMemberButton";
+import LeaveConversationButton from "./LeaveConversationButton";
 
 type Props = {
   conversationId: string;
@@ -45,15 +45,11 @@ export default function LeaveConversationDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <DeleteMemberButton
+          <LeaveConversationButton
             conversationId={conversationId}
             memberId={memberId}
             onDialogClose={handleDialogClose}
-            errorMessage="Failed to leave conversation"
-            successMessage="Left conversation successfully"
-          >
-            Leave
-          </DeleteMemberButton>
+          />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

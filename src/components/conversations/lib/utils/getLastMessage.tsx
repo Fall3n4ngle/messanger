@@ -5,7 +5,7 @@ import { getMessageSeen } from "@/lib/utils";
 type GetLastMessageContent = {
   isOwn: boolean;
   content: string | null;
-  file: string | null;
+  file?: string | null;
   senderName: string;
   isGroup: boolean;
 };

@@ -9,7 +9,6 @@ import {
   updateGroupSchema,
 } from "@/lib/validations";
 import { db } from "@/lib/db";
-import { getUserAuth } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import { getUserByClerkId } from "../user/queries";
 import { revalidatePath } from "next/cache";

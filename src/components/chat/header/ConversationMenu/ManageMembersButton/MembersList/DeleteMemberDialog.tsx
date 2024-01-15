@@ -11,7 +11,7 @@ import {
 } from "@/components/ui";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import DeleteMemberButton from "../../DeleteMemberButton";
+import DeleteMemberButton from "../../LeaveConversationButton";
 
 type Props = {
   conversationId: string;

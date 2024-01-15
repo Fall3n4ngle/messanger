@@ -33,24 +33,14 @@ export const usePusherConversations = ({
 
     const handleNewConversation = () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations"]
-      })
+        queryKey: ["conversations"],
+      });
     };
 
     const handleDeleteMember = async ({
       conversationId,
-      userId,
     }: DeleteMemberEvent) => {
-      if (currentUserId !== userId) {
-        await revalidateConversationPath(conversationId);
-        return;
-      }
-
-      deleteConversation(conversationId);
-
-      if (pathname.includes(conversationId)) {
-        router.push("/conversations");
-      }
+      await revalidateConversationPath(conversationId);
     };
 
     const handleConversationUpdate = async (
