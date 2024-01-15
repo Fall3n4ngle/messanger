@@ -27,41 +27,23 @@ export const useMarkAsSeen = () => {
         {
           queryKey: ["conversations"],
         },
-        (oldData: InfiniteData<Conversation[], unknown> | undefined) => {
-          if (!oldData) {
-            return {
-              pageParams: [],
-              pages: [],
-            };
-          }
+        (oldData: Conversation[] | undefined) => {
+          if (!oldData) return [];
 
-          const { pageParams, pages } = oldData;
+          return oldData.map((conversation) => {
+            if (conversation.id === conversationId) {
+              return {
+                ...conversation,
+                messages: [
+                  ...conversation.messages.filter(
+                    (message) => message.id !== messageId
+                  ),
+                ],
+              };
+            }
 
-          return {
-            pageParams,
-            pages: pages.map((page) => {
-              let found = false;
-
-              if (found) return page;
-
-              return page.map((conversation) => {
-                if (conversation.id === conversationId) {
-                  found = true;
-
-                  return {
-                    ...conversation,
-                    messages: [
-                      ...conversation.messages.filter(
-                        (message) => message.id !== messageId
-                      ),
-                    ],
-                  };
-                }
-
-                return conversation;
-              });
-            }),
-          };
+            return conversation;
+          });
         }
       );
 

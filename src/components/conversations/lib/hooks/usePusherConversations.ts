@@ -1,8 +1,6 @@
 import { pusherClient } from "@/lib/pusher/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useNewConversation } from "./useNewConversation";
-import { Conversation } from "../types";
 import { useDeleteConversation } from "./useDeleteConversation";
 import { usePathname, useRouter } from "next/navigation";
 import { DeleteMemberEvent } from "@/lib/actions/member/mutations";
@@ -27,15 +25,16 @@ export const usePusherConversations = ({
 
   const queryClient = useQueryClient();
 
-  const { updateCache: addConversation } = useNewConversation();
   const { updateCache: deleteConversation } = useDeleteConversation();
   const { updateCache: updateConversation } = useUpdateConversation();
 
   useEffect(() => {
     pusherClient.subscribe(currentUserId);
 
-    const handleNewConversation = (newConversation: Conversation) => {
-      addConversation(newConversation);
+    const handleNewConversation = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"]
+      })
     };
 
     const handleDeleteMember = async ({
@@ -87,7 +86,6 @@ export const usePusherConversations = ({
     currentUserId,
     queryClient,
     query,
-    addConversation,
     deleteConversation,
     pathname,
     router,

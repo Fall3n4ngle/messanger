@@ -15,12 +15,17 @@ export const conversationSchema = z.object({
     }),
   image: z.string().optional().nullable(),
   members: memberSchema.array().min(1, {
-    message: "Add at least on member"
+    message: "Add at least one member",
   }),
-  isGroup: z.boolean().default(false).optional(),
+  isGroup: z.boolean().default(false),
 });
 
-export type ConversationFields = z.infer<typeof conversationSchema>;
+export const createConversationSchema = conversationSchema.pick({
+  name: true,
+  image: true,
+  isGroup: true,
+  members: true,
+});
 
 export const updateGroupSchema = conversationSchema.pick({
   name: true,
@@ -28,11 +33,12 @@ export const updateGroupSchema = conversationSchema.pick({
   id: true,
 });
 
-export type UpdateGroupFields = z.infer<typeof updateGroupSchema>;
-
 export const addMembersSchema = conversationSchema.pick({
   members: true,
   id: true,
 });
 
+export type ConversationFields = z.infer<typeof conversationSchema>;
+export type CreateConversationFields = z.infer<typeof createConversationSchema>;
 export type AddMembersFields = z.infer<typeof addMembersSchema>;
+export type UpdateGroupFields = z.infer<typeof updateGroupSchema>;

@@ -1,43 +1,14 @@
-import { GroupInfo, GroupMembers } from "@/components/common";
+import { FormMessage } from "@/components/common";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useState } from "react";
-import ToastMessage from "@/components/common/FormMessage";
-import { useToast } from "@/lib/hooks";
-import { useRouter } from "next/navigation";
-import { createGroup } from "@/lib/actions/conversation/mutations";
 import { Button, Form } from "@/components/ui";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { conversationSchema, membersSchema } from "@/lib/validations";
-import { z } from "zod";
-
-type Step = {
-  id: string;
-  fields: (keyof FormFields)[];
-  component: JSX.Element;
-};
-
-const steps: Step[] = [
-  {
-    id: "info",
-    fields: ["name", "image"],
-    component: <GroupInfo />,
-  },
-  {
-    id: "members",
-    fields: ["members"],
-    component: <GroupMembers />,
-  },
-];
-
-const fieldsSchema = conversationSchema.pick({
-  name: true,
-  image: true,
-});
-
-export const formSchema = fieldsSchema.merge(membersSchema);
-
-export type FormFields = z.infer<typeof formSchema>;
+import { useNewConversation } from "../lib/hooks/useNewConversation";
+import { useToast } from "@/lib/hooks";
+import { useRouter } from "next/navigation";
+import { FormFields, formSchema } from "./lib/validations/formSchema";
+import { steps } from "./lib/const";
 
 type Props = {
   onDialogClose: Function;
@@ -45,6 +16,7 @@ type Props = {
 
 export default function CreateGroupForm({ onDialogClose }: Props) {
   const [step, setStep] = useState(0);
+  const { mutateAsync } = useNewConversation();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -59,33 +31,32 @@ export default function CreateGroupForm({ onDialogClose }: Props) {
   async function onSubmit(fields: FormFields) {
     const { members, ...data } = fields;
 
-    const result = await createGroup({
-      ...data,
-      id: "",
+    const result = await mutateAsync({
       isGroup: true,
       members: members.map(({ value }) => ({ id: value })),
+      ...data,
     });
 
-    if (result?.success) {
+    if (!result?.success) {
       toast({
         description: (
-          <ToastMessage type="success" message="Group created successfully" />
+          <FormMessage type="error" message="Failed to create group" />
         ),
       });
 
-      onDialogClose();
-      form.reset();
-      setStep(0);
-      router.push(`/conversations/${result.data?.id}`);
+      return;
     }
 
-    if (result?.error) {
-      toast({
-        description: (
-          <ToastMessage type="error" message="Error creating group" />
-        ),
-      });
-    }
+    toast({
+      description: (
+        <FormMessage type="success" message="Created group successfully" />
+      ),
+    });
+
+    onDialogClose();
+    form.reset();
+    setStep(0);
+    router.push(`/conversations/${result.data?.id}`);
   }
 
   const handlePreviousClick = (e: FormEvent) => {

@@ -21,7 +21,7 @@ type Message = {
 export type Conversation = {
   id: string;
   name: string;
-  image: string | null;
+  image?: string | null;
   updatedAt: Date;
   lastMessage: LastMessage;
   messages: Message[];

@@ -41,7 +41,7 @@ export default function MessageForm({ conversationId, member }: Props) {
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
-  const { mutate } = useSendMessage({ member });
+  const { mutate, isSuccess } = useSendMessage({ member });
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -79,8 +79,10 @@ export default function MessageForm({ conversationId, member }: Props) {
       updatedAt: new Date(),
     });
 
-    form.reset();
-    form.setValue("content", "");
+    if (isSuccess) {
+      form.reset();
+      form.setValue("content", "");
+    }
   };
 
   const { isSubmitting } = form.formState;

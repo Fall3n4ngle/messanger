@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 type Props = {
   name: string;
-  image: string | null;
+  image?: string | null;
   isActive: boolean;
   lastMessageAt: string;
   lastMessageContent: ReactNode;

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, ScrollArea } from "@/components/ui";
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
 import { Message } from "../lib/types";
@@ -25,12 +25,32 @@ export default function MessagesList({
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
 
-  const { data, fetchPreviousPage, hasPreviousPage } = useInfiniteMessages({
-    conversationId,
-    initialMessages,
-  });
+  const messagesListRef = useRef<HTMLDivElement>(null);
+
+  const { data, fetchPreviousPage, hasPreviousPage, dataUpdatedAt } =
+    useInfiniteMessages({
+      conversationId,
+      initialMessages,
+    });
 
   usePusherMessages();
+
+  const offsetTop = messagesListRef.current?.parentElement?.scrollTop;
+
+  useEffect(() => {
+    console.log(offsetTop);
+  }, [offsetTop]);
+
+  const scrollToBottom = () => {
+    messagesListRef.current?.lastElementChild?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [dataUpdatedAt]);
 
   if (!data.pages[0].length) {
     return (
@@ -55,7 +75,7 @@ export default function MessagesList({
           </Button>
         </div>
       )}
-      <div className="flex-1 flex flex-col gap-6">
+      <div className="flex-1 flex flex-col gap-6" ref={messagesListRef}>
         {data?.pages.map((group, groupIndex) => (
           <Fragment key={groupIndex}>
             {group.map(({ member, ...props }, messageIndex) => {

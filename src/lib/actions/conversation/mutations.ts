@@ -2,10 +2,10 @@
 
 import {
   AddMembersFields,
-  ConversationFields,
+  CreateConversationFields,
   UpdateGroupFields,
   addMembersSchema,
-  conversationSchema,
+  createConversationSchema,
   updateGroupSchema,
 } from "@/lib/validations";
 import { db } from "@/lib/db";
@@ -15,20 +15,21 @@ import { getUserByClerkId } from "../user/queries";
 import { revalidatePath } from "next/cache";
 import { MemberRole } from "@prisma/client";
 import { pusherServer } from "@/lib/pusher/server";
+import { auth } from "@clerk/nextjs";
 
-export const createGroup = async (fields: ConversationFields) => {
-  const result = conversationSchema.safeParse(fields);
+export const createGroup = async (fields: CreateConversationFields) => {
+  const result = createConversationSchema.safeParse(fields);
 
   if (result.success) {
     const {
-      data: { id, members: newMembers, ...values },
+      data: { members: newMembers, ...values },
     } = result;
 
     try {
-      const { session } = await getUserAuth();
-      if (!session) redirect("/sign-in");
+      const { userId } = auth();
+      if (!userId) redirect("/sign-in");
 
-      const currentUser = await getUserByClerkId(session.user.id);
+      const currentUser = await getUserByClerkId(userId);
       if (!currentUser) redirect("/onboarding");
 
       const mappedMembers = newMembers
@@ -105,19 +106,21 @@ export const createGroup = async (fields: ConversationFields) => {
       const { members, ...conversation } = createdGroup;
 
       members.forEach((member) => {
-        pusherServer.trigger(member.userId, "conversation:new", conversation);
+        if (member.userId !== userId) {
+          pusherServer.trigger(member.userId, "conversation:new", {});
+        }
       });
 
       return { success: true, data: conversation };
     } catch (error) {
       const message = (error as Error).message ?? "Failed to create group";
       console.log(message);
-      return { success: false, error: message };
+      throw new Error(message);
     }
   }
 
   if (result.error) {
-    return { success: false, error: result.error.format() };
+    throw new Error(result.error.toString());
   }
 };
 
@@ -174,7 +177,7 @@ export const updateGroup = async (fields: UpdateGroupFields) => {
 
 export type AddMembersEvent = {
   conversationId: string;
-}
+};
 
 export const addMembers = async (fields: AddMembersFields) => {
   const result = addMembersSchema.safeParse(fields);
