@@ -4,7 +4,10 @@ import { useForm } from "react-hook-form";
 import { FormMessage } from "@/components/common";
 import { Button, Form } from "@/components/ui";
 import { GroupMembers } from "@/components/common";
-import { addMembers } from "@/lib/actions/conversation/mutations";
+import {
+  addMembers,
+  revalidateConversationPath,
+} from "@/lib/actions/conversation/mutations";
 import { Loader2 } from "lucide-react";
 import { formMembersSchema, FormMembersFields } from "@/lib/validations";
 
@@ -35,6 +38,8 @@ export default function AddMembersForm({
     });
 
     if (result?.success) {
+      await revalidateConversationPath(conversationId);
+
       toast({
         description: (
           <FormMessage type="success" message="Members added successfully" />

@@ -96,7 +96,11 @@ export const createGroup = async (fields: CreateConversationFields) => {
           },
           members: {
             select: {
-              userId: true,
+              user: {
+                select: {
+                  clerkId: true,
+                },
+              },
             },
           },
         },
@@ -105,8 +109,10 @@ export const createGroup = async (fields: CreateConversationFields) => {
       const { members, ...conversation } = createdGroup;
 
       members.forEach((member) => {
-        if (member.userId !== userId) {
-          pusherServer.trigger(member.userId, "conversation:new", {});
+        if (member.user.clerkId !== userId) {
+          const conversationChannel = `${member.user.clerkId}_conversations`;
+
+          pusherServer.trigger(conversationChannel, "conversation:new", {});
         }
       });
 
@@ -136,6 +142,8 @@ export const updateGroup = async (fields: UpdateGroupFields) => {
     const { id, ...fields } = result.data;
 
     try {
+      const { userId } = auth();
+
       const updatedGroup = await db.conversation.update({
         where: { id },
         data: fields,
@@ -145,7 +153,11 @@ export const updateGroup = async (fields: UpdateGroupFields) => {
           image: true,
           members: {
             select: {
-              userId: true,
+              user: {
+                select: {
+                  clerkId: true,
+                },
+              },
             },
           },
         },
@@ -154,11 +166,15 @@ export const updateGroup = async (fields: UpdateGroupFields) => {
       const { members, ...conversation } = updatedGroup;
 
       members.forEach((member) => {
-        pusherServer.trigger(
-          member.userId,
-          "conversation:update",
-          conversation as UpdateConversationEvent
-        );
+        if (member.user.clerkId !== userId) {
+          const conversationChannel = `${member.user.clerkId}_conversations`;
+
+          pusherServer.trigger(
+            conversationChannel,
+            "conversation:update",
+            conversation as UpdateConversationEvent
+          );
+        }
       });
 
       return { success: true, data: conversation };
@@ -182,8 +198,10 @@ export const addMembers = async (fields: AddMembersFields) => {
   const result = addMembersSchema.safeParse(fields);
 
   if (result.success) {
+    const { members: newMembers, id } = result.data;
+
     try {
-      const { members: newMembers, id } = result.data;
+      const { userId } = auth();
 
       const mappedMembers = newMembers.map((member) => ({
         userId: member.id,
@@ -202,16 +220,28 @@ export const addMembers = async (fields: AddMembersFields) => {
         select: {
           members: {
             select: {
-              userId: true,
+              user: {
+                select: {
+                  clerkId: true,
+                },
+              },
             },
           },
         },
       });
 
       updatedGroup.members.forEach((member) => {
-        pusherServer.trigger(member.userId, "conversation:add_members", {
-          conversationId: id,
-        });
+        if (member.user.clerkId !== userId) {
+          const conversationChannel = `${member.user.clerkId}_conversations`;
+
+          pusherServer.trigger(
+            conversationChannel,
+            "conversation:add_members",
+            {
+              conversationId: id,
+            }
+          );
+        }
       });
 
       return { success: true, data: updatedGroup };

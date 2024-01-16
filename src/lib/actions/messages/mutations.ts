@@ -12,26 +12,9 @@ export type UpdateMessage = {
   file: string | null;
 };
 
-type Message = {
-  id: string;
-};
-
-export type NewMessage = {
-  id: string;
-  messages: Message[];
-  lastMessage: {
-    id: string;
-    content: string | null;
-    updatedAt: Date;
-    file: string | null;
-    member: {
-      user: {
-        clerkId: string;
-        name: string;
-      };
-    };
-  } | null;
-};
+export type SendConversationEvent = {
+  conversationId: string;
+}
 
 export const sendMessage = async (fields: MessageFields) => {
   const result = sendMessageSchema.parse(fields);
@@ -95,9 +78,11 @@ export const sendMessage = async (fields: MessageFields) => {
 
   updatedConversation.members.forEach((member) => {
     if (member.user.clerkId !== userId) {
-      pusherServer.trigger(member.user.clerkId, "messages:new", {
+      const conversationsChannel = `${member.user.clerkId}_conversations`;
+
+      pusherServer.trigger(conversationsChannel, "conversation:new_message", {
         conversationId: createdMessage.conversationId,
-      });
+      } as SendConversationEvent);
     }
   });
 
@@ -178,7 +163,9 @@ export const deleteMessage = async ({
 
   conversation?.members.forEach((member) => {
     if (member.user.clerkId !== userId) {
-      pusherServer.trigger(member.user.clerkId, "messages:delete", {
+      const messagesChannel = `${member.user.clerkId}_messages`;
+
+      pusherServer.trigger(messagesChannel, "messages:delete", {
         conversationId,
       });
     }
@@ -220,7 +207,9 @@ export const markAsSeen = async ({
     },
   });
 
-  pusherServer.trigger(updatedMessage.member.user.clerkId, "messages:seen", {
+  const messagesChannel = `${updatedMessage.member.user.clerkId}_messages`;
+
+  pusherServer.trigger(messagesChannel, "messages:seen", {
     conversationId,
   });
 

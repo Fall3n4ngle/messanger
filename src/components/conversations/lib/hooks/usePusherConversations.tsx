@@ -11,23 +11,19 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/lib/hooks";
 import { FormMessage } from "@/components/common";
+import { SendConversationEvent } from "@/lib/actions/messages/mutations";
 
-type UsePusherConversationsProps = {
-  currentUserId: string;
-  query: string | null;
-};
-
-export const usePusherConversations = ({
-  currentUserId,
-  query,
-}: UsePusherConversationsProps) => {
+export const usePusherConversations = () => {
   const queryClient = useQueryClient();
-  const { userId: currentClerkId } = useAuth();
+  const { userId: currentUserId } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
-    pusherClient.subscribe(currentUserId);
+    if (!currentUserId) return;
+
+    const conversationsChannel = `${currentUserId}_conversations`;
+    pusherClient.subscribe(conversationsChannel);
 
     const handleNewConversation = () => {
       queryClient.invalidateQueries({
@@ -40,7 +36,7 @@ export const usePusherConversations = ({
       userId,
       conversationName,
     }: DeleteMemberEvent) => {
-      if (userId !== currentClerkId) {
+      if (userId !== currentUserId) {
         await revalidateConversationPath(conversationId);
         return;
       }
@@ -75,30 +71,24 @@ export const usePusherConversations = ({
       await revalidateConversationPath(conversationId);
     };
 
-    const handleNewMessage = () => {
+    const handleNewMessage = ({ conversationId }: SendConversationEvent) => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
     };
 
     pusherClient.bind("conversation:new", handleNewConversation);
-    pusherClient.bind("member:delete", handleDeleteMember);
+    pusherClient.bind("conversation:delete_member", handleDeleteMember);
     pusherClient.bind("conversation:update", handleConversationUpdate);
     pusherClient.bind("conversation:new_message", handleNewMessage);
     pusherClient.bind("conversation:add_members", handleAddMembers);
 
     return () => {
-      pusherClient.unsubscribe(currentUserId);
+      pusherClient.unsubscribe(conversationsChannel);
       pusherClient.unbind("conversation:new", handleNewConversation);
-      pusherClient.unbind("conversation:new_message", handleNewMessage);
+      pusherClient.unbind("messages:new", handleNewMessage);
       pusherClient.unbind("member:delete", handleDeleteMember);
       pusherClient.unbind("conversation:update", handleConversationUpdate);
       pusherClient.unbind("conversation:add_members", handleAddMembers);
     };
-  }, [
-    currentUserId,
-    queryClient,
-    query,
-    currentClerkId,
-    router,
-    toast,
-  ]);
+  }, [queryClient, currentUserId, router, toast]);
 };

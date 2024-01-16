@@ -22,20 +22,20 @@ export default function WithControls({
   file,
   messageId,
   children,
-  previousMessageId
+  previousMessageId,
 }: Props) {
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
       <ContextMenuContent className="w-[200px]">
-        <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+        <ContextMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
           <DeleteMessageButton
             messageId={messageId}
             conversationId={conversationId}
             previousMessageId={previousMessageId}
           />
         </ContextMenuItem>
-        <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+        <ContextMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
           <EditMessageButton id={messageId} content={content} file={file} />
         </ContextMenuItem>
       </ContextMenuContent>

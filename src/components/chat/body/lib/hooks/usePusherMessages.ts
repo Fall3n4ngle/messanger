@@ -10,7 +10,9 @@ export const usePusherMessages = () => {
   useEffect(() => {
     if (!userId) return;
 
-    pusherClient.subscribe(userId);
+    const messagesCahannel = `${userId}_messages`;
+
+    pusherClient.subscribe(messagesCahannel);
 
     const handleMessageEvent = ({
       conversationId,
@@ -32,7 +34,7 @@ export const usePusherMessages = () => {
     pusherClient.bind("messages:seen", handleMessageEvent);
 
     return () => {
-      pusherClient.unsubscribe(userId);
+      pusherClient.unsubscribe(messagesCahannel);
       pusherClient.unbind("messages:new", handleMessageEvent);
       pusherClient.unbind("messages:delete", handleMessageEvent);
       pusherClient.unbind("messages:update", handleMessageEvent);

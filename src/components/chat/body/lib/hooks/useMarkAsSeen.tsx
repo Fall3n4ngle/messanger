@@ -1,11 +1,7 @@
 import { Conversation } from "@/components/conversations/lib/types";
 import { markAsSeen } from "@/lib/actions/messages/mutations";
 import { useToast } from "@/lib/hooks";
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormMessage } from "@/components/common";
 
 export const useMarkAsSeen = () => {

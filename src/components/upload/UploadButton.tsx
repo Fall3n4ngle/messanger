@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, PropsWithChildren, ReactNode } from "react";
+import { ChangeEvent, PropsWithChildren, forwardRef } from "react";
 import {
   UploadFileResponse,
   generateMimeTypes,
@@ -28,50 +28,60 @@ type Props = {
   disabled?: boolean;
 } & PropsWithChildren;
 
-export default function UploadButton({
-  className,
-  onClientUploadComplete,
-  onUploadError,
-  onBeforeUploadBegin,
-  children,
-  disabled,
-}: Props) {
-  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
-    onClientUploadComplete,
-    onUploadError,
-    onBeforeUploadBegin,
-  });
+const UploadButton = forwardRef<HTMLLabelElement, Props>(
+  (
+    {
+      className,
+      onClientUploadComplete,
+      onUploadError,
+      onBeforeUploadBegin,
+      children,
+      disabled,
+    },
+    ref
+  ) => {
+    const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+      onClientUploadComplete,
+      onUploadError,
+      onBeforeUploadBegin,
+    });
 
-  const { fileTypes, multiple } = generatePermittedFileTypes(
-    permittedFileInfo?.config
-  );
+    const { fileTypes, multiple } = generatePermittedFileTypes(
+      permittedFileInfo?.config
+    );
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    startUpload(Array.from(e.target.files));
-  };
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files) return;
+      startUpload(Array.from(e.target.files));
+    };
 
-  return (
-    <label
-      className={cn(
-        buttonVariants({
-          size: "icon",
-          variant: "secondary",
-        }),
-        "cursor-pointer !mt-0",
-        disabled && "cursor-default opacity-50",
-        className
-      )}
-    >
-      <input
-        type="file"
-        onChange={handleChange}
-        className="hidden"
-        accept={generateMimeTypes(fileTypes ?? [])?.join(", ")}
-        multiple={multiple}
-        disabled={disabled}
-      />
-      {children}
-    </label>
-  );
-}
+    return (
+      <label
+        ref={ref}
+        className={cn(
+          buttonVariants({
+            size: "icon",
+            variant: "secondary",
+          }),
+          "cursor-pointer !mt-0",
+          disabled && "cursor-default opacity-50",
+          className
+        )}
+      >
+        <input
+          type="file"
+          onChange={handleChange}
+          className="hidden"
+          accept={generateMimeTypes(fileTypes ?? [])?.join(", ")}
+          multiple={multiple}
+          disabled={disabled}
+        />
+        {children}
+      </label>
+    );
+  }
+);
+
+UploadButton.displayName = "UploadButton";
+
+export default UploadButton;

@@ -14,7 +14,7 @@ export default function EditMessageButton(props: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="w-full flex items-end gap-3">
+        <button className="w-full flex items-end gap-3 p-2">
           <Pencil className="text-primary" />
           Edit
         </button>

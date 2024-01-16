@@ -2,13 +2,14 @@ import { Conversation } from "./lib/types";
 import { useToast } from "@/lib/hooks";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateGroup } from "@/lib/actions/conversation/mutations";
+import { revalidateConversationPath } from "@/lib/actions/conversation/mutations";
 import ToastMessage from "@/components/common/FormMessage";
 import { Button, Form } from "@/components/ui";
 import { GroupInfo } from "@/components/common";
 import { Loader2 } from "lucide-react";
 import { updateGroupSchema } from "@/lib/validations";
 import { z } from "zod";
+import { useUpdateGroup } from "./lib/hooks/useUpdateGroup";
 
 const formSchema = updateGroupSchema.pick({ name: true, image: true });
 type FormFields = z.infer<typeof formSchema>;
@@ -24,6 +25,7 @@ export default function EditConversationForm({
   onDialogClose,
 }: Props) {
   const { toast } = useToast();
+  const { mutateAsync } = useUpdateGroup();
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -34,12 +36,14 @@ export default function EditConversationForm({
   });
 
   async function onSubmit(fields: FormFields) {
-    const result = await updateGroup({
+    const result = await mutateAsync({
       id,
       ...fields,
     });
 
     if (result?.success) {
+      await revalidateConversationPath(id);
+
       toast({
         description: (
           <ToastMessage type="success" message="Group updated successfully" />

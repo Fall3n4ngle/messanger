@@ -8,7 +8,6 @@ import {
 import { Message } from "../../../lib/types";
 import { FormMessage } from "@/components/common";
 import { Conversation } from "@/components/conversations/lib/types";
-import { flushSync } from "react-dom";
 
 type Props = Pick<Message, "member">;
 
@@ -36,21 +35,19 @@ export const useSendMessage = ({ member }: Props) => {
         queryKey: ["conversations"],
       });
 
-      flushSync(() => {
-        queryClient.setQueryData(
-          ["messages", data.conversationId],
-          ({ pages, pageParams }: InfiniteData<Message[], unknown>) => {
-            const newMessage: Message = { ...data, seenBy: [], member };
+      queryClient.setQueryData(
+        ["messages", data.conversationId],
+        ({ pages, pageParams }: InfiniteData<Message[], unknown>) => {
+          const newMessage: Message = { ...data, seenBy: [], member };
 
-            return {
-              pages: pages.map((page, index) =>
-                index === pages.length - 1 ? [...page, newMessage] : page
-              ),
-              pageParams,
-            };
-          }
-        );
-      });
+          return {
+            pages: pages.map((page, index) =>
+              index === pages.length - 1 ? [...page, newMessage] : page
+            ),
+            pageParams,
+          };
+        }
+      );
 
       queryClient.setQueriesData(
         {

@@ -59,7 +59,11 @@ export const deleteMember = async (data: DeleteMemberFields) => {
           name: true,
           members: {
             select: {
-              userId: true,
+              user: {
+                select: {
+                  clerkId: true,
+                },
+              },
             },
           },
         },
@@ -70,17 +74,27 @@ export const deleteMember = async (data: DeleteMemberFields) => {
           id: memberId,
         },
         select: {
-          userId: true,
+          user: {
+            select: {
+              clerkId: true,
+            },
+          },
         },
       });
 
       conversation?.members.forEach((member) => {
-        if (userId !== deletedMember.userId) {
-          pusherServer.trigger(member.userId, "member:delete", {
-            conversationId,
-            userId: deletedMember.userId,
-            conversationName: conversation.name,
-          } as DeleteMemberEvent);
+        if (userId !== deletedMember.user.clerkId) {
+          const conversationsChannel = `${member.user.clerkId}_conversations`;
+
+          pusherServer.trigger(
+            conversationsChannel,
+            "conversation:delete_member",
+            {
+              conversationId,
+              userId: deletedMember.user.clerkId,
+              conversationName: conversation.name,
+            } as DeleteMemberEvent
+          );
         }
       });
 

@@ -41,7 +41,7 @@ export default function MessageForm({ conversationId, member }: Props) {
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
-  const { mutate, isSuccess } = useSendMessage({ member });
+  const { mutate } = useSendMessage({ member });
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -79,10 +79,8 @@ export default function MessageForm({ conversationId, member }: Props) {
       updatedAt: new Date(),
     });
 
-    if (isSuccess) {
-      form.reset();
-      form.setValue("content", "");
-    }
+    form.reset();
+    form.setValue("content", "");
   };
 
   const { isSubmitting } = form.formState;
@@ -121,7 +119,7 @@ export default function MessageForm({ conversationId, member }: Props) {
                 <FormLabel className="sr-only">Attach image</FormLabel>
                 <TooltipProvider delayDuration={300}>
                   <Tooltip>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger className="!mt-0" asChild>
                       <UploadButton
                         className="rounded-full"
                         onUploadError={handleUploadError}

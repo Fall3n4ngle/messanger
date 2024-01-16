@@ -26,6 +26,10 @@ export default function LeaveConversationButton({
   const { mutate } = useMutation({
     mutationFn: deleteMember,
     onMutate: ({ conversationId }) => {
+      queryClient.cancelQueries({
+        queryKey: ["conversations"],
+      });
+
       const previousData = queryClient.getQueriesData({
         queryKey: ["conversations"],
       });

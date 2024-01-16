@@ -31,7 +31,7 @@ export default function ConversationsList({
     intialConversations,
   });
 
-  usePusherConversations({ currentUserId, query });
+  usePusherConversations();
 
   if (!userId) {
     return null;

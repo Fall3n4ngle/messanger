@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, ScrollArea } from "@/components/ui";
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useCallback, useEffect, useRef } from "react";
 import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
 import { Message } from "../lib/types";
@@ -9,6 +9,7 @@ import { useInfiniteMessages } from "./lib/hooks/useInfinteMessages";
 import { usePusherMessages } from "./lib/hooks/usePusherMessages";
 import { useAuth } from "@clerk/nextjs";
 import { getMessageCard } from "./lib/utils/getMessageCard";
+import { useInView } from "react-intersection-observer";
 
 type Props = {
   initialMessages: Message[];
@@ -21,11 +22,13 @@ export default function MessagesList({
   conversationId,
   initialMessages,
   memberRole,
+  memberId,
 }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
 
   const messagesListRef = useRef<HTMLDivElement>(null);
+  const { ref: bottomRef, inView: isScrolledToBottom } = useInView();
 
   const { data, fetchPreviousPage, hasPreviousPage, dataUpdatedAt } =
     useInfiniteMessages({
@@ -35,22 +38,19 @@ export default function MessagesList({
 
   usePusherMessages();
 
-  const offsetTop = messagesListRef.current?.parentElement?.scrollTop;
+  const scrollToBottom = useCallback(() => {
+    const messagesList = messagesListRef.current;
+    if (!messagesList || !isScrolledToBottom) return;
 
-  useEffect(() => {
-    console.log(offsetTop);
-  }, [offsetTop]);
-
-  const scrollToBottom = () => {
-    messagesListRef.current?.lastElementChild?.scrollIntoView({
+    messagesList.lastElementChild?.scrollIntoView({
       behavior: "smooth",
       block: "end",
     });
-  };
+  }, [isScrolledToBottom]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [dataUpdatedAt]);
+  }, [dataUpdatedAt, scrollToBottom]);
 
   if (!data.pages[0].length) {
     return (
@@ -103,6 +103,7 @@ export default function MessagesList({
                 member,
                 memberRole,
                 previousMessageId,
+                memberId,
               });
 
               return card;
@@ -110,6 +111,7 @@ export default function MessagesList({
           </Fragment>
         ))}
       </div>
+      <div ref={bottomRef} />
     </ScrollArea>
   );
 }
