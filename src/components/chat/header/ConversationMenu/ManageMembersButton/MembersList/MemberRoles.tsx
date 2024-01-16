@@ -34,12 +34,6 @@ export default function MemberRoles({ id, role, conversationId }: Props) {
   const handleSelect = async (newRole: MemberRole) => {
     setOptimisticRole(newRole);
 
-    toast({
-      description: (
-        <FormMessage type="success" message="Role updated successfully" />
-      ),
-    });
-
     const result = await changeMemberRole({
       id,
       role: newRole,

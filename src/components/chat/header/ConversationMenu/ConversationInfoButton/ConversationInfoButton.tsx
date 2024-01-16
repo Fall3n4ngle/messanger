@@ -22,12 +22,12 @@ export default function ConversationInfoButton({ members, ...props }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="flex items-center gap-3">
+        <button className="flex items-center gap-3 px-2 py-1.5">
           <Info className="h-4 w-4" />
           View group info
-        </div>
+        </button>
       </DialogTrigger>
-      <DialogContent className="h-[500px] space-y-1">
+      <DialogContent className="h-[500px] space-y-1.5 flex flex-col">
         <DialogHeader>
           <DialogTitle>Group info</DialogTitle>
         </DialogHeader>

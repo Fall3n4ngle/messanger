@@ -55,19 +55,25 @@ export default function ConversationMenuButton({
         </Tooltip>
       </TooltipProvider>
       <DropdownMenuContent className="p-1.5 space-y-0.5">
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
           <ConversationInfoButton name={name} image={image} members={members} />
         </DropdownMenuItem>
         {canEdit && (
           <>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem
+              onSelect={(e) => e.preventDefault()}
+              className="p-0"
+            >
               <EditConversationButton
                 id={conversationId}
                 name={name}
                 image={image}
               />
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem
+              onSelect={(e) => e.preventDefault()}
+              className="p-0"
+            >
               <ManageMembersButton
                 members={members}
                 conversationId={conversationId}
@@ -75,7 +81,7 @@ export default function ConversationMenuButton({
             </DropdownMenuItem>
           </>
         )}
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
           <LeaveConversationDialog
             conversationId={conversationId}
             memberId={userMemberId}

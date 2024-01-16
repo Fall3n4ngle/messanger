@@ -30,10 +30,10 @@ export default function LeaveConversationDialog({
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <div className="flex items-center gap-3 ">
+        <button className="flex items-center gap-3 px-2 py-1.5">
           <Trash2 className="h-4 w-4 text-destructive" />
           Leave
-        </div>
+        </button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

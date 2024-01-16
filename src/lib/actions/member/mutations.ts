@@ -38,6 +38,8 @@ export const changeMemberRole = async ({
 
 export type DeleteMemberEvent = {
   conversationId: string;
+  userId: string;
+  conversationName: string;
 };
 
 export const deleteMember = async (data: DeleteMemberFields) => {
@@ -54,6 +56,7 @@ export const deleteMember = async (data: DeleteMemberFields) => {
           id: conversationId,
         },
         select: {
+          name: true,
           members: {
             select: {
               userId: true,
@@ -72,9 +75,11 @@ export const deleteMember = async (data: DeleteMemberFields) => {
       });
 
       conversation?.members.forEach((member) => {
-        if (member.userId !== userId) {
+        if (userId !== deletedMember.userId) {
           pusherServer.trigger(member.userId, "member:delete", {
             conversationId,
+            userId: deletedMember.userId,
+            conversationName: conversation.name,
           } as DeleteMemberEvent);
         }
       });

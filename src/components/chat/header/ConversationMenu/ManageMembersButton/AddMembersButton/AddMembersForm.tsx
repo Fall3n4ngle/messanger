@@ -1,12 +1,12 @@
 import { useToast } from "@/lib/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import ToastMessage from "@/components/common/FormMessage";
+import { FormMessage } from "@/components/common";
 import { Button, Form } from "@/components/ui";
 import { GroupMembers } from "@/components/common";
 import { addMembers } from "@/lib/actions/conversation/mutations";
 import { Loader2 } from "lucide-react";
-import { MembersFields, membersSchema } from "@/lib/validations";
+import { formMembersSchema, FormMembersFields } from "@/lib/validations";
 
 type Props = {
   conversationId: string;
@@ -21,14 +21,14 @@ export default function AddMembersForm({
 }: Props) {
   const { toast } = useToast();
 
-  const form = useForm<MembersFields>({
-    resolver: zodResolver(membersSchema),
+  const form = useForm<FormMembersFields>({
+    resolver: zodResolver(formMembersSchema),
     defaultValues: {
       members: [],
     },
   });
 
-  async function onSubmit({ members }: MembersFields) {
+  async function onSubmit({ members }: FormMembersFields) {
     const result = await addMembers({
       id: conversationId,
       members: members.map((member) => ({ id: member.value })),
@@ -37,7 +37,7 @@ export default function AddMembersForm({
     if (result?.success) {
       toast({
         description: (
-          <ToastMessage type="success" message="Members added successfully" />
+          <FormMessage type="success" message="Members added successfully" />
         ),
       });
 
@@ -48,7 +48,7 @@ export default function AddMembersForm({
     if (result?.error) {
       toast({
         description: (
-          <ToastMessage type="error" message="Error adding members" />
+          <FormMessage type="error" message="Error adding members" />
         ),
       });
     }

@@ -1,15 +1,16 @@
 import { pusherClient } from "@/lib/pusher/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useDeleteConversation } from "./useDeleteConversation";
-import { usePathname, useRouter } from "next/navigation";
 import { DeleteMemberEvent } from "@/lib/actions/member/mutations";
 import {
   AddMembersEvent,
   UpdateConversationEvent,
   revalidateConversationPath,
 } from "@/lib/actions/conversation/mutations";
-import { useUpdateConversation } from "./useUpdateConversation";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/lib/hooks";
+import { FormMessage } from "@/components/common";
 
 type UsePusherConversationsProps = {
   currentUserId: string;
@@ -20,13 +21,10 @@ export const usePusherConversations = ({
   currentUserId,
   query,
 }: UsePusherConversationsProps) => {
-  const router = useRouter();
-  const pathname = usePathname();
-
   const queryClient = useQueryClient();
-
-  const { updateCache: deleteConversation } = useDeleteConversation();
-  const { updateCache: updateConversation } = useUpdateConversation();
+  const { userId: currentClerkId } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     pusherClient.subscribe(currentUserId);
@@ -39,14 +37,37 @@ export const usePusherConversations = ({
 
     const handleDeleteMember = async ({
       conversationId,
+      userId,
+      conversationName,
     }: DeleteMemberEvent) => {
-      await revalidateConversationPath(conversationId);
+      if (userId !== currentClerkId) {
+        await revalidateConversationPath(conversationId);
+        return;
+      }
+
+      router.push("/conversations");
+
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
+      });
+
+      toast({
+        description: (
+          <FormMessage
+            type="error"
+            message={`You have been excluded from ${conversationName} group`}
+          />
+        ),
+      });
     };
 
     const handleConversationUpdate = async (
       updatedConversation: UpdateConversationEvent
     ) => {
-      updateConversation(updatedConversation);
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
+      });
+
       await revalidateConversationPath(updatedConversation.id);
     };
 
@@ -76,9 +97,8 @@ export const usePusherConversations = ({
     currentUserId,
     queryClient,
     query,
-    deleteConversation,
-    pathname,
+    currentClerkId,
     router,
-    updateConversation,
+    toast,
   ]);
 };

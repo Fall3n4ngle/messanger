@@ -21,10 +21,10 @@ export default function EditConversationButton(props: Conversation) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <div className="flex items-center gap-3">
+        <button className="flex items-center gap-3 px-2 py-1.5">
           <Settings className="h-4 w-4" />
           Edit group
-        </div>
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
