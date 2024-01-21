@@ -1,10 +1,6 @@
 import { sendMessage } from "@/lib/actions/messages/mutations";
 import { useToast } from "@/lib/hooks";
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Message } from "../../../lib/types";
 import { FormMessage } from "@/components/common";
 import { Conversation } from "@/components/conversations/lib/types";
@@ -37,15 +33,9 @@ export const useSendMessage = ({ member }: Props) => {
 
       queryClient.setQueryData(
         ["messages", data.conversationId],
-        ({ pages, pageParams }: InfiniteData<Message[], unknown>) => {
+        (oldData: Message[]) => {
           const newMessage: Message = { ...data, seenBy: [], member };
-
-          return {
-            pages: pages.map((page, index) =>
-              index === pages.length - 1 ? [...page, newMessage] : page
-            ),
-            pageParams,
-          };
+          return [...oldData, newMessage];
         }
       );
 
@@ -106,7 +96,6 @@ export const useSendMessage = ({ member }: Props) => {
     onSettled: (_data, _error, { conversationId }) => {
       queryClient.invalidateQueries({
         queryKey: ["messages", conversationId],
-        stale: true,
       });
 
       queryClient.invalidateQueries({

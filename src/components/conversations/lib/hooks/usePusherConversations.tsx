@@ -8,14 +8,15 @@ import {
   revalidateConversationPath,
 } from "@/lib/actions/conversation/mutations";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/lib/hooks";
 import { FormMessage } from "@/components/common";
 
 export const usePusherConversations = () => {
+  const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const { userId: currentUserId } = useAuth();
-  const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,7 +37,10 @@ export const usePusherConversations = () => {
       conversationName,
     }: DeleteMemberEvent) => {
       if (userId !== currentUserId) {
-        await revalidateConversationPath(conversationId);
+        if (pathname.includes(conversationId)) {
+          await revalidateConversationPath(conversationId);
+        }
+
         return;
       }
 
@@ -67,7 +71,13 @@ export const usePusherConversations = () => {
     };
 
     const handleAddMembers = async ({ conversationId }: AddMembersEvent) => {
-      await revalidateConversationPath(conversationId);
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
+      });
+
+      if (pathname.includes(conversationId)) {
+        await revalidateConversationPath(conversationId);
+      }
     };
 
     pusherClient.bind("conversation:new", handleNewConversation);
@@ -82,5 +92,5 @@ export const usePusherConversations = () => {
       pusherClient.unbind("conversation:update", handleConversationUpdate);
       pusherClient.unbind("conversation:add_members", handleAddMembers);
     };
-  }, [queryClient, currentUserId, router, toast]);
+  }, [queryClient, currentUserId, router, toast, pathname]);
 };

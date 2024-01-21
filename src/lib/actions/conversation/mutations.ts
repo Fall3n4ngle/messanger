@@ -239,7 +239,7 @@ export const addMembers = async (fields: AddMembersFields) => {
             "conversation:add_members",
             {
               conversationId: id,
-            }
+            } as AddMembersEvent
           );
         }
       });

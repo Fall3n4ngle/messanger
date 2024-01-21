@@ -90,15 +90,12 @@ export const sendMessage = async (fields: SendMessageFields) => {
 
       updatedConversation.members.forEach((member) => {
         if (member.user.clerkId !== userId) {
-          const conversationsChannel = `${member.user.clerkId}_conversations`;
+          const conversationsChannel = `${member.user.clerkId}_messages`;
+          console.log(userId);
 
-          pusherServer.trigger(
-            conversationsChannel,
-            "conversation:new_message",
-            {
-              conversationId: createdMessage.conversationId,
-            } as SendConversationEvent
-          );
+          pusherServer.trigger(conversationsChannel, "messages:new", {
+            conversationId: createdMessage.conversationId,
+          } as SendConversationEvent);
         }
       });
 

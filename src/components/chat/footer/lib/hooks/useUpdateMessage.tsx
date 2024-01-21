@@ -3,11 +3,9 @@ import { FormMessage } from "@/components/common";
 import { Conversation } from "@/components/conversations/lib/types";
 import { updateMessage } from "@/lib/actions/messages/mutations";
 import { useToast } from "@/lib/hooks";
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+let isLast = false;
 
 export const useUpdateMessage = () => {
   const queryClient = useQueryClient();
@@ -29,37 +27,20 @@ export const useUpdateMessage = () => {
         conversationId,
       ]);
 
-      let previousConversationsData;
-      let isLast = false;
-
       queryClient.setQueryData(
         ["messages", conversationId],
-        ({ pages, pageParams }: InfiniteData<Message[], unknown>) => {
-          return {
-            pageParams,
-            pages: pages.map((page, pageIndex) => {
-              let found = false;
+        (oldData: Message[]) => {
+          return oldData.map((message, index) => {
+            if (message.id === id) {
+              if (index === oldData.length - 1) {
+                isLast = true;
+              }
 
-              if (found) return page;
+              return { ...message, ...data };
+            }
 
-              return page.map((message, messageIndex) => {
-                if (message.id === id) {
-                  found = true;
-
-                  if (
-                    pageIndex === pages.length - 1 &&
-                    messageIndex === page.length - 1
-                  ) {
-                    isLast = true;
-                  }
-
-                  return { ...message, ...data };
-                }
-
-                return message;
-              });
-            }),
-          };
+            return message;
+          });
         }
       );
 
@@ -68,6 +49,8 @@ export const useUpdateMessage = () => {
           <FormMessage type="success" message="Message updated successfully" />
         ),
       });
+
+      let previousConversationsData;
 
       if (isLast) {
         previousConversationsData = queryClient.getQueriesData({
@@ -99,7 +82,7 @@ export const useUpdateMessage = () => {
         );
       }
 
-      return { previousMessagesData, previousConversationsData, isLast };
+      return { previousMessagesData, previousConversationsData };
     },
     onError: (_error, { conversationId }, context) => {
       queryClient.setQueryData(
@@ -107,7 +90,7 @@ export const useUpdateMessage = () => {
         context?.previousMessagesData
       );
 
-      if (context?.isLast) {
+      if (isLast) {
         queryClient.setQueriesData(
           {
             queryKey: ["conversations"],
@@ -122,13 +105,13 @@ export const useUpdateMessage = () => {
         ),
       });
     },
-    onSettled: (_data, _error, { conversationId }, context) => {
+    onSettled: (_data, _error, { conversationId }) => {
       queryClient.invalidateQueries({
         queryKey: ["messages", conversationId],
         stale: true,
       });
 
-      if (context?.isLast) {
+      if (isLast) {
         queryClient.invalidateQueries({
           queryKey: ["conversations"],
         });
