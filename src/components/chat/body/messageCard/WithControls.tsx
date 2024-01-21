@@ -35,8 +35,12 @@ export default function WithControls({
             previousMessageId={previousMessageId}
           />
         </ContextMenuItem>
-        <ContextMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
-          <EditMessageButton id={messageId} content={content} file={file} />
+        <ContextMenuItem className="p-0">
+          <EditMessageButton
+            id={messageId}
+            content={content}
+            file={file}
+          />
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

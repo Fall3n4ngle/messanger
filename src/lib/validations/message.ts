@@ -9,4 +9,26 @@ export const sendMessageSchema = z.object({
   memberId: z.string(),
 });
 
-export type MessageFields = z.infer<typeof sendMessageSchema>;
+export const deleteMessageSchema = z.object({
+  messageId: z.string(),
+  conversationId: z.string(),
+  previousMessageId: z.string().nullable(),
+});
+
+export const markAsSeenSchema = z.object({
+  messageId: z.string(),
+  conversationId: z.string(),
+  memberId: z.string(),
+});
+
+export const updateMessageSchema = sendMessageSchema.pick({
+  id: true,
+  file: true,
+  content: true,
+  conversationId: true,
+});
+
+export type SendMessageFields = z.infer<typeof sendMessageSchema>;
+export type DeleteMessageFields = z.infer<typeof deleteMessageSchema>;
+export type MarkAsSeenFields = z.infer<typeof markAsSeenSchema>;
+export type UpdateMessageFields = z.infer<typeof updateMessageSchema>;

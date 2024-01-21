@@ -11,7 +11,6 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/lib/hooks";
 import { FormMessage } from "@/components/common";
-import { SendConversationEvent } from "@/lib/actions/messages/mutations";
 
 export const usePusherConversations = () => {
   const queryClient = useQueryClient();
@@ -71,21 +70,14 @@ export const usePusherConversations = () => {
       await revalidateConversationPath(conversationId);
     };
 
-    const handleNewMessage = ({ conversationId }: SendConversationEvent) => {
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
-      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
-    };
-
     pusherClient.bind("conversation:new", handleNewConversation);
     pusherClient.bind("conversation:delete_member", handleDeleteMember);
     pusherClient.bind("conversation:update", handleConversationUpdate);
-    pusherClient.bind("conversation:new_message", handleNewMessage);
     pusherClient.bind("conversation:add_members", handleAddMembers);
 
     return () => {
       pusherClient.unsubscribe(conversationsChannel);
       pusherClient.unbind("conversation:new", handleNewConversation);
-      pusherClient.unbind("messages:new", handleNewMessage);
       pusherClient.unbind("member:delete", handleDeleteMember);
       pusherClient.unbind("conversation:update", handleConversationUpdate);
       pusherClient.unbind("conversation:add_members", handleAddMembers);

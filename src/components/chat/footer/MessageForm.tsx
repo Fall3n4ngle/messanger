@@ -17,7 +17,7 @@ import { UploadButton, UploadImage } from "@/components/upload";
 import { deleteFiles } from "@/lib/actions/files";
 import { useToast } from "@/lib/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image as ImageIcon, Loader2, SendHorizontal } from "lucide-react";
+import { Image as ImageIcon, Loader2, SendHorizontal, X } from "lucide-react";
 import Image from "next/image";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -27,6 +27,8 @@ import { Message } from "../lib/types";
 import { sendMessageSchema } from "@/lib/validations";
 import { useSendMessage } from "./lib/hooks/useSendMessage";
 import { v4 as uuidv4 } from "uuid";
+import { useMessageForm } from "../store/useMessageForm";
+import { useUpdateMessage } from "./lib/hooks/useUpdateMessage";
 
 type Props = {
   conversationId: string;
@@ -37,14 +39,20 @@ type FormFields = z.infer<typeof formSchema>;
 
 export default function MessageForm({ conversationId, member }: Props) {
   const { toast } = useToast();
+  const { messageData, setMessageData } = useMessageForm();
+  const { mutate: sendMessage } = useSendMessage({ member });
+  const { mutate: updateMessage } = useUpdateMessage();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
-  const { mutate } = useSendMessage({ member });
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
+    values: {
+      content: messageData.content ?? "",
+      file: messageData.file ?? "",
+    },
   });
 
   const handleUploadError = (error: Error) => {
@@ -55,7 +63,12 @@ export default function MessageForm({ conversationId, member }: Props) {
     setIsUploading(false);
   };
 
-  const handleDelete = () =>
+  const handleDelete = () => {
+    if (messageData.isUpdating) {
+      form.setValue("file", "");
+      return;
+    }
+
     startTransition(async () => {
       if (!fileKey) return;
 
@@ -69,15 +82,35 @@ export default function MessageForm({ conversationId, member }: Props) {
 
       form.setValue("file", "");
     });
+  };
+
+  const resetMessageData = () => {
+    setMessageData({
+      id: null,
+      content: null,
+      file: null,
+      isUpdating: false,
+    });
+  };
 
   const onSubmit = async (fields: FormFields) => {
-    mutate({
-      ...fields,
-      conversationId,
-      memberId: member.id,
-      id: uuidv4(),
-      updatedAt: new Date(),
-    });
+    if (messageData.isUpdating && messageData.id) {
+      updateMessage({
+        id: messageData.id,
+        conversationId,
+        ...fields,
+      });
+
+      resetMessageData();
+    } else {
+      sendMessage({
+        ...fields,
+        conversationId,
+        memberId: member.id,
+        id: uuidv4(),
+        updatedAt: new Date(),
+      });
+    }
 
     form.reset();
     form.setValue("content", "");
@@ -88,12 +121,12 @@ export default function MessageForm({ conversationId, member }: Props) {
 
   return (
     <div className="px-6 py-4 border-t">
-      <div>
+      <div className="flex w-full items-center justify-between">
         {url && (
           <UploadImage
             isPending={isPending}
             onDelete={handleDelete}
-            className="w-28 h-28 mb-5 ml-[52px]"
+            className="w-28 h-28 ml-[52px] mb-5"
           >
             <div className="relative w-full h-full ">
               <Image
@@ -104,6 +137,16 @@ export default function MessageForm({ conversationId, member }: Props) {
               />
             </div>
           </UploadImage>
+        )}
+        {messageData.isUpdating && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={resetMessageData}
+            className="ml-auto rounded-full mb-5"
+          >
+            <X className="w-4.5 h-4.5" />
+          </Button>
         )}
       </div>
       <Form {...form}>
@@ -151,13 +194,14 @@ export default function MessageForm({ conversationId, member }: Props) {
           <FormField
             name="content"
             control={form.control}
-            render={({ field }) => (
+            render={({ field: { ref, ...field } }) => (
               <FormItem className="grow">
                 <FormLabel className="sr-only">Write a message</FormLabel>
                 <FormControl>
                   <MessageFormInput
                     conversationId={conversationId}
                     userName={member.user.name}
+                    ref={ref}
                     {...field}
                   />
                 </FormControl>

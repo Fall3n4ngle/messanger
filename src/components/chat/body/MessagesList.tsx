@@ -6,10 +6,10 @@ import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
 import { Message } from "../lib/types";
 import { useInfiniteMessages } from "./lib/hooks/useInfinteMessages";
-import { usePusherMessages } from "./lib/hooks/usePusherMessages";
 import { useAuth } from "@clerk/nextjs";
 import { getMessageCard } from "./lib/utils/getMessageCard";
 import { useInView } from "react-intersection-observer";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   initialMessages: Message[];
@@ -30,13 +30,16 @@ export default function MessagesList({
   const messagesListRef = useRef<HTMLDivElement>(null);
   const { ref: bottomRef, inView: isScrolledToBottom } = useInView();
 
-  const { data, fetchPreviousPage, hasPreviousPage, dataUpdatedAt } =
-    useInfiniteMessages({
-      conversationId,
-      initialMessages,
-    });
-
-  usePusherMessages();
+  const {
+    data,
+    fetchPreviousPage,
+    hasPreviousPage,
+    dataUpdatedAt,
+    isFetchingPreviousPage,
+  } = useInfiniteMessages({
+    conversationId,
+    initialMessages,
+  });
 
   const scrollToBottom = useCallback(() => {
     const messagesList = messagesListRef.current;
@@ -62,19 +65,24 @@ export default function MessagesList({
     );
   }
 
+  let topSection;
+  if (isFetchingPreviousPage) {
+    topSection = <Loader2 className="animate-spin" />;
+  } else if (hasPreviousPage) {
+    topSection = (
+      <Button
+        variant="ghost"
+        className="mb-6"
+        onClick={() => fetchPreviousPage()}
+      >
+        Load previous
+      </Button>
+    );
+  }
+
   return (
     <ScrollArea className="flex-1 px-6 pb-6 pt-3">
-      {hasPreviousPage && (
-        <div className="flex justify-center">
-          <Button
-            variant="ghost"
-            className="mb-6"
-            onClick={() => fetchPreviousPage()}
-          >
-            Load previous
-          </Button>
-        </div>
-      )}
+      <div className="flex w-full justify-center h-8">{topSection}</div>
       <div className="flex-1 flex flex-col gap-6" ref={messagesListRef}>
         {data?.pages.map((group, groupIndex) => (
           <Fragment key={groupIndex}>
@@ -85,14 +93,13 @@ export default function MessagesList({
               const isActive = usersIds.includes(clerkId);
 
               let previousMessageId: string | null = null;
-
               if (messageIndex >= 1) {
                 previousMessageId = group[messageIndex - 1].id;
               } else {
                 if (groupIndex >= 1) {
                   const previousGroup = data.pages[groupIndex - 1];
                   previousMessageId =
-                    previousGroup[previousGroup.length - 1].id;
+                    previousGroup[previousGroup.length - 1]?.id ?? null;
                 }
               }
 

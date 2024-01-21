@@ -10,6 +10,7 @@ import { usePusherConversations } from "./lib/hooks/usePusherConversations";
 import { useAuth } from "@clerk/nextjs";
 import { getLastMessageData } from "./lib/utils/getLastMessage";
 import { useConversations } from "./lib/hooks/useConversations";
+import { usePusherMessages } from "./lib/hooks/usePusherMessages";
 
 type Props = {
   intialConversations: Conversation[];
@@ -32,6 +33,7 @@ export default function ConversationsList({
   });
 
   usePusherConversations();
+  usePusherMessages();
 
   if (!userId) {
     return null;
@@ -55,7 +57,7 @@ export default function ConversationsList({
           }) => {
             const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
             const isActive = pathname.includes(id);
-            const unreadMessagesCount = unreadMessages.length;
+            const unreadMessagesCount = unreadMessages?.length;
             const { message, seen } = getLastMessageData({
               currentUserClerkId: userId,
               isGroup,

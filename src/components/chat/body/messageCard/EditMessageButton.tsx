@@ -1,29 +1,20 @@
 import { Pencil } from "lucide-react";
 import { Message } from "../../lib/types";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui";
+import { useMessageForm } from "../../store/useMessageForm";
 
 type Props = Pick<Message, "id" | "content" | "file">;
 
 export default function EditMessageButton(props: Props) {
+  const { setMessageData } = useMessageForm();
+
+  const handleClick = () => {
+    setMessageData({ ...props, isUpdating: true });
+  };
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button className="w-full flex items-end gap-3 p-2">
-          <Pencil className="text-primary" />
-          Edit
-        </button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit message</DialogTitle>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+    <button className="w-full flex items-end gap-3 p-2" onClick={handleClick}>
+      <Pencil className="text-primary" />
+      Edit
+    </button>
   );
 }

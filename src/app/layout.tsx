@@ -4,6 +4,7 @@ import Providers from "@/providers";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import "./globals.css";
 
@@ -25,6 +26,7 @@ export default async function RootLayout({
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <Providers>
           <div className="flex h-screen">{children}</div>
+          <ReactQueryDevtools initialIsOpen={false} />
         </Providers>
       </body>
     </html>

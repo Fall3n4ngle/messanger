@@ -131,6 +131,7 @@ export const useDeleteMessage = () => {
     onSettled: (_data, _error, { conversationId }) => {
       queryClient.invalidateQueries({
         queryKey: ["messages", conversationId],
+        stale: true,
       });
 
       queryClient.invalidateQueries({

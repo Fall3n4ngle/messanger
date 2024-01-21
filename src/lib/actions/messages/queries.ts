@@ -52,5 +52,11 @@ export const getMessages = async ({
     skip: cursor ? 1 : 0,
   });
 
+  console.log({
+    messages,
+    take,
+    lastCursor,
+  });
+
   return messages;
 };
