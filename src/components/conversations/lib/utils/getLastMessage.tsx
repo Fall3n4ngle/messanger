@@ -61,12 +61,7 @@ export const getLastMessageData = ({
     return { message: "No messages yet", seen: null };
   }
 
-  const {
-    _count,
-    content,
-    file,
-    member: { user },
-  } = lastMessage;
+  const { _count, content, file, user } = lastMessage;
 
   const isOwn = user.clerkId === currentUserClerkId;
 

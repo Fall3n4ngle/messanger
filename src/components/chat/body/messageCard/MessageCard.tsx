@@ -8,14 +8,14 @@ export type MessageCardPorps = {
   isOwn: boolean;
   isActive: boolean;
   seen: ReactNode;
-} & Pick<Message, "content" | "file" | "updatedAt" | "member">;
+} & Pick<Message, "content" | "file" | "updatedAt" | "user">;
 
 const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
   (
-    { content, file, updatedAt, member, isOwn, isActive, seen, ...props },
+    { content, file, updatedAt, user, isOwn, isActive, seen, ...props },
     ref
   ) => {
-    const { image, name } = member.user;
+    const { image, name } = user;
 
     return (
       <div

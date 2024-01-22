@@ -52,7 +52,7 @@ export const useDeleteMessage = () => {
                 },
                 content: message.content,
                 id: message.id,
-                member: message.member,
+                user: message.user,
                 updatedAt: message.updatedAt,
                 file: message.file,
               };

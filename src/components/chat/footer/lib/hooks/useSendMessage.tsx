@@ -5,9 +5,9 @@ import { Message } from "../../../lib/types";
 import { FormMessage } from "@/components/common";
 import { Conversation } from "@/components/conversations/lib/types";
 
-type Props = Pick<Message, "member">;
+type Props = Pick<Message, "user">;
 
-export const useSendMessage = ({ member }: Props) => {
+export const useSendMessage = ({ user }: Props) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -34,7 +34,7 @@ export const useSendMessage = ({ member }: Props) => {
       queryClient.setQueryData(
         ["messages", data.conversationId],
         (oldData: Message[]) => {
-          const newMessage: Message = { ...data, seenBy: [], member };
+          const newMessage: Message = { ...data, seenBy: [], user };
           return [...oldData, newMessage];
         }
       );
@@ -54,7 +54,7 @@ export const useSendMessage = ({ member }: Props) => {
             ...oldData[index],
             lastMessage: {
               ...data,
-              member,
+              user,
               _count: {
                 seenBy: 0,
               },

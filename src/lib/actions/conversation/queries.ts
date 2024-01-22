@@ -34,13 +34,11 @@ export const getUserConversations = async ({
           AND: {
             seenBy: {
               none: {
-                userId: currentUserId,
+                id: currentUserId,
               },
             },
-            member: {
-              userId: {
-                not: currentUserId,
-              },
+            userId: {
+              not: currentUserId,
             },
           },
         },
@@ -54,14 +52,10 @@ export const getUserConversations = async ({
           content: true,
           updatedAt: true,
           file: true,
-          member: {
+          user: {
             select: {
-              user: {
-                select: {
-                  clerkId: true,
-                  name: true,
-                },
-              },
+              clerkId: true,
+              name: true,
             },
           },
           _count: {

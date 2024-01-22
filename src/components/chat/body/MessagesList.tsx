@@ -16,14 +16,14 @@ type Props = {
   initialMessages: Message[];
   conversationId: string;
   memberRole: MemberRole;
-  memberId: string;
+  currentUserId: string;
 };
 
 export default function MessagesList({
   conversationId,
   initialMessages,
   memberRole,
-  memberId,
+  currentUserId,
 }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
@@ -75,9 +75,9 @@ export default function MessagesList({
         <ChevronsDown className="text-muted-foreground" />
       </Button>
       <div className="flex-1 flex flex-col gap-6" ref={messagesListRef}>
-        {messages.map(({ member, ...props }, messageIndex) => {
-          if (!member.user || !userId) return;
-          const { clerkId } = member.user;
+        {messages.map(({ user, ...props }, messageIndex) => {
+          if (!user || !userId) return;
+          const { clerkId } = user;
           const isOwn = clerkId === userId;
           const isActive = usersIds.includes(clerkId);
 
@@ -90,10 +90,10 @@ export default function MessagesList({
             ...props,
             isActive,
             isOwn,
-            member,
             memberRole,
             previousMessageId,
-            memberId,
+            userId: currentUserId,
+            user,
           });
 
           return card;

@@ -6,7 +6,7 @@ export const sendMessageSchema = z.object({
   file: z.string().optional(),
   conversationId: z.string(),
   updatedAt: z.date(),
-  memberId: z.string(),
+  userId: z.string(),
 });
 
 export const deleteMessageSchema = z.object({
@@ -18,7 +18,7 @@ export const deleteMessageSchema = z.object({
 export const markAsSeenSchema = z.object({
   messageId: z.string(),
   conversationId: z.string(),
-  memberId: z.string(),
+  userId: z.string(),
 });
 
 export const updateMessageSchema = sendMessageSchema.pick({

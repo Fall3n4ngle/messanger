@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteConversation, relatedConversationSchema, CompleteMember, relatedMemberSchema } from "./index"
+import { CompleteConversation, relatedConversationSchema, CompleteMember, relatedMemberSchema, CompleteMessage, relatedMessageSchema } from "./index"
 
 export const userSchema = z.object({
   id: z.string(),
@@ -13,6 +13,8 @@ export const userSchema = z.object({
 export interface CompleteUser extends z.infer<typeof userSchema> {
   conversations: CompleteConversation[]
   member: CompleteMember[]
+  sentMessages: CompleteMessage[]
+  seenMessages: CompleteMessage[]
 }
 
 /**
@@ -23,4 +25,6 @@ export interface CompleteUser extends z.infer<typeof userSchema> {
 export const relatedUserSchema: z.ZodSchema<CompleteUser> = z.lazy(() => userSchema.extend({
   conversations: relatedConversationSchema.array(),
   member: relatedMemberSchema.array(),
+  sentMessages: relatedMessageSchema.array(),
+  seenMessages: relatedMessageSchema.array(),
 }))

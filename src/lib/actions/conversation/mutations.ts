@@ -62,13 +62,11 @@ export const createGroup = async (fields: CreateConversationFields) => {
               AND: {
                 seenBy: {
                   none: {
-                    userId: currentUser.id,
+                    id: currentUser.id,
                   },
                 },
-                member: {
-                  userId: {
-                    not: currentUser.id,
-                  },
+                userId: {
+                  not: currentUser.id,
                 },
               },
             },
@@ -82,14 +80,10 @@ export const createGroup = async (fields: CreateConversationFields) => {
               content: true,
               updatedAt: true,
               file: true,
-              member: {
+              user: {
                 select: {
-                  user: {
-                    select: {
-                      clerkId: true,
-                      name: true,
-                    },
-                  },
+                  clerkId: true,
+                  name: true,
                 },
               },
             },

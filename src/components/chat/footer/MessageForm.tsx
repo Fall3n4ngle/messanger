@@ -32,15 +32,15 @@ import { useUpdateMessage } from "./lib/hooks/useUpdateMessage";
 
 type Props = {
   conversationId: string;
-} & Pick<Message, "member">;
+} & Pick<Message, "user">;
 
 const formSchema = sendMessageSchema.pick({ content: true, file: true });
 type FormFields = z.infer<typeof formSchema>;
 
-export default function MessageForm({ conversationId, member }: Props) {
+export default function MessageForm({ conversationId, user }: Props) {
   const { toast } = useToast();
   const { messageData, setMessageData } = useMessageForm();
-  const { mutate: sendMessage } = useSendMessage({ member });
+  const { mutate: sendMessage } = useSendMessage({ user });
   const { mutate: updateMessage } = useUpdateMessage();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export default function MessageForm({ conversationId, member }: Props) {
       sendMessage({
         ...fields,
         conversationId,
-        memberId: member.id,
+        userId: user.id,
         id: uuidv4(),
         updatedAt: new Date(),
       });
@@ -200,7 +200,7 @@ export default function MessageForm({ conversationId, member }: Props) {
                 <FormControl>
                   <MessageFormInput
                     conversationId={conversationId}
-                    userName={member.user.name}
+                    userName={user.name}
                     ref={ref}
                     {...field}
                   />

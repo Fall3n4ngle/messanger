@@ -6,15 +6,13 @@ import { useMarkAsSeen } from "../lib/hooks/useMarkAsSeen";
 
 type Props = {
   messageId: string;
-  memberId: string;
-  seen: boolean;
+  userId: string;
   conversationId: string;
 } & PropsWithChildren;
 
 export default function WithSeenOnScroll({
-  memberId,
+  userId,
   messageId,
-  seen,
   children,
   conversationId,
 }: Props) {
@@ -25,14 +23,14 @@ export default function WithSeenOnScroll({
   const { mutate } = useMarkAsSeen();
 
   useEffect(() => {
-    if (inView && !seen) {
+    if (inView) {
       mutate({
-        memberId,
+        userId,
         conversationId,
         messageId,
       });
     }
-  }, [inView, seen, memberId, messageId, conversationId, mutate]);
+  }, [inView, userId, messageId, conversationId, mutate]);
 
   return <div ref={ref}>{children}</div>;
 }

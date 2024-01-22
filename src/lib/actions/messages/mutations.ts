@@ -40,28 +40,19 @@ export const sendMessage = async (fields: SendMessageFields) => {
           file: true,
           updatedAt: true,
           conversationId: true,
-          member: {
+          user: {
             select: {
-              id: true,
-              role: true,
-              user: {
-                select: {
-                  image: true,
-                  name: true,
-                  clerkId: true,
-                },
-              },
+              image: true,
+              name: true,
+              clerkId: true,
             },
           },
+
           seenBy: {
             select: {
               id: true,
-              user: {
-                select: {
-                  name: true,
-                  image: true,
-                },
-              },
+              name: true,
+              image: true,
             },
           },
         },
@@ -257,7 +248,7 @@ export const markAsSeen = async (data: MarkAsSeenFields) => {
   const result = markAsSeenSchema.safeParse(data);
 
   if (result.success) {
-    const { conversationId, memberId, messageId } = result.data;
+    const { conversationId, userId, messageId } = result.data;
 
     try {
       const updatedMessage = await db.message.update({
@@ -265,24 +256,20 @@ export const markAsSeen = async (data: MarkAsSeenFields) => {
         data: {
           seenBy: {
             connect: {
-              id: memberId,
+              id: userId,
             },
           },
         },
         select: {
-          member: {
+          user: {
             select: {
-              user: {
-                select: {
-                  clerkId: true,
-                },
-              },
+              clerkId: true,
             },
           },
         },
       });
 
-      const messagesChannel = `${updatedMessage.member.user.clerkId}_messages`;
+      const messagesChannel = `${updatedMessage.user.clerkId}_messages`;
 
       pusherServer.trigger(messagesChannel, "messages:seen", {
         conversationId,
