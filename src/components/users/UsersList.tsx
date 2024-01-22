@@ -5,16 +5,11 @@ import { UserCard } from "../common";
 import { ScrollArea } from "../ui";
 import { useInView } from "react-intersection-observer";
 import { useAuth } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
 import { useActiveUsers } from "@/store";
 import { useInfiniteUsers } from "./lib/hooks/useInfiniteUsers";
-
-type User = {
-  id: string;
-  name: string;
-  clerkId: string;
-  image: string | null;
-};
+import { User } from "./lib/types";
+import UserCardSkeleton from "./UserCardSkeleton";
+import { cn } from "@/lib/utils";
 
 type Props = {
   initialUsers: User[];
@@ -37,7 +32,9 @@ export default function UsersList({ initialUsers, query }: Props) {
       query,
     });
 
-  const handleClick = () => startTransition(async () => {});
+  const handleClick = () => startTransition(async () => {
+    
+  });
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -58,7 +55,13 @@ export default function UsersList({ initialUsers, query }: Props) {
               const isActive = usersIds.includes(clerkId);
 
               return (
-                <li key={id}>
+                <li
+                  key={id}
+                  className={cn(
+                    "cursor-pointer",
+                    isPending && "cursor-not-allowed pointer-events-none"
+                  )}
+                >
                   <UserCard isActive={isActive} {...props} />
                 </li>
               );
@@ -66,11 +69,7 @@ export default function UsersList({ initialUsers, query }: Props) {
           </Fragment>
         ))}
       </ul>
-      {isFetchingNextPage && (
-        <div className="flex w-full justify-center mt-4">
-          <Loader2 className="animate-spin text-secondary-foreground" />
-        </div>
-      )}
+      {isFetchingNextPage && <UserCardSkeleton />}
       <div ref={bottomRef} className="pt-4" />
     </ScrollArea>
   );

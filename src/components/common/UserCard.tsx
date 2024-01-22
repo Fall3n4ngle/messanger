@@ -11,7 +11,7 @@ type Props = {
 
 export default function UserCard({ image, name, isActive, rightSide }: Props) {
   return (
-    <div className="flex items-center gap-5 cursor-pointer p-2 rounded-md transition-colors">
+    <div className="flex items-center gap-5 p-2 rounded-md transition-colors">
       <div className="relative">
         <Avatar>
           {image && <AvatarImage src={image} alt={`${name} profile image`} />}

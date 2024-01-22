@@ -1,7 +1,7 @@
 "use client";
 
-import { ScrollArea } from "@/components/ui";
-import { useCallback, useEffect, useRef } from "react";
+import { Button, ScrollArea } from "@/components/ui";
+import { useEffect, useRef } from "react";
 import { useActiveUsers } from "@/store";
 import { MemberRole } from "@prisma/client";
 import { Message } from "../lib/types";
@@ -9,6 +9,8 @@ import { useMessages } from "./lib/hooks/useMessages";
 import { useAuth } from "@clerk/nextjs";
 import { getMessageCard } from "./lib/utils/getMessageCard";
 import { useInView } from "react-intersection-observer";
+import { ChevronsDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   initialMessages: Message[];
@@ -34,19 +36,17 @@ export default function MessagesList({
     initialMessages,
   });
 
-  const scrollToBottom = useCallback(() => {
-    const messagesList = messagesListRef.current;
-    if (!messagesList || !isScrolledToBottom) return;
-
-    messagesList.lastElementChild?.scrollIntoView({
+  const scrollToBottom = () => {
+    messagesListRef.current?.lastElementChild?.scrollIntoView({
       behavior: "smooth",
       block: "end",
     });
-  }, [isScrolledToBottom]);
+  };
 
   useEffect(() => {
+    if (!isScrolledToBottom) return;
     scrollToBottom();
-  }, [dataUpdatedAt, scrollToBottom]);
+  }, [dataUpdatedAt, isScrolledToBottom]);
 
   if (messages.length < 1) {
     return (
@@ -59,7 +59,21 @@ export default function MessagesList({
   }
 
   return (
-    <ScrollArea className="flex-1 px-6 pb-6 pt-3">
+    <ScrollArea className="flex-1 px-6 pb-6 pt-3 relative">
+      <Button
+        variant="secondary"
+        size="icon"
+        className={cn(
+          "rounded-full absolute right-6 bottom-6 z-10 w-14 h-14 hover:bg-secondary transition-opacity delay-200",
+          {
+            "visible opacity-100": !isScrolledToBottom,
+            "invisible opacity-0": isScrolledToBottom,
+          }
+        )}
+        onClick={scrollToBottom}
+      >
+        <ChevronsDown className="text-muted-foreground" />
+      </Button>
       <div className="flex-1 flex flex-col gap-6" ref={messagesListRef}>
         {messages.map(({ member, ...props }, messageIndex) => {
           if (!member.user || !userId) return;
