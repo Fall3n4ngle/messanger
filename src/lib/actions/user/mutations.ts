@@ -2,7 +2,6 @@
 
 import { UserFields, userSchema } from "@/lib/validations";
 import { db } from "@/lib/db";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -10,16 +9,21 @@ export const upsertUser = async (fields: UserFields) => {
   const parsed = userSchema.safeParse(fields);
 
   if (parsed.success) {
-    const { data } = parsed;
+    const {
+      data: { id, ...data },
+    } = parsed;
     try {
-      const heads = headers();
-      const pathname = heads.get("next-url");
-
-      const result = await db?.user.upsert({
+      const result = await db.user.upsert({
         create: data,
         update: data,
-        where: { clerkId: data.clerkId },
+        where: { id: id ?? "" },
       });
+
+      if (!id) {
+        redirect("/");
+      }
+
+      revalidatePath("/");
 
       return { success: true, data: result };
     } catch (error) {

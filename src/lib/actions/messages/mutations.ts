@@ -1,81 +1,302 @@
 "use server";
 
-import { getUserAuth } from "@/lib/utils";
-import { MessageFields, messageSchema } from "@/lib/validations";
+import {
+  sendMessageSchema,
+  SendMessageFields,
+  DeleteMessageFields,
+  deleteMessageSchema,
+  MarkAsSeenFields,
+  markAsSeenSchema,
+  UpdateMessageFields,
+  updateMessageSchema,
+} from "@/lib/validations";
 import { redirect } from "next/navigation";
-import { getUserByClerkId } from "../user/queries";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
+import { auth } from "@clerk/nextjs";
 
-export const upsertMessage = async (fields: MessageFields) => {
-  const result = messageSchema.safeParse(fields);
+export type UpdateMessage = {
+  id?: string;
+  content: string | null;
+  file: string | null;
+};
+
+export type SendConversationEvent = {
+  conversationId: string;
+};
+
+export const sendMessage = async (fields: SendMessageFields) => {
+  const result = sendMessageSchema.safeParse(fields);
 
   if (result.success) {
-    const {
-      data: { id, conversationId, ...data },
-    } = result;
     try {
-      const { session } = await getUserAuth();
-      if (!session) redirect("/sign-in");
+      const { userId } = auth();
 
-      const currentUser = await getUserByClerkId(session.user.id);
-      if (!currentUser) redirect("/onboarding");
-
-      const upsertedMessage = await db.message.upsert({
-        where: { id: id ?? "" },
-        create: { ...data, conversationId, senderId: currentUser.id },
-        update: data,
+      const createdMessage = await db.message.create({
+        data: result.data,
         select: {
+          id: true,
           content: true,
           file: true,
-          id: true,
+          updatedAt: true,
+          conversationId: true,
+          member: {
+            select: {
+              id: true,
+              role: true,
+              user: {
+                select: {
+                  image: true,
+                  name: true,
+                  clerkId: true,
+                },
+              },
+            },
+          },
           seenBy: {
             select: {
               id: true,
-            },
-          },
-          sentBy: {
-            select: {
-              name: true,
-              image: true,
-              clerkId: true,
+              user: {
+                select: {
+                  name: true,
+                  image: true,
+                },
+              },
             },
           },
         },
       });
-
-      pusherServer.trigger(conversationId, "messages:new", upsertedMessage);
 
       const updatedConversation = await db.conversation.update({
-        where: { id: conversationId },
-        data: {
-          lastMessageAt: new Date(),
+        where: {
+          id: createdMessage.conversationId,
         },
-        include: {
-          messages: true,
-          users: true,
+        data: {
+          lastMessageId: createdMessage.id,
+        },
+        select: {
+          members: {
+            select: {
+              id: true,
+              user: {
+                select: {
+                  clerkId: true,
+                },
+              },
+            },
+          },
         },
       });
 
-      return { success: true, data: upsertedMessage };
+      updatedConversation.members.forEach((member) => {
+        if (member.user.clerkId !== userId) {
+          const conversationsChannel = `${member.user.clerkId}_messages`;
+          console.log(userId);
+
+          pusherServer.trigger(conversationsChannel, "messages:new", {
+            conversationId: createdMessage.conversationId,
+          } as SendConversationEvent);
+        }
+      });
+
+      return { data: createdMessage };
     } catch (error) {
-      const message = (error as Error).message ?? "Failed to create message";
-      console.log(message);
-      return { success: false, error: message };
+      const message = (error as Error).message ?? "Failed to send message";
+      console.log({ message });
+      throw new Error(message);
     }
+  }
+
+  if (result.error) {
+    throw new Error(result.error.toString());
   }
 };
 
-export const deleteMessage = async (messageId: string) => {
-  try {
-    const deletedMessage = await db.message.delete({
-      where: { id: messageId },
-    });
+export const deleteMessage = async (data: DeleteMessageFields) => {
+  const result = deleteMessageSchema.safeParse(data);
 
-    return { success: true, data: deletedMessage };
-  } catch (error) {
-    const message = (error as Error).message ?? "Failed to delete message";
-    console.log(message);
-    return { success: false, error: message };
+  if (result.success) {
+    const { conversationId, messageId, previousMessageId } = result.data;
+
+    try {
+      const { userId } = auth();
+
+      if (!userId) redirect("/sign-in");
+
+      const deletedMessage = await db.message.delete({
+        where: { id: messageId },
+        select: {
+          id: true,
+          conversation: {
+            select: {
+              lastMessageId: true,
+            },
+          },
+        },
+      });
+
+      const isLast = deletedMessage.conversation.lastMessageId === messageId;
+      let conversation;
+
+      if (isLast) {
+        conversation = await db.conversation.update({
+          where: { id: conversationId },
+          data: {
+            lastMessageId: previousMessageId,
+          },
+          select: {
+            members: {
+              select: {
+                id: true,
+                user: {
+                  select: {
+                    clerkId: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      } else {
+        conversation = await db.conversation.findFirst({
+          where: { id: conversationId },
+          select: {
+            members: {
+              select: {
+                user: {
+                  select: {
+                    clerkId: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      conversation?.members.forEach((member) => {
+        if (member.user.clerkId !== userId) {
+          const messagesChannel = `${member.user.clerkId}_messages`;
+
+          pusherServer.trigger(messagesChannel, "messages:delete", {
+            conversationId,
+          });
+        }
+      });
+
+      return { data: deletedMessage };
+    } catch (error) {
+      const message = (error as Error).message ?? "Failed to delete message";
+      console.log({ message });
+      throw new Error(message);
+    }
+  }
+
+  if (result.error) {
+    throw new Error(result.error.toString());
+  }
+};
+
+export const updateMessage = async (data: UpdateMessageFields) => {
+  const result = updateMessageSchema.safeParse(data);
+
+  if (result.success) {
+    const { id, conversationId, ...data } = result.data;
+
+    try {
+      const { userId } = auth();
+
+      const updatedMessage = await db.message.update({
+        where: { id },
+        data,
+      });
+
+      const conversation = await db.conversation.findFirst({
+        where: { id: conversationId },
+        select: {
+          members: {
+            select: {
+              user: {
+                select: {
+                  clerkId: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!conversation) {
+        throw new Error("conversation not found");
+      }
+
+      conversation.members.forEach((member) => {
+        if (member.user.clerkId !== userId) {
+          const messagesChannel = `${member.user.clerkId}_messages`;
+
+          pusherServer.trigger(messagesChannel, "messages:update", {
+            conversationId,
+          });
+        }
+      });
+
+      return { success: true, data: updatedMessage };
+    } catch (error) {
+      const message = (error as Error).message ?? "Failed to update message";
+      console.log({ message });
+      throw new Error(message);
+    }
+  }
+
+  if (result.error) {
+    throw new Error(result.error.toString());
+  }
+};
+
+export const markAsSeen = async (data: MarkAsSeenFields) => {
+  const result = markAsSeenSchema.safeParse(data);
+
+  if (result.success) {
+    const { conversationId, memberId, messageId } = result.data;
+
+    try {
+      const updatedMessage = await db.message.update({
+        where: { id: messageId },
+        data: {
+          seenBy: {
+            connect: {
+              id: memberId,
+            },
+          },
+        },
+        select: {
+          member: {
+            select: {
+              user: {
+                select: {
+                  clerkId: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const messagesChannel = `${updatedMessage.member.user.clerkId}_messages`;
+
+      pusherServer.trigger(messagesChannel, "messages:seen", {
+        conversationId,
+      });
+
+      return { success: true, data: updatedMessage };
+    } catch (error) {
+      const message = (error as Error).message ?? "Failed to mark as seen";
+      console.log({ message });
+      throw new Error(message);
+    }
+  }
+
+  if (result.error) {
+    throw new Error(result.error.toString());
   }
 };

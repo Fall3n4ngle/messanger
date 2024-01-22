@@ -20,4 +20,25 @@ export const conversationSchema = z.object({
   isGroup: z.boolean().default(false),
 });
 
+export const createConversationSchema = conversationSchema.pick({
+  name: true,
+  image: true,
+  isGroup: true,
+  members: true,
+});
+
+export const updateGroupSchema = conversationSchema.pick({
+  name: true,
+  image: true,
+  id: true,
+});
+
+export const addMembersSchema = conversationSchema.pick({
+  members: true,
+  id: true,
+});
+
 export type ConversationFields = z.infer<typeof conversationSchema>;
+export type CreateConversationFields = z.infer<typeof createConversationSchema>;
+export type AddMembersFields = z.infer<typeof addMembersSchema>;
+export type UpdateGroupFields = z.infer<typeof updateGroupSchema>;

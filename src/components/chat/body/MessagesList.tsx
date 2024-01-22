@@ -1,62 +1,54 @@
 "use client";
 
 import { Button, ScrollArea } from "@/components/ui";
-import { getMessages } from "@/lib/actions/messages/queries";
-import {
-  InfiniteData,
-  useInfiniteQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { Fragment, useEffect, useRef } from "react";
-import MessageCard from "./MessageCard";
-import { pusherClient } from "@/lib/pusher/client";
-import { useAuth } from "@clerk/nextjs";
+import { useEffect, useRef } from "react";
 import { useActiveUsers } from "@/store";
-
-export type Message = {
-  id: string;
-  content: string | null;
-  file: string | null;
-  updatedAt: Date;
-  sentBy: {
-    image: string | null;
-    name: string;
-    clerkId: string;
-  } | null;
-};
+import { MemberRole } from "@prisma/client";
+import { Message } from "../lib/types";
+import { useMessages } from "./lib/hooks/useMessages";
+import { useAuth } from "@clerk/nextjs";
+import { getMessageCard } from "./lib/utils/getMessageCard";
+import { useInView } from "react-intersection-observer";
+import { ChevronsDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   initialMessages: Message[];
   conversationId: string;
+  memberRole: MemberRole;
+  memberId: string;
 };
-
-const take = 25;
 
 export default function MessagesList({
   conversationId,
   initialMessages,
+  memberRole,
+  memberId,
 }: Props) {
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
 
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const messagesListRef = useRef<HTMLDivElement>(null);
+  const { ref: bottomRef, inView: isScrolledToBottom } = useInView();
 
-  const { data, fetchPreviousPage, hasPreviousPage } = useInfiniteMessages({
+  const { data: messages, dataUpdatedAt } = useMessages({
     conversationId,
     initialMessages,
   });
 
-  usePusherMessages({ conversationId });
+  const scrollToBottom = () => {
+    messagesListRef.current?.lastElementChild?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  };
 
   useEffect(() => {
+    if (!isScrolledToBottom) return;
     scrollToBottom();
-  }, []);
+  }, [dataUpdatedAt, isScrolledToBottom]);
 
-  if (!data.pages[0].length) {
+  if (messages.length < 1) {
     return (
       <div className="flex items-center justify-center h-full w-full">
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
@@ -67,106 +59,47 @@ export default function MessagesList({
   }
 
   return (
-    <ScrollArea className="flex-1 px-6 pb-6 pt-3" ref={listRef}>
-      {hasPreviousPage && (
-        <div className="flex justify-center">
-          <Button
-            variant="ghost"
-            className="mb-6"
-            onClick={() => fetchPreviousPage()}
-          >
-            Load previous
-          </Button>
-        </div>
-      )}
-      <div className="flex-1 flex flex-col gap-6">
-        {data?.pages.map((group, id) => (
-          <Fragment key={id}>
-            {group.map((message) => {
-              if (!message.sentBy) return;
-              const { clerkId } = message.sentBy;
-              const isOwn = clerkId === userId;
-              const isActive = usersIds.includes(clerkId);
+    <ScrollArea className="flex-1 px-6 pb-6 pt-3 relative">
+      <Button
+        variant="secondary"
+        size="icon"
+        className={cn(
+          "rounded-full absolute right-6 bottom-6 z-10 w-14 h-14 hover:bg-secondary transition-opacity delay-200",
+          {
+            "visible opacity-100": !isScrolledToBottom,
+            "invisible opacity-0": isScrolledToBottom,
+          }
+        )}
+        onClick={scrollToBottom}
+      >
+        <ChevronsDown className="text-muted-foreground" />
+      </Button>
+      <div className="flex-1 flex flex-col gap-6" ref={messagesListRef}>
+        {messages.map(({ member, ...props }, messageIndex) => {
+          if (!member.user || !userId) return;
+          const { clerkId } = member.user;
+          const isOwn = clerkId === userId;
+          const isActive = usersIds.includes(clerkId);
 
-              return (
-                <MessageCard
-                  key={message.id}
-                  isOwn={isOwn}
-                  isActive={isActive}
-                  {...message}
-                />
-              );
-            })}
-          </Fragment>
-        ))}
+          let previousMessageId: string | null = null;
+          if (messageIndex > 0) {
+            previousMessageId = messages[messageIndex - 1].id;
+          }
+
+          const card = getMessageCard({
+            ...props,
+            isActive,
+            isOwn,
+            member,
+            memberRole,
+            previousMessageId,
+            memberId,
+          });
+
+          return card;
+        })}
       </div>
       <div ref={bottomRef} />
     </ScrollArea>
   );
 }
-
-const useInfiniteMessages = ({ conversationId, initialMessages }: Props) => {
-  const getData = async ({ pageParam }: { pageParam?: string }) => {
-    const messages = await getMessages({
-      conversationId,
-      lastCursor: pageParam,
-      take: -take,
-    });
-
-    return messages;
-  };
-
-  return useInfiniteQuery({
-    queryKey: ["messages", conversationId],
-    queryFn: getData,
-    initialPageParam: undefined,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length < +take) {
-        return;
-      }
-
-      return lastPage[lastPage.length - 1].id;
-    },
-    getPreviousPageParam: (firstPage) => {
-      if (firstPage.length < +take) {
-        return;
-      }
-
-      return firstPage[0].id;
-    },
-    initialData: {
-      pages: [initialMessages],
-      pageParams: [undefined],
-    },
-    staleTime: Infinity,
-  });
-};
-
-const usePusherMessages = ({ conversationId }: { conversationId: string }) => {
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    pusherClient.subscribe(conversationId);
-
-    const handleNewMessage = (newMessage: Message) => {
-      queryClient.setQueryData(
-        ["messages", conversationId],
-        ({ pageParams, pages }: InfiniteData<Message[], unknown>) => {
-          return {
-            pages: pages.map((page, index) =>
-              index === pages.length - 1 ? [...page, newMessage] : page
-            ),
-            pageParams,
-          };
-        }
-      );
-    };
-
-    pusherClient.bind("messages:new", handleNewMessage);
-
-    return () => {
-      pusherClient.unsubscribe(conversationId);
-      pusherClient.unbind("messages:new", handleNewMessage);
-    };
-  }, [conversationId, queryClient]);
-};

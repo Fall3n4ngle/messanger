@@ -1,15 +1,17 @@
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui";
+import { ReactNode } from "react";
 
 type Props = {
   name: string;
   image: string | null;
   isActive: boolean;
+  rightSide?: ReactNode;
 };
 
-export default function UserCard({ image, name, isActive }: Props) {
+export default function UserCard({ image, name, isActive, rightSide }: Props) {
   return (
-    <div className="flex items-center gap-5 cursor-pointer p-2 hover:bg-secondary rounded-md transition-colors">
+    <div className="flex items-center gap-5 p-2 rounded-md transition-colors">
       <div className="relative">
         <Avatar>
           {image && <AvatarImage src={image} alt={`${name} profile image`} />}
@@ -22,7 +24,8 @@ export default function UserCard({ image, name, isActive }: Props) {
           )}
         />
       </div>
-      <span className="font-semibold">{name}</span>
+      <span className="font-semibold grow">{name}</span>
+      {rightSide}
     </div>
   );
 }

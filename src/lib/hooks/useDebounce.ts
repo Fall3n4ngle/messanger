@@ -16,7 +16,7 @@ export const useDebouncedValue = <T>(value: T, delay = 300) => {
   return debouncedValue;
 };
 
-function debounce(func: Function, wait: number) {
+export function debounce(func: Function, wait: number) {
   let timeout: string | number | NodeJS.Timeout | undefined;
   return function executedFunction(...args: any) {
     const later = () => {

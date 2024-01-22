@@ -5,25 +5,17 @@ import { formatDate } from "@/lib/utils";
 import ConversationCard from "./ConversationCard";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { getUserConversations } from "@/lib/actions/conversation/queries";
-import { Fragment, useEffect } from "react";
-
-type Conversation = {
-  id: string;
-  name: string;
-  image: string | null;
-  lastMessageAt: Date;
-  createdAt: Date;
-};
+import { Conversation } from "./lib/types";
+import { usePusherConversations } from "./lib/hooks/usePusherConversations";
+import { useAuth } from "@clerk/nextjs";
+import { getLastMessageData } from "./lib/utils/getLastMessage";
+import { useConversations } from "./lib/hooks/useConversations";
+import { usePusherMessages } from "./lib/hooks/usePusherMessages";
 
 type Props = {
   intialConversations: Conversation[];
   currentUserId: string;
 };
-
-const take = 25;
 
 export default function ConversationsList({
   intialConversations,
@@ -32,74 +24,63 @@ export default function ConversationsList({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
+  const { userId } = useAuth();
 
-  const { ref: bottomRef, inView } = useInView({
-    threshold: 0,
+  const { data } = useConversations({
+    currentUserId,
+    query,
+    intialConversations,
   });
 
-  const getData = async ({ pageParam }: { pageParam?: Date }) => {
-    const conversations = await getUserConversations({
-      currentUserId,
-      query: query ?? "",
-      lastCursor: pageParam,
-      take,
-    });
+  usePusherConversations();
+  usePusherMessages();
 
-    return conversations;
-  };
+  if (!userId) {
+    return null;
+  }
 
-  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
-    queryKey: ["conversations", query],
-    queryFn: getData,
-    initialPageParam: undefined,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length < take) {
-        return;
-      }
-
-      return lastPage[lastPage.length - 1].createdAt;
-    },
-    initialData: {
-      pages: [intialConversations],
-      pageParams: [undefined],
-    },
-  });
-
-  useEffect(() => {
-    if (inView && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, fetchNextPage]);
-
-  if (!data.pages[0].length) {
-    return <p className="ml-3">No conversations found</p>;
+  if (!data.length) {
+    return <p className="pl-3">No conversations found</p>;
   }
 
   return (
     <ScrollArea className="px-4">
       <ul className="flex flex-col gap-3">
-        {data.pages.map((group, id) => (
-          <Fragment key={id}>
-            {group.map(({ id, lastMessageAt, ...props }) => {
-              const date = formatDate(lastMessageAt);
-              const isActive = pathname.includes(id);
+        {data.map(
+          ({
+            id,
+            lastMessage,
+            messages: unreadMessages,
+            updatedAt,
+            isGroup,
+            ...props
+          }) => {
+            const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
+            const isActive = pathname.includes(id);
+            const unreadMessagesCount = unreadMessages?.length;
+            const { message, seen } = getLastMessageData({
+              currentUserClerkId: userId,
+              isGroup,
+              lastMessage,
+            });
 
-              return (
-                <li key={id}>
-                  <Link href={`/conversations/${id}`}>
-                    <ConversationCard
-                      isActive={isActive}
-                      lastMessageAt={date}
-                      {...props}
-                    />
-                  </Link>
-                </li>
-              );
-            })}
-          </Fragment>
-        ))}
+            return (
+              <li key={id}>
+                <Link href={`/conversations/${id}`}>
+                  <ConversationCard
+                    isActive={isActive}
+                    lastMessageAt={date}
+                    lastMessageContent={message}
+                    unreadMessagesCount={unreadMessagesCount}
+                    seen={seen}
+                    {...props}
+                  />
+                </Link>
+              </li>
+            );
+          }
+        )}
       </ul>
-      <div ref={bottomRef} />
     </ScrollArea>
   );
 }

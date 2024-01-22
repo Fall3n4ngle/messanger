@@ -23,11 +23,13 @@ export default function Providers({ children }: PropsWithChildren) {
       enableSystem
       disableTransitionOnChange
     >
-      <QueryClientProvider client={queryClient}>
-        <ClerkProvider>{children}</ClerkProvider>
-      </QueryClientProvider>
-      <Toaster />
-      <ActiveStatus />
+      <ClerkProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+        <Toaster />
+        <ActiveStatus />
+      </ClerkProvider>
     </ThemeProvider>
   );
 }

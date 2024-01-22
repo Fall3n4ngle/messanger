@@ -1,65 +1,40 @@
 "use client";
 
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useTransition } from "react";
 import { UserCard } from "../common";
 import { ScrollArea } from "../ui";
 import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { getUsers } from "@/lib/actions/user/queries";
 import { useAuth } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
 import { useActiveUsers } from "@/store";
-
-type User = {
-  id: string;
-  name: string;
-  clerkId: string;
-  image: string | null;
-};
+import { useInfiniteUsers } from "./lib/hooks/useInfiniteUsers";
+import { User } from "./lib/types";
+import UserCardSkeleton from "./UserCardSkeleton";
+import { cn } from "@/lib/utils";
 
 type Props = {
   initialUsers: User[];
   query?: string;
 };
 
-const take = 25;
-
 export default function UsersList({ initialUsers, query }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
+  const [isPending, startTransition] = useTransition();
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,
   });
 
-  const getData = async ({ pageParam }: { pageParam?: string }) => {
-    const users = await getUsers({
-      currentUserClerkId: userId!,
-      lastCursor: pageParam,
-      query,
-      take,
-    });
-
-    return users;
-  };
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ["users", query],
-      queryFn: getData,
-      initialPageParam: undefined,
-      getNextPageParam: (lastPage) => {
-        if (lastPage.length < take) {
-          return;
-        }
-
-        return lastPage[lastPage.length - 1].id;
-      },
-      initialData: {
-        pages: [initialUsers],
-        pageParams: [undefined],
-      },
+    useInfiniteUsers({
+      userId: userId!,
+      initialUsers,
+      query,
     });
+
+  const handleClick = () => startTransition(async () => {
+    
+  });
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -79,16 +54,22 @@ export default function UsersList({ initialUsers, query }: Props) {
             {group.map(({ id, clerkId, ...props }) => {
               const isActive = usersIds.includes(clerkId);
 
-              return <UserCard key={id} isActive={isActive} {...props} />;
+              return (
+                <li
+                  key={id}
+                  className={cn(
+                    "cursor-pointer",
+                    isPending && "cursor-not-allowed pointer-events-none"
+                  )}
+                >
+                  <UserCard isActive={isActive} {...props} />
+                </li>
+              );
             })}
           </Fragment>
         ))}
       </ul>
-      {isFetchingNextPage && (
-        <div className="flex w-full justify-center mt-4">
-          <Loader2 className="animate-spin text-secondary-foreground" />
-        </div>
-      )}
+      {isFetchingNextPage && <UserCardSkeleton />}
       <div ref={bottomRef} className="pt-4" />
     </ScrollArea>
   );

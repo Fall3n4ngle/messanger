@@ -19,21 +19,28 @@ import { UserForm } from "../common";
 import { useAuth } from "@clerk/nextjs";
 import { useActiveUsers } from "@/store/useActiveUsers";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 type Props = {
   image: string | null;
   name: string;
   clerkId: string;
+  id: string;
 };
 
-export default function UserButton({ image, name, clerkId }: Props) {
+export default function UserButton({ image, name, clerkId, id }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleModalClose = () => {
+    setIsOpen(false);
+  };
 
   const isActive = userId && usersIds.includes(userId);
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -72,7 +79,13 @@ export default function UserButton({ image, name, clerkId }: Props) {
             Change your display name or image
           </DialogDescription>
         </DialogHeader>
-        <UserForm clerkId={clerkId} name={name} image={image} />
+        <UserForm
+          clerkId={clerkId}
+          name={name}
+          image={image}
+          id={id}
+          onCloseModal={handleModalClose}
+        />
       </DialogContent>
     </Dialog>
   );

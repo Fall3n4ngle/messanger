@@ -5,36 +5,76 @@ import { db } from "@/lib/db";
 type Props = {
   currentUserId: string;
   query?: string;
-  take?: number;
-  lastCursor?: Date;
 };
 
 export const getUserConversations = async ({
   currentUserId,
-  lastCursor,
   query = "",
-  take,
 }: Props) => {
-  const cursor = lastCursor ? { createdAt: lastCursor } : undefined;
-
   const convsersations = await db.conversation.findMany({
     where: {
-      users: {
+      members: {
         some: {
-          id: currentUserId,
+          userId: currentUserId,
         },
       },
       name: {
         contains: query,
-        mode: "insensitive"
-      }
+        mode: "insensitive",
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      updatedAt: true,
+      isGroup: true,
+      messages: {
+        where: {
+          AND: {
+            seenBy: {
+              none: {
+                userId: currentUserId,
+              },
+            },
+            member: {
+              userId: {
+                not: currentUserId,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+        },
+      },
+      lastMessage: {
+        select: {
+          id: true,
+          content: true,
+          updatedAt: true,
+          file: true,
+          member: {
+            select: {
+              user: {
+                select: {
+                  clerkId: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              seenBy: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
-      lastMessageAt: "desc",
+      updatedAt: "desc",
     },
-    cursor,
-    take,
-    skip: cursor ? 1 : 0,
   });
 
   return convsersations;
@@ -48,8 +88,18 @@ export const getConversationById = async (conversationId: string) => {
       name: true,
       image: true,
       isGroup: true,
-      creatorId: true,
-      users: true,
+      members: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              clerkId: true,
+            },
+          },
+        },
+      },
     },
   });
 

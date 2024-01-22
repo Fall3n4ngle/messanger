@@ -21,41 +21,61 @@ datasource db {
 }
 
 model User {
-  id                   String         @id @default(uuid())
-  clerkId              String         @unique
-  name                 String
-  image                String?
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt()
-  sentMessages         Message[]
-  seenMessages         Message[]      @relation(name: "seenMessages")
-  conversation         Conversation[]
-  createdConversations Conversation[] @relation(name: "createdConversations")
+  id            String         @id @default(uuid())
+  clerkId       String         @unique
+  name          String
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt()
+  conversations Conversation[]
+  member        Member[]
 }
 
 model Conversation {
   id            String    @id @default(uuid())
-  name          String
+  name          String 
   image         String?
   isGroup       Boolean   @default(false)
-  lastMessageAt DateTime  @default(now())
-  createdAt     DateTime  @default(now()) @unique
+  lastMessage   Message?  @relation("LastMessage", fields: [lastMessageId], references: [id])
+  lastMessageId String?   @unique
+  createdAt     DateTime  @unique @default(now())
   updatedAt     DateTime  @updatedAt()
-  users         User[]
-  messages      Message[]
-  creator       User?     @relation(fields: [creatorId], references: [id], name: "createdConversations")
-  creatorId     String?
+  messages      Message[] @relation("Messages")
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+  members       Member[]
+}
+
+enum MemberRole {
+  ADMIN
+  VIEW
+  EDIT
+}
+
+model Member {
+  id             String        @id @default(uuid())
+  role           MemberRole    @default(VIEW)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId String?
+  sentMessages   Message[]
+  seenMessages   Message[]     @relation("seenMessages")
+
+  @@index([userId])
+  @@index([conversationId])
 }
 
 model Message {
-  id             String       @id @default(uuid())
-  content        String? 
+  id             String        @id @default(uuid())
+  content        String?
   file           String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt()
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt()
   conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-  sentBy         User?        @relation(fields: [senderId], references: [id])
-  senderId       String?
-  seenBy         User[]       @relation(name: "seenMessages")
+  conversation   Conversation  @relation("Messages", fields: [conversationId], references: [id], onDelete: Cascade)
+  lastMessageOf  Conversation? @relation("LastMessage")
+  member         Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId       String
+  seenBy         Member[]      @relation("seenMessages")
 }

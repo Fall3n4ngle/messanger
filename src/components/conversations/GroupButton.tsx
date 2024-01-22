@@ -12,7 +12,7 @@ import {
   DialogDescription,
 } from "../ui";
 import { UserPlus } from "lucide-react";
-import { GroupForm } from "../common";
+import { CreateGroupButton } from "./CreateGroupForm";
 
 export default function GroupButton() {
   return (
@@ -41,10 +41,7 @@ export default function GroupButton() {
             Choose group name, image and add other users
           </DialogDescription>
         </DialogHeader>
-        <GroupForm
-          successMessage="Conversation created successfully"
-          errorMessage="Failed to create conversation"
-        />
+        <CreateGroupButton />
       </DialogContent>
     </Dialog>
   );

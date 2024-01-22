@@ -8,26 +8,39 @@ type Props = {
   lastCursor?: string;
 };
 
-export const getMessages = async ({
-  conversationId,
-  lastCursor,
-  take,
-}: Props) => {
-  const cursor = lastCursor ? { id: lastCursor } : undefined;
-
+export const getMessages = async ({ conversationId }: Props) => {
   const messages = await db.message.findMany({
     where: {
       conversationId,
     },
+    select: {
+      id: true,
+      content: true,
+      file: true,
+      updatedAt: true,
+      conversationId: true,
+      member: {
+        select: {
+          id: true,
+          role: true,
+          user: {
+            select: {
+              image: true,
+              name: true,
+              clerkId: true,
+            },
+          },
+        },
+      },
+      seenBy: {
+        select: {
+          id: true,
+        },
+      },
+    },
     orderBy: {
       createdAt: "asc",
     },
-    include: {
-      sentBy: true,
-    },
-    cursor,
-    take,
-    skip: cursor ? 1 : 0,
   });
 
   return messages;

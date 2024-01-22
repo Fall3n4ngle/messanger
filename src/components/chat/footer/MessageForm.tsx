@@ -8,7 +8,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  inputClassName,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -16,36 +15,33 @@ import {
 } from "@/components/ui";
 import { UploadButton, UploadImage } from "@/components/upload";
 import { deleteFiles } from "@/lib/actions/files";
-import { upsertMessage } from "@/lib/actions/messages/mutations";
-import {
-  useDebouncedCallback,
-  useThrottledCallback,
-  useToast,
-} from "@/lib/hooks";
-import { messageSchema } from "@/lib/validations/message";
+import { useToast } from "@/lib/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image as ImageIcon, Loader2, SendHorizontal } from "lucide-react";
+import { Image as ImageIcon, Loader2, SendHorizontal, X } from "lucide-react";
 import Image from "next/image";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import TextareaAutosize from "react-textarea-autosize";
-import { cn } from "@/lib/utils";
-import {
-  addTypingUser,
-  removeTypingUser,
-} from "@/lib/actions/typingUser/mutations";
+import MessageFormInput from "./MessageFormInput";
+import { Message } from "../lib/types";
+import { sendMessageSchema } from "@/lib/validations";
+import { useSendMessage } from "./lib/hooks/useSendMessage";
+import { v4 as uuidv4 } from "uuid";
+import { useMessageForm } from "../store/useMessageForm";
+import { useUpdateMessage } from "./lib/hooks/useUpdateMessage";
 
 type Props = {
   conversationId: string;
-  userName: string;
-};
+} & Pick<Message, "member">;
 
-const formSchema = messageSchema.pick({ content: true, file: true });
+const formSchema = sendMessageSchema.pick({ content: true, file: true });
 type FormFields = z.infer<typeof formSchema>;
 
-export default function MessageForm({ conversationId, userName }: Props) {
+export default function MessageForm({ conversationId, member }: Props) {
   const { toast } = useToast();
+  const { messageData, setMessageData } = useMessageForm();
+  const { mutate: sendMessage } = useSendMessage({ member });
+  const { mutate: updateMessage } = useUpdateMessage();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -53,6 +49,10 @@ export default function MessageForm({ conversationId, userName }: Props) {
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
+    values: {
+      content: messageData.content ?? "",
+      file: messageData.file ?? "",
+    },
   });
 
   const handleUploadError = (error: Error) => {
@@ -63,7 +63,12 @@ export default function MessageForm({ conversationId, userName }: Props) {
     setIsUploading(false);
   };
 
-  const handleDelete = () =>
+  const handleDelete = () => {
+    if (messageData.isUpdating) {
+      form.setValue("file", "");
+      return;
+    }
+
     startTransition(async () => {
       if (!fileKey) return;
 
@@ -77,49 +82,51 @@ export default function MessageForm({ conversationId, userName }: Props) {
 
       form.setValue("file", "");
     });
-
-  const onSubmit = async (fields: FormFields) => {
-    const result = await upsertMessage({ ...fields, conversationId });
-
-    if (result?.success) {
-      form.reset();
-      form.setValue("content", "");
-    }
-
-    if (result?.error) {
-      toast({
-        description: (
-          <ToastMessage type="error" message="Error sending message" />
-        ),
-      });
-    }
   };
 
-  const handleTypeStart = useThrottledCallback(async () => {
-    await addTypingUser({
-      conversationId,
-      userName,
+  const resetMessageData = () => {
+    setMessageData({
+      id: null,
+      content: null,
+      file: null,
+      isUpdating: false,
     });
-  }, 200);
+  };
 
-  const handleTypeEnd = useDebouncedCallback(async () => {
-    await removeTypingUser({
-      conversationId,
-      userName,
-    });
-  }, 1500);
+  const onSubmit = async (fields: FormFields) => {
+    if (messageData.isUpdating && messageData.id) {
+      updateMessage({
+        id: messageData.id,
+        conversationId,
+        ...fields,
+      });
+
+      resetMessageData();
+    } else {
+      sendMessage({
+        ...fields,
+        conversationId,
+        memberId: member.id,
+        id: uuidv4(),
+        updatedAt: new Date(),
+      });
+    }
+
+    form.reset();
+    form.setValue("content", "");
+  };
 
   const { isSubmitting } = form.formState;
   const url = form.watch("file");
 
   return (
     <div className="px-6 py-4 border-t">
-      <div>
+      <div className="flex w-full items-center justify-between">
         {url && (
           <UploadImage
             isPending={isPending}
             onDelete={handleDelete}
-            className="w-28 h-28 mb-5 ml-[52px]"
+            className="w-28 h-28 ml-[52px] mb-5"
           >
             <div className="relative w-full h-full ">
               <Image
@@ -130,6 +137,16 @@ export default function MessageForm({ conversationId, userName }: Props) {
               />
             </div>
           </UploadImage>
+        )}
+        {messageData.isUpdating && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={resetMessageData}
+            className="ml-auto rounded-full mb-5"
+          >
+            <X className="w-4.5 h-4.5" />
+          </Button>
         )}
       </div>
       <Form {...form}>
@@ -145,9 +162,9 @@ export default function MessageForm({ conversationId, userName }: Props) {
                 <FormLabel className="sr-only">Attach image</FormLabel>
                 <TooltipProvider delayDuration={300}>
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger className="!mt-0" asChild>
                       <UploadButton
-                        className="rounded-full !mt-0"
+                        className="rounded-full"
                         onUploadError={handleUploadError}
                         onBeforeUploadBegin={(files) => {
                           setIsUploading(true);
@@ -177,21 +194,14 @@ export default function MessageForm({ conversationId, userName }: Props) {
           <FormField
             name="content"
             control={form.control}
-            render={({ field }) => (
+            render={({ field: { ref, ...field } }) => (
               <FormItem className="grow">
                 <FormLabel className="sr-only">Write a message</FormLabel>
                 <FormControl>
-                  <TextareaAutosize
-                    id="message"
-                    placeholder="Write a message..."
-                    className={cn(
-                      inputClassName,
-                      "!m-0 resize-none bg-secondary dark:bg-secondary/50 border-none"
-                    )}
-                    onKeyDown={() => {
-                      handleTypeStart();
-                      handleTypeEnd();
-                    }}
+                  <MessageFormInput
+                    conversationId={conversationId}
+                    userName={member.user.name}
+                    ref={ref}
                     {...field}
                   />
                 </FormControl>

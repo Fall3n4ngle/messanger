@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import Select, { AsyncProps } from "react-select/async";
-import { GroupBase, OptionProps } from "react-select";
+import { GroupBase, MultiValueGenericProps, OptionProps } from "react-select";
 import { loadUsers } from "@/lib/api/loadUsers";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui";
 
@@ -25,7 +25,7 @@ export default function UsersSelect<
       unstyled
       classNames={classNames}
       onChange={onChange}
-      components={{ Option: CustomOption }}
+      components={{ Option: CustomOption, MultiValueLabel: CustomLabel }}
       {...props}
     />
   );
@@ -56,6 +56,10 @@ const CustomOption = <
   );
 };
 
+const CustomLabel = ({ data }: MultiValueGenericProps<Option>) => {
+  return <label>{data.label}</label>;
+};
+
 const classNames = {
   control: ({ isFocused }: any) =>
     cn(
@@ -75,7 +79,8 @@ const classNames = {
   multiValue: () =>
     "mr-1 inline-flex items-center rounded-md border px-2.5 py-0.5 text-sm font-semibold bg-secondary text-foreground cursor-default",
   clearIndicator: () => "text-muted-foreground hover:text-foreground ml-1.5",
-  multiValueRemove: () => "ml-1.5 text-muted-foreground hover:text-foreground transition-colors",
+  multiValueRemove: () =>
+    "ml-1.5 text-muted-foreground hover:text-foreground transition-colors",
   loadingIndicator: () => "mr-1",
   placeholder: () => "text-muted-foreground",
 };

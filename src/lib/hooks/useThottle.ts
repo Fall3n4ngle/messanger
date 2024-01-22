@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-function throttle(func: Function, limit: number) {
+export function throttle(func: Function, limit: number) {
   let inThrottle: boolean | undefined;
   return function throttledFunction(...args: any) {
     if (!inThrottle) {

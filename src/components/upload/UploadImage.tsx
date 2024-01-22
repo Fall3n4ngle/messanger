@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Loader, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { PropsWithChildren } from "react";
 
 type Props = {
@@ -24,7 +24,7 @@ export default function UploadImage({
         disabled={isPending}
       >
         {isPending ? (
-          <Loader size={17} className="animate-spin" />
+          <Loader2 size={17} className="animate-spin" />
         ) : (
           <X size={17} />
         )}

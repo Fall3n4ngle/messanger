@@ -1,21 +1,22 @@
 import * as z from "zod"
-import { CompleteUser, relatedUserSchema, CompleteMessage, relatedMessageSchema } from "./index"
+import { CompleteMessage, relatedMessageSchema, CompleteUser, relatedUserSchema, CompleteMember, relatedMemberSchema } from "./index"
 
 export const conversationSchema = z.object({
   id: z.string(),
   name: z.string(),
   image: z.string().nullish(),
   isGroup: z.boolean(),
-  lastMessageAt: z.date(),
+  lastMessageId: z.string().nullish(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  creatorId: z.string().nullish(),
+  userId: z.string(),
 })
 
 export interface CompleteConversation extends z.infer<typeof conversationSchema> {
-  users: CompleteUser[]
+  lastMessage?: CompleteMessage | null
   messages: CompleteMessage[]
-  creator?: CompleteUser | null
+  user: CompleteUser
+  members: CompleteMember[]
 }
 
 /**
@@ -24,7 +25,8 @@ export interface CompleteConversation extends z.infer<typeof conversationSchema>
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const relatedConversationSchema: z.ZodSchema<CompleteConversation> = z.lazy(() => conversationSchema.extend({
-  users: relatedUserSchema.array(),
+  lastMessage: relatedMessageSchema.nullish(),
   messages: relatedMessageSchema.array(),
-  creator: relatedUserSchema.nullish(),
+  user: relatedUserSchema,
+  members: relatedMemberSchema.array(),
 }))
