@@ -29,11 +29,13 @@ model User {
   updatedAt     DateTime       @updatedAt()
   conversations Conversation[]
   member        Member[]
+  sentMessages  Message[]
+  seenMessages  Message[]      @relation("seenMessages")
 }
 
 model Conversation {
   id            String    @id @default(uuid())
-  name          String 
+  name          String
   image         String?
   isGroup       Boolean   @default(false)
   lastMessage   Message?  @relation("LastMessage", fields: [lastMessageId], references: [id])
@@ -59,8 +61,6 @@ model Member {
   userId         String
   conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   conversationId String?
-  sentMessages   Message[]
-  seenMessages   Message[]     @relation("seenMessages")
 
   @@index([userId])
   @@index([conversationId])
@@ -75,7 +75,7 @@ model Message {
   conversationId String
   conversation   Conversation  @relation("Messages", fields: [conversationId], references: [id], onDelete: Cascade)
   lastMessageOf  Conversation? @relation("LastMessage")
-  member         Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  memberId       String
-  seenBy         Member[]      @relation("seenMessages")
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  seenBy         User[]        @relation("seenMessages")
 }

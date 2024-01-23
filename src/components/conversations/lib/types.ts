@@ -3,11 +3,9 @@ export type LastMessage = {
   content: string | null;
   updatedAt: Date;
   file?: string | null;
-  member: {
-    user: {
-      clerkId: string;
-      name: string;
-    };
+  user: {
+    clerkId: string;
+    name: string;
   };
   _count: {
     seenBy: number;

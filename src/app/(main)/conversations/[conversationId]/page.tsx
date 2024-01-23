@@ -68,10 +68,10 @@ export default async function Conversation({
           initialMessages={messages}
           conversationId={id}
           memberRole={userMember.role}
-          memberId={userMember.id}
+          currentUserId={userMember.user.id}
         />
         <div className="max-w-[1000px] self-center w-full">
-          <MessageForm conversationId={id} member={userMember} />
+          <MessageForm conversationId={id} user={userMember.user} />
         </div>
       </div>
     </div>

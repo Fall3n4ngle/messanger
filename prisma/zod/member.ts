@@ -1,6 +1,6 @@
 import * as z from "zod"
 import { MemberRole } from "@prisma/client"
-import { CompleteUser, relatedUserSchema, CompleteConversation, relatedConversationSchema, CompleteMessage, relatedMessageSchema } from "./index"
+import { CompleteUser, relatedUserSchema, CompleteConversation, relatedConversationSchema } from "./index"
 
 export const memberSchema = z.object({
   id: z.string(),
@@ -12,8 +12,6 @@ export const memberSchema = z.object({
 export interface CompleteMember extends z.infer<typeof memberSchema> {
   user: CompleteUser
   conversation?: CompleteConversation | null
-  sentMessages: CompleteMessage[]
-  seenMessages: CompleteMessage[]
 }
 
 /**
@@ -24,6 +22,4 @@ export interface CompleteMember extends z.infer<typeof memberSchema> {
 export const relatedMemberSchema: z.ZodSchema<CompleteMember> = z.lazy(() => memberSchema.extend({
   user: relatedUserSchema,
   conversation: relatedConversationSchema.nullish(),
-  sentMessages: relatedMessageSchema.array(),
-  seenMessages: relatedMessageSchema.array(),
 }))

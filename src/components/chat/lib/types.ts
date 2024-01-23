@@ -1,5 +1,3 @@
-import { MemberRole } from "@prisma/client";
-
 type SeenBy = {
   id: string;
 };
@@ -10,14 +8,11 @@ export type Message = {
   file?: string | null;
   updatedAt: Date;
   conversationId: string;
-  member: {
+  user: {
     id: string;
-    role: MemberRole;
-    user: {
-      image: string | null;
-      name: string;
-      clerkId: string;
-    };
+    image: string | null;
+    name: string;
+    clerkId: string;
   };
   seenBy: SeenBy[];
 };

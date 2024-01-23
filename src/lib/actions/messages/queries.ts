@@ -19,17 +19,12 @@ export const getMessages = async ({ conversationId }: Props) => {
       file: true,
       updatedAt: true,
       conversationId: true,
-      member: {
+      user: {
         select: {
           id: true,
-          role: true,
-          user: {
-            select: {
-              image: true,
-              name: true,
-              clerkId: true,
-            },
-          },
+          image: true,
+          name: true,
+          clerkId: true,
         },
       },
       seenBy: {

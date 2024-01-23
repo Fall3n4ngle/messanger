@@ -8,20 +8,20 @@ type Props = {
   isOwn: boolean;
   isActive: boolean;
   previousMessageId: string | null;
-  memberId: string;
+  userId: string;
 } & Message;
 
 export const getMessageCard = ({
   isOwn,
   memberRole,
   id,
-  member,
   seenBy,
   conversationId,
   updatedAt,
   isActive,
   previousMessageId,
-  memberId,
+  user,
+  userId,
   ...props
 }: Props) => {
   const seen = getMessageSeen({
@@ -29,7 +29,7 @@ export const getMessageCard = ({
     isSeen: seenBy.length > 0,
   });
 
-  const seenByMember = seenBy.some((m) => m.id === memberId)
+  const seenByUser = !!seenBy.find((m) => m.id === user.id);
 
   let result = (
     <MessageCard
@@ -37,7 +37,7 @@ export const getMessageCard = ({
       isOwn={isOwn}
       isActive={isActive}
       updatedAt={updatedAt}
-      member={member}
+      user={user}
       seen={seen}
       {...props}
     />
@@ -57,12 +57,11 @@ export const getMessageCard = ({
     );
   }
 
-  if (!isOwn && !seenByMember) {
+  if (!isOwn && !seenByUser) {
     result = (
       <WithSeenOnScroll
-        memberId={memberId}
+        userId={userId}
         messageId={id}
-        seen={seenByMember}
         conversationId={conversationId}
         key={id}
       >
