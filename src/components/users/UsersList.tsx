@@ -1,7 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useTransition } from "react";
-import { UserCard } from "../common";
+import { Fragment, useEffect } from "react";
 import { ScrollArea } from "../ui";
 import { useInView } from "react-intersection-observer";
 import { useAuth } from "@clerk/nextjs";
@@ -9,7 +8,7 @@ import { useActiveUsers } from "@/store";
 import { useInfiniteUsers } from "./lib/hooks/useInfiniteUsers";
 import { User } from "./lib/types";
 import UserCardSkeleton from "./UserCardSkeleton";
-import { cn } from "@/lib/utils";
+import { UserCardWithDialog } from "./UserCardWithDialog";
 
 type Props = {
   initialUsers: User[];
@@ -19,7 +18,6 @@ type Props = {
 export default function UsersList({ initialUsers, query }: Props) {
   const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
-  const [isPending, startTransition] = useTransition();
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,
@@ -31,10 +29,6 @@ export default function UsersList({ initialUsers, query }: Props) {
       initialUsers,
       query,
     });
-
-  const handleClick = () => startTransition(async () => {
-    
-  });
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -51,18 +45,16 @@ export default function UsersList({ initialUsers, query }: Props) {
       <ul className="flex flex-col gap-2" ref={bottomRef}>
         {data.pages.map((group, id) => (
           <Fragment key={id}>
-            {group.map(({ id, clerkId, ...props }) => {
+            {group.map(({ id: userId, clerkId, ...props }) => {
               const isActive = usersIds.includes(clerkId);
 
               return (
-                <li
-                  key={id}
-                  className={cn(
-                    "cursor-pointer",
-                    isPending && "cursor-not-allowed pointer-events-none"
-                  )}
-                >
-                  <UserCard isActive={isActive} {...props} />
+                <li key={userId}>
+                  <UserCardWithDialog
+                    userId={userId}
+                    isActive={isActive}
+                    {...props}
+                  />
                 </li>
               );
             })}

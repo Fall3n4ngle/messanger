@@ -1,35 +1,34 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import Select, { AsyncProps } from "react-select/async";
+import AsyncSelect, { AsyncProps } from "react-select/async";
 import { GroupBase, MultiValueGenericProps, OptionProps } from "react-select";
-import { loadUsers } from "@/lib/api/loadUsers";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui";
+import { Avatar, AvatarFallback, AvatarImage } from ".";
+import { forwardRef } from "react";
 
-type Option = {
+export type Option = {
   label: string;
   value: string;
   image: string | null;
 };
 
-export default function UsersSelect<
-  IsMulti extends boolean,
-  GroupType extends GroupBase<Option> = GroupBase<Option>
->({ onChange, ...props }: AsyncProps<Option, IsMulti, GroupType>) {
+export const Select = forwardRef<
+  any,
+  AsyncProps<Option, boolean, GroupBase<Option>>
+>((props, ref) => {
   return (
-    <Select
+    <AsyncSelect
+      ref={ref}
       cacheOptions
       defaultOptions
       closeMenuOnSelect={false}
-      loadOptions={loadUsers}
       unstyled
       classNames={classNames}
-      onChange={onChange}
       components={{ Option: CustomOption, MultiValueLabel: CustomLabel }}
       {...props}
     />
   );
-}
+});
 
 const CustomOption = <
   IsMulti extends boolean = true,
@@ -64,6 +63,7 @@ const classNames = {
   control: ({ isFocused }: any) =>
     cn(
       "border border-input bg-background px-3 py-2 rounded-md ring-offset-background",
+
       isFocused && "ring-offset-2 ring-ring ring-2"
     ),
   valueContainer: () => "cursor-pointer",

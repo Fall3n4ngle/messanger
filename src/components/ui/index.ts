@@ -11,8 +11,8 @@ export * from "./tooltip";
 export * from "./dialog";
 export * from "./scroll-area";
 export * from "./alert-dialog";
-export * from "./sheet";
 export * from "./popover";
 export * from "./command";
 export * from "./context-menu";
-export * from "./skeleton"
+export * from "./skeleton";
+export { Select as AsyncSelect } from "./async-select";

@@ -2,14 +2,19 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui";
 import { ReactNode } from "react";
 
-type Props = {
+export type UserCardProps = {
   name: string;
   image: string | null;
   isActive: boolean;
   rightSide?: ReactNode;
 };
 
-export default function UserCard({ image, name, isActive, rightSide }: Props) {
+export default function UserCard({
+  image,
+  name,
+  isActive,
+  rightSide,
+}: UserCardProps) {
   return (
     <div className="flex items-center gap-5 p-2 rounded-md transition-colors">
       <div className="relative">
