@@ -1,8 +1,12 @@
-import { checkAuth } from "@/lib/utils";
+import { checkAuth } from "@/common/utils";
 import { SignOutButton } from "@clerk/nextjs";
 
 export default async function Home() {
   await checkAuth();
 
-  return <main><SignOutButton/></main>;
+  return (
+    <main>
+      <SignOutButton />
+    </main>
+  );
 }

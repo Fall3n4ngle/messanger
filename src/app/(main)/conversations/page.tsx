@@ -1,4 +1,4 @@
-import { EmptyConversationMessage } from "@/components/common";
+import { EmptyConversationMessage } from "@/components";
 
 export default async function Conversations() {
   return (

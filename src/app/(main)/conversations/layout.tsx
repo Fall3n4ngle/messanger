@@ -1,12 +1,11 @@
 import { PropsWithChildren } from "react";
-import {
-  ConversationsHeader,
-  ConversationsList,
-} from "@/components/conversations";
-import { getUserConversations } from "@/lib/actions/conversation/queries";
-import { getUserByClerkId } from "@/lib/actions/user/queries";
+import { Conversations } from "@/modules/conversations";
+import { getUserConversations } from "@/common/actions/conversation/queries";
+import { getUserByClerkId } from "@/common/actions/user/queries";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs";
+import { Search } from "@/components";
+import { CreateConversationButton } from "@/modules/createConversation";
 
 export default async function layout({ children }: PropsWithChildren) {
   const { userId } = auth();
@@ -22,8 +21,13 @@ export default async function layout({ children }: PropsWithChildren) {
   return (
     <>
       <div className="border-r max-w-[320px] w-full flex flex-col">
-        <ConversationsHeader />
-        <ConversationsList
+        <div className="flex items-center gap-3 p-4">
+          <div className="grow">
+            <Search label="Search conversations" id="searchConversations" />
+          </div>
+          <CreateConversationButton />
+        </div>
+        <Conversations
           intialConversations={userConversations}
           currentUserId={currentUser.id}
         />

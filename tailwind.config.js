@@ -1,10 +1,15 @@
-const { fontFamily } = require("tailwindcss/defaultTheme")
+const { fontFamily } = require("tailwindcss/defaultTheme");
 const { withUt } = require("uploadthing/tw");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = withUt({
   darkMode: ["class"],
-  content: ["src/app/**/*.{ts,tsx}", "src/components/**/*.{ts,tsx}"],
+  content: [
+    "src/app/**/*.{ts,tsx}",
+    "src/components/**/*.{ts,tsx}",
+    "src/ui/**/*.{ts,tsx}",
+    "src/modules/**/*.{ts,tsx}",
+  ],
   theme: {
     container: {
       center: true,
@@ -74,4 +79,4 @@ module.exports = withUt({
     },
   },
   plugins: [require("tailwindcss-animate")],
-})
+});

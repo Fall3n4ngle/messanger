@@ -1,15 +1,13 @@
-import {
-  MessageForm,
-  MessagesList,
-  ConversationHeading,
-  MediaRoomButton,
-  ConversationMenuButton,
-} from "@/components/chat";
-import { getConversationById } from "@/lib/actions/conversation/queries";
-import { getUserMember } from "@/lib/actions/member/queries";
-import { getMessages } from "@/lib/actions/messages/queries";
+import { getConversationById } from "./actions/conversation";
+import { getUserMember } from "@/common/actions/member/queries";
+import { getMessages } from "@/common/actions/messages/queries";
 import { auth } from "@clerk/nextjs";
 import { notFound, redirect } from "next/navigation";
+import { Messages } from "@/modules/messages";
+import { MessageForm } from "@/modules/messageForm";
+import ConversationHeading from "./components/ConversationHeading";
+import { MediaRoomButton } from "@/modules/mediaRoom";
+import { ConversationMenuButton } from "@/modules/conversationMenu";
 
 type Props = {
   params: {
@@ -64,7 +62,7 @@ export default async function Conversation({
             </div>
           </div>
         </div>
-        <MessagesList
+        <Messages
           initialMessages={messages}
           conversationId={id}
           memberRole={userMember.role}

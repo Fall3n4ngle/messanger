@@ -3,7 +3,7 @@
 import { PropsWithChildren } from "react";
 import { ThemeProvider } from "./Theme";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ActiveStatus from "@/components/ActiveStatus";
 
@@ -19,7 +19,7 @@ export default function Providers({ children }: PropsWithChildren) {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="dark"
       enableSystem
       disableTransitionOnChange
     >

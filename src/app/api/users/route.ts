@@ -1,4 +1,4 @@
-import { getUsers } from "@/lib/actions/user/queries";
+import { getUsers } from "@/common/actions/user/queries";
 import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { NextResponse, type NextRequest } from "next/server";

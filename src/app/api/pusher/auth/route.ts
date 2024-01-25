@@ -1,5 +1,5 @@
 import { pusherServer } from "@/lib/pusher/server";
-import { getUserAuth } from "@/lib/utils";
+import { getUserAuth } from "@/common/utils";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
