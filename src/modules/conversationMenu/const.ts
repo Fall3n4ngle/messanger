@@ -1,12 +1,14 @@
 import { MemberRole } from "@prisma/client";
 
-type Role = {
-  value: MemberRole;
+export type AvailableRoles = Exclude<MemberRole, "ADMIN">
+
+type Role<T> = {
+  value: T;
   label: string;
   description: string;
 };
 
-export const availableMemberRoles: Role[] = [
+export const availableMemberRoles: Role<AvailableRoles>[] = [
   {
     label: "Editor",
     value: "EDIT",
@@ -19,7 +21,7 @@ export const availableMemberRoles: Role[] = [
   },
 ];
 
-export const allMemberRoles: Role[] = [
+export const allMemberRoles: Role<MemberRole>[] = [
   ...availableMemberRoles,
   {
     label: "Admin",

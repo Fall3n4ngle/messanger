@@ -12,41 +12,27 @@ import {
   PopoverTrigger,
 } from "@/ui";
 import { ChevronsUpDown } from "lucide-react";
-import { MemberRole } from "@prisma/client";
 import { useState } from "react";
-import { availableMemberRoles } from "@/common/const/memberRoles";
-import { changeMemberRole } from "../../actions/member";
-import { useToast } from "@/common/hooks";
-import { ToastMessage } from "@/components";
 import { cn } from "@/common/utils";
+import { AvailableRoles, availableMemberRoles } from "../../const";
+import { useChangeRole } from "../../hooks/useChangeRole";
 
 type Props = {
   id: string;
-  role: MemberRole;
+  role: AvailableRoles;
   conversationId: string;
 };
 
 export default function MemberRoles({ id, role, conversationId }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [optimisticRole, setOptimisticRole] = useState(role);
-  const { toast } = useToast();
 
-  const handleSelect = async (newRole: MemberRole) => {
-    setOptimisticRole(newRole);
+  const { mutate, optimisticRole } = useChangeRole({
+    defaultRole: role,
+    conversationId,
+  });
 
-    const result = await changeMemberRole({
-      id,
-      role: newRole,
-      conversationId,
-    });
-
-    if (result.error) {
-      setOptimisticRole(role);
-
-      toast({
-        description: <ToastMessage type="error" message="Error updating role" />,
-      });
-    }
+  const handleSelect = async (newRole: AvailableRoles) => {
+    mutate({ memberId: id, role: newRole, conversationId });
   };
 
   const currentRoleLabel = availableMemberRoles.find(

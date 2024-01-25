@@ -2,7 +2,7 @@ import { pusherClient } from "@/lib/pusher/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { DeleteMemberEvent } from "@/common/types/events";
-import { revalidatePathFromClient } from "@/common/actions/revalidatePath"
+import { revalidatePathFromClient } from "@/common/actions/revalidatePath";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/common/hooks";
@@ -68,19 +68,20 @@ export const usePusherConversations = () => {
     };
 
     const handleAddMembers = async ({ conversationId }: ConversationEvent) => {
-      queryClient.invalidateQueries({
-        queryKey: ["conversations"],
-      });
+      await revalidatePathFromClient(`/conversations/${conversationId}`);
+    };
 
-      if (pathname.includes(conversationId)) {
-        await revalidatePathFromClient(`/conversations/${conversationId}`)
-      }
+    const handleMemberUpdate = async ({
+      conversationId,
+    }: ConversationEvent) => {
+      await revalidatePathFromClient(`/conversations/${conversationId}`);
     };
 
     pusherClient.bind("conversation:new", handleNewConversation);
     pusherClient.bind("conversation:delete_member", handleDeleteMember);
     pusherClient.bind("conversation:update", handleConversationUpdate);
     pusherClient.bind("conversation:add_members", handleAddMembers);
+    pusherClient.bind("conversation:update_member", handleMemberUpdate);
 
     return () => {
       pusherClient.unsubscribe(conversationsChannel);
@@ -88,6 +89,7 @@ export const usePusherConversations = () => {
       pusherClient.unbind("member:delete", handleDeleteMember);
       pusherClient.unbind("conversation:update", handleConversationUpdate);
       pusherClient.unbind("conversation:add_members", handleAddMembers);
+      pusherClient.unbind("conversation:update_member", handleMemberUpdate);
     };
   }, [queryClient, currentUserId, router, toast, pathname]);
 };

@@ -1,39 +1,74 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { revalidatePath } from "next/cache";
-import { MemberRole } from "@prisma/client";
 import { pusherServer } from "@/lib/pusher/server";
-import { DeleteMemberEvent } from "@/common/types/events";
-import { DeleteMemberFields, deleteMemberSchema } from "../validations/member";
+import { ConversationEvent, DeleteMemberEvent } from "@/common/types/events";
+import {
+  ChangeRoleFields,
+  DeleteMemberFields,
+  changeRoleSchema,
+  deleteMemberSchema,
+} from "../validations/member";
 import { auth } from "@clerk/nextjs";
 
-type ChangeMemberRoleProps = {
-  id: string;
-  role: MemberRole;
-  conversationId: string;
-};
+export const changeMemberRole = async (data: ChangeRoleFields) => {
+  const result = changeRoleSchema.safeParse(data);
 
-export const changeMemberRole = async ({
-  id,
-  role,
-  conversationId,
-}: ChangeMemberRoleProps) => {
-  try {
-    const updatedMember = await db.member.update({
-      where: { id },
-      data: {
-        role,
-      },
-    });
+  if (result.success) {
+    const { role, memberId, conversationId } = result.data;
 
-    revalidatePath(`/conversations/${conversationId}`);
+    try {
+      const { userId } = auth();
 
-    return { success: true, data: updatedMember };
-  } catch (error) {
-    const message = (error as Error).message ?? "Failed to change member role";
-    console.log(message);
-    return { success: false, error: message };
+      const updatedMember = await db.member.update({
+        where: {
+          id: memberId,
+        },
+        data: {
+          role,
+        },
+      });
+
+      const conversation = await db.conversation.findFirst({
+        where: { id: conversationId },
+        select: {
+          members: {
+            select: {
+              user: {
+                select: {
+                  clerkId: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      conversation?.members.forEach((member) => {
+        if (member.user.clerkId !== userId) {
+          const conversationsChannel = `${member.user.clerkId}_conversations`;
+
+          pusherServer.trigger(
+            conversationsChannel,
+            "conversation:update_member",
+            {
+              conversationId,
+            } as ConversationEvent
+          );
+        }
+      });
+
+      return { success: true, data: updatedMember };
+    } catch (error) {
+      const message =
+        (error as Error).message ?? "Failed to change member role";
+      console.log(message);
+      throw new Error(message);
+    }
+  }
+
+  if (result.error) {
+    throw new Error(result.error.toString());
   }
 };
 

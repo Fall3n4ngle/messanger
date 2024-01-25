@@ -8,7 +8,7 @@ import {
 import { UserCard } from "@/components";
 import { useActiveUsers } from "@/common/store";
 import { MemberRole } from "@prisma/client";
-import { allMemberRoles } from "@/common/const/memberRoles";
+import { allMemberRoles } from "../../const";
 import { UserMember } from "@/common/actions/member/queries";
 
 type Props = {
