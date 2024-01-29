@@ -17,7 +17,7 @@ export default function WithSeenOnScroll({
   conversationId,
 }: Props) {
   const { ref, inView } = useInView({
-    threshold: 1,
+    threshold: 0.5,
   });
 
   const { mutate } = useMarkAsSeen();

@@ -1,8 +1,7 @@
 import { inputClassName } from "@/ui";
 import { addTypingUser, removeTypingUser } from "../actions/user";
-import { useDebouncedCallback, useThrottledCallback } from "@/common/hooks";
 import { cn } from "@/common/utils";
-import { KeyboardEvent, forwardRef } from "react";
+import { KeyboardEvent, forwardRef, useEffect, useRef, useState } from "react";
 import { ControllerRenderProps } from "react-hook-form";
 import TextareaAutosize from "react-textarea-autosize";
 
@@ -13,21 +12,10 @@ type Props = {
 
 const ContentInput = forwardRef<HTMLTextAreaElement, Props>(
   ({ conversationId, userName, ...props }, ref) => {
-    const handleTypeStart = useThrottledCallback(async () => {
-      await addTypingUser({
-        conversationId,
-        userName,
-      });
-    }, 200);
+    const [isTyping, setIsTyping] = useState(false);
+    const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
-    const handleTypeEnd = useDebouncedCallback(async () => {
-      await removeTypingUser({
-        conversationId,
-        userName,
-      });
-    }, 500);
-
-    const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
 
@@ -41,9 +29,37 @@ const ContentInput = forwardRef<HTMLTextAreaElement, Props>(
         return;
       }
 
-      handleTypeStart();
-      handleTypeEnd();
+      if (!isTyping) {
+        await addTypingUser({
+          conversationId,
+          userName,
+        });
+
+        setIsTyping(true);
+      }
     };
+
+    const handleKeyUp = () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      typingTimeoutRef.current = setTimeout(async () => {
+        await removeTypingUser({
+          conversationId,
+          userName,
+        });
+        setIsTyping(false);
+      }, 500);
+    };
+
+    useEffect(() => {
+      return () => {
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+      };
+    }, []);
 
     return (
       <TextareaAutosize
@@ -56,6 +72,7 @@ const ContentInput = forwardRef<HTMLTextAreaElement, Props>(
         {...props}
         ref={ref}
         onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
       />
     );
   }
