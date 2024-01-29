@@ -8,7 +8,7 @@ import {
   FormMessage,
   Input,
 } from "@/ui";
-import FileInput from "./FileInput";
+import Dropzone from "./Dropzone";
 import { useFormContext } from "react-hook-form";
 
 export default function GroupInfo() {
@@ -19,13 +19,12 @@ export default function GroupInfo() {
       <FormField
         control={control}
         name="image"
-        render={({ field }) => (
+        render={() => (
           <FormItem className="mb-2">
             <FormLabel>Group image</FormLabel>
             <FormControl>
-              <FileInput value={field.value ?? ""} onChange={field.onChange} />
+              <Dropzone />
             </FormControl>
-            <FormMessage />
           </FormItem>
         )}
       />

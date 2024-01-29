@@ -70,15 +70,10 @@ export default function ConversationMenuButton({
                 image={image}
               />
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="p-0"
-            >
-              <ManageMembersButton
-                members={members}
-                conversationId={conversationId}
-              />
-            </DropdownMenuItem>
+            <ManageMembersButton
+              members={members}
+              conversationId={conversationId}
+            />
           </>
         )}
         <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">

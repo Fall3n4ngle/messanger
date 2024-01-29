@@ -5,9 +5,8 @@ import { userSchema } from "@/common/validations";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { upsertUser } from "@/common/actions/user/mutations";
+import { upsertUser as upsertUserServer } from "@/common/actions/user/mutations";
 import {
-  Button,
   Form,
   FormControl,
   FormField,
@@ -16,9 +15,12 @@ import {
   Input,
   FormMessage,
 } from "@/ui";
-import { Loader } from "lucide-react";
-import FileInput from "@/components/FileInput";
+import { Dropzone } from "@/components";
 import ToastMessage from "./ToastMessage";
+import { useMutation } from "@tanstack/react-query";
+import IsUploadingProvider from "@/common/context/isUploading";
+import { useState } from "react";
+import SubmitButton from "./SubmitButton";
 
 type Props = {
   id?: string;
@@ -43,6 +45,7 @@ export default function UserForm({
   errorMessage = "Error updating profile",
 }: Props) {
   const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -52,10 +55,9 @@ export default function UserForm({
     },
   });
 
-  async function onSubmit(values: FormFields) {
-    const result = await upsertUser({ ...values, clerkId, id });
-
-    if (result?.success) {
+  const { mutateAsync: upsertUser } = useMutation({
+    mutationFn: upsertUserServer,
+    onSuccess: () => {
       toast({
         description: <ToastMessage type="success" message={successMessage} />,
       });
@@ -63,55 +65,64 @@ export default function UserForm({
       if (onCloseModal) {
         onCloseModal();
       }
-    }
-
-    if (result?.error) {
-      console.log(result.error);
-
+    },
+    onError: () => {
       toast({
         description: <ToastMessage type="error" message={errorMessage} />,
       });
-    }
-  }
+    },
+  });
 
-  const { isSubmitting } = form.formState;
+  async function onSubmit(values: FormFields) {
+    if (!id) {
+      await upsertUser({ ...values, clerkId, id });
+      return;
+    }
+
+    if (values.name !== name || values.image !== image) {
+      await upsertUser({ ...values, clerkId, id });
+    }
+
+    onCloseModal && onCloseModal();
+  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="image"
-          render={({ field }) => (
-            <FormItem className="mb-2">
-              <FormLabel>Profile image</FormLabel>
-              <FormControl>
-                <FileInput
-                  value={field.value ?? ""}
-                  onChange={field.onChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem className="mb-4">
-              <FormLabel>User name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button disabled={isSubmitting} type="submit">
-          Submit{" "}
-          {isSubmitting && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-        </Button>
+        <IsUploadingProvider
+          isUploading={isUploading}
+          setIsUploading={setIsUploading}
+        >
+          <FormField
+            control={form.control}
+            name="image"
+            render={() => (
+              <FormItem className="mb-2">
+                <FormLabel>Profile image</FormLabel>
+                <FormControl>
+                  <Dropzone />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel>User name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex w-full justify-end">
+            <SubmitButton />
+          </div>
+        </IsUploadingProvider>
       </form>
     </Form>
   );

@@ -18,14 +18,12 @@ const getLastMessageContent = ({
 }: GetLastMessageContent) => {
   let message;
 
-  if (content && !file) {
+  if (content) {
     message = shortenSentence({
       maxLength: 18,
       sentence: content,
     });
-  } else {
-    message = "Sent a file";
-  }
+  } 
 
   let sender;
 

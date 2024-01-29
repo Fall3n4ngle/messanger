@@ -23,7 +23,7 @@ export default async function Conversation({
   if (!clerkId) redirect("/sign-in");
 
   const conversationPromise = getConversationById(conversationId);
-  const messagesPromise = getMessages({ conversationId, take: -25 });
+  const messagesPromise = getMessages({ conversationId });
   const userMemberPromise = getUserMember({ conversationId, clerkId });
 
   const [conversation, messages, userMember] = await Promise.all([
@@ -68,7 +68,7 @@ export default async function Conversation({
           memberRole={userMember.role}
           currentUserId={userMember.user.id}
         />
-        <div className="max-w-[1000px] self-center w-full">
+        <div className="self-center w-full flex justify-center border-t">
           <MessageForm conversationId={id} user={userMember.user} />
         </div>
       </div>

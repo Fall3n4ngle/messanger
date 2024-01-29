@@ -25,7 +25,7 @@ export default function AddMembersButton({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen} modal>
       <DialogTrigger asChild>
         <Button>Add members</Button>
       </DialogTrigger>

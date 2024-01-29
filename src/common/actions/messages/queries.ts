@@ -4,8 +4,6 @@ import { db } from "@/lib/db";
 
 type Props = {
   conversationId: string;
-  take?: number;
-  lastCursor?: string;
 };
 
 export const getMessages = async ({ conversationId }: Props) => {

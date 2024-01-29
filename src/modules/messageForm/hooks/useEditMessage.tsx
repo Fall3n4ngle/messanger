@@ -27,6 +27,8 @@ export const useEditMessage = () => {
         conversationId,
       ]);
 
+      const updatedAt = new Date();
+
       queryClient.setQueryData(
         ["messages", conversationId],
         (oldData: Message[]) => {
@@ -36,7 +38,7 @@ export const useEditMessage = () => {
                 isLast = true;
               }
 
-              return { ...message, ...data };
+              return { ...message, ...data, updatedAt };
             }
 
             return message;
@@ -71,7 +73,7 @@ export const useEditMessage = () => {
                   lastMessage: {
                     ...conversation.lastMessage,
                     ...data,
-                    updatedAt: new Date(),
+                    updatedAt,
                   },
                 } as UserConversation;
               }

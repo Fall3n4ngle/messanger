@@ -1,14 +1,14 @@
 import { Conversation } from "../../types";
-import { useToast } from "@/common/hooks";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ToastMessage, GroupInfo } from "@/components";
-import { Button, Form } from "@/ui";
-import { Loader2 } from "lucide-react";
+import { GroupInfo } from "@/components";
+import { Form } from "@/ui";
 import { editConversationSchema } from "../../validations/conversation";
 import { z } from "zod";
 import { useEditConversation } from "../../hooks/useEditConversation";
-import { revalidatePathFromClient } from "@/common/actions/revalidatePath";
+import { useState } from "react";
+import IsUploadingProvider from "@/common/context/isUploading";
+import SubmitButton from "@/components/SubmitButton";
 
 const formSchema = editConversationSchema.pick({ name: true, image: true });
 type FormFields = z.infer<typeof formSchema>;
@@ -23,8 +23,8 @@ export default function EditConversationForm({
   name,
   onDialogClose,
 }: Props) {
-  const { toast } = useToast();
   const { mutateAsync } = useEditConversation();
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -35,46 +35,35 @@ export default function EditConversationForm({
   });
 
   async function onSubmit(fields: FormFields) {
+    if (fields.image === image && fields.name === name) {
+      onDialogClose();
+      form.reset();
+      return;
+    }
+
     const result = await mutateAsync({
       id,
       ...fields,
     });
 
-    if (result?.success) {
-      await revalidatePathFromClient(`/conversations/${id}`);
-
-      toast({
-        description: (
-          <ToastMessage
-            type="success"
-            message="Conversation updated successfully"
-          />
-        ),
-      });
-
-      onDialogClose();
-      form.reset();
+    if (!result?.success) {
+      return;
     }
 
-    if (result?.error) {
-      toast({
-        description: (
-          <ToastMessage type="error" message="Error updating conversation" />
-        ),
-      });
-    }
+    onDialogClose();
+    form.reset();
   }
-
-  const { isSubmitting } = form.formState;
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
-        <GroupInfo />
-        <Button disabled={isSubmitting} type="submit" className="self-end">
-          Submit{" "}
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        </Button>
+        <IsUploadingProvider
+          isUploading={isUploading}
+          setIsUploading={setIsUploading}
+        >
+          <GroupInfo />
+          <SubmitButton />
+        </IsUploadingProvider>
       </form>
     </Form>
   );

@@ -29,11 +29,11 @@ export const upsertUser = async (fields: UserFields) => {
     } catch (error) {
       const message = (error as Error).message ?? "Failed to upsert user";
       console.log(message);
-      return { success: false, error: message };
+      throw new Error(message);
     }
   }
 
   if (parsed.error) {
-    return { success: false, error: parsed.error.format() };
+    throw new Error(parsed.error.toString());
   }
 };

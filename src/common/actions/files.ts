@@ -2,7 +2,7 @@
 
 import { UTApi } from "uploadthing/server";
 
-export const deleteFiles = async (fileKeys: string | string[]) => {
+export const deleteFiles = async (fileKeys: string) => {
   try {
     const result = await new UTApi().deleteFiles(fileKeys);
 
@@ -14,6 +14,6 @@ export const deleteFiles = async (fileKeys: string | string[]) => {
   } catch (error) {
     console.log(error);
     const message = (error as Error)?.message ?? "Error deleting file";
-    return { success: false, error: message };
+    throw new Error(message);
   }
 };

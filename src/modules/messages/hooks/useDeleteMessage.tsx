@@ -4,11 +4,13 @@ import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
 import { Message } from "@/common/actions/messages/queries";
 import { UserConversation } from "@/common/actions/conversation/queries";
+import { useMessageForm } from "@/common/store";
 
 let isLast = false;
 
 export const useDeleteMessage = () => {
   const queryClient = useQueryClient();
+  const { messageData, resetMessageData } = useMessageForm();
   const { toast } = useToast();
 
   return useMutation({
@@ -27,6 +29,10 @@ export const useDeleteMessage = () => {
         "messages",
         conversationId,
       ]);
+
+      if (messageId === messageData.id) {
+        resetMessageData();
+      }
 
       let previousMessage: UserConversation["lastMessage"] | null;
 

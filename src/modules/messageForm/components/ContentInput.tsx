@@ -11,7 +11,7 @@ type Props = {
   userName: string;
 } & ControllerRenderProps;
 
-const MessageFormInput = forwardRef<HTMLTextAreaElement, Props>(
+const ContentInput = forwardRef<HTMLTextAreaElement, Props>(
   ({ conversationId, userName, ...props }, ref) => {
     const handleTypeStart = useThrottledCallback(async () => {
       await addTypingUser({
@@ -35,6 +35,7 @@ const MessageFormInput = forwardRef<HTMLTextAreaElement, Props>(
           bubbles: true,
           cancelable: true,
         });
+
         e.currentTarget.form?.dispatchEvent(formEvent);
 
         return;
@@ -60,6 +61,6 @@ const MessageFormInput = forwardRef<HTMLTextAreaElement, Props>(
   }
 );
 
-MessageFormInput.displayName = "MessageFormInput";
+ContentInput.displayName = "MessageFormInput";
 
-export default MessageFormInput;
+export default ContentInput;

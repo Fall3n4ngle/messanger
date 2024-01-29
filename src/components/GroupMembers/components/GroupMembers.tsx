@@ -1,6 +1,13 @@
 "use client";
 
-import { AsyncSelect, FormField, FormItem, FormLabel, FormMessage } from "@/ui";
+import {
+  AsyncSelect,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/ui";
 import { useFormContext } from "react-hook-form";
 import { loadUsers } from "../api/loadUsers";
 import { useAuth } from "@clerk/nextjs";
@@ -28,19 +35,21 @@ export default function GroupMembersForm({ excludedUsers }: Props) {
         return (
           <FormItem className="mb-6">
             <FormLabel htmlFor="selectMembers">Members</FormLabel>
-            <AsyncSelect
-              isMulti
-              id="selectMembers"
-              ref={ref}
-              defaultValue={getValues("members")}
-              filterOption={filterOption}
-              loadOptions={(query) =>
-                loadUsers({ query, currentUserClerkId: userId })
-              }
-              onChange={(data) => {
-                onChange(data);
-              }}
-            />
+            <FormControl>
+              <AsyncSelect
+                isMulti
+                id="selectMembers"
+                ref={ref}
+                defaultValue={getValues("members")}
+                filterOption={filterOption}
+                loadOptions={(query) =>
+                  loadUsers({ query, currentUserClerkId: userId })
+                }
+                onChange={(data) => {
+                  onChange(data);
+                }}
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         );

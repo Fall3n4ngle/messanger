@@ -1,14 +1,16 @@
-import { ToastMessage } from "@/components";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useState } from "react";
 import { Button, Form } from "@/ui";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNewConversation } from "../hooks/useNewConversation";
-import { useToast } from "@/common/hooks";
 import { useRouter } from "next/navigation";
 import { FormFields, formSchema } from "../validations/formSchema";
 import { steps } from "../const";
+import IsUploadingProvider from "@/common/context/isUploading";
+import { useToast } from "@/common/hooks";
+import { ToastMessage } from "@/components";
+import SubmitButton from "@/components/SubmitButton";
 
 type Props = {
   onDialogClose: Function;
@@ -17,8 +19,10 @@ type Props = {
 export default function CreateConversationForm({ onDialogClose }: Props) {
   const router = useRouter();
   const { toast } = useToast();
+  const { mutateAsync: createConversation } = useNewConversation();
+
   const [step, setStep] = useState(0);
-  const { mutateAsync } = useNewConversation();
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -31,35 +35,43 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
   async function onSubmit(fields: FormFields) {
     const { members, ...data } = fields;
 
-    const result = await mutateAsync({
-      isGroup: true,
-      members: members.map(({ value }) => ({ id: value })),
-      ...data,
-    });
+    await createConversation(
+      {
+        isGroup: true,
+        members: members.map(({ value }) => ({ id: value })),
+        ...data,
+      },
+      {
+        onSuccess(result) {
+          onDialogClose();
+          form.reset();
+          setStep(0);
 
-    if (!result?.success) {
-      toast({
-        description: (
-          <ToastMessage type="error" message="Failed to create conversation" />
-        ),
-      });
+          toast({
+            description: (
+              <ToastMessage
+                type="success"
+                message="Created conversation successfully"
+              />
+            ),
+          });
 
-      return;
-    }
-
-    toast({
-      description: (
-        <ToastMessage
-          type="success"
-          message="Created conversation successfully"
-        />
-      ),
-    });
-
-    onDialogClose();
-    form.reset();
-    setStep(0);
-    router.push(`/conversations/${result.data?.id}`);
+          if (result?.data.id) {
+            router.push(`/conversations/${result?.data?.id}`);
+          }
+        },
+        onError() {
+          toast({
+            description: (
+              <ToastMessage
+                type="error"
+                message="Failed to create conversation"
+              />
+            ),
+          });
+        },
+      }
+    );
   }
 
   const handlePreviousClick = (e: FormEvent) => {
@@ -80,38 +92,40 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
     setStep((prev) => prev + 1);
   };
 
-  const { isSubmitting } = form.formState;
-
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col justify-between grow"
+      <IsUploadingProvider
+        isUploading={isUploading}
+        setIsUploading={setIsUploading}
       >
-        {steps[step].component}
-        <div className="flex items-center justify-between">
-          <Button
-            onClick={handlePreviousClick}
-            variant="secondary"
-            disabled={step === 0}
-            type="button"
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" /> Back
-          </Button>
-          {step < steps.length - 1 ? (
-            <Button onClick={handleNextClick} variant="secondary" type="button">
-              Next <ChevronRight className="ml-2 h-4 w-4" />
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col justify-between grow"
+        >
+          {steps[step].component}
+          <div className="flex items-center justify-between">
+            <Button
+              onClick={handlePreviousClick}
+              variant="secondary"
+              disabled={step === 0}
+              type="button"
+            >
+              <ChevronLeft className="mr-2 h-4 w-4" /> Back
             </Button>
-          ) : (
-            <Button disabled={isSubmitting} type="submit">
-              Submit{" "}
-              {isSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-            </Button>
-          )}
-        </div>
-      </form>
+            {step < steps.length - 1 ? (
+              <Button
+                onClick={handleNextClick}
+                variant="secondary"
+                type="button"
+              >
+                Next <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <SubmitButton />
+            )}
+          </div>
+        </form>
+      </IsUploadingProvider>
     </Form>
   );
 }
