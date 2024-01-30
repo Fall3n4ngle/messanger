@@ -2,7 +2,7 @@ import { pusherClient } from "@/lib/pusher/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { DeleteMemberEvent } from "@/common/types/events";
-import { revalidatePathFromClient } from "@/common/actions/revalidatePath";
+import { revalidatePathFromClient } from "../actions/cache";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/common/hooks";

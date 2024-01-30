@@ -9,6 +9,7 @@ import { MemberRole } from "@prisma/client";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { ConversationEvent } from "@/common/types/events";
+import { revalidatePath } from "next/cache";
 
 export const addMembers = async (fields: AddMembersFields) => {
   const result = addMembersSchema.safeParse(fields);
@@ -24,7 +25,7 @@ export const addMembers = async (fields: AddMembersFields) => {
         role: "VIEW" as MemberRole,
       }));
 
-      const updatedGroup = await db.conversation.update({
+      const updatedConversation = await db.conversation.update({
         where: { id },
         data: {
           members: {
@@ -46,7 +47,9 @@ export const addMembers = async (fields: AddMembersFields) => {
         },
       });
 
-      updatedGroup.members.forEach((member) => {
+      revalidatePath(`/conversations/${id}`);
+
+      updatedConversation.members.forEach((member) => {
         if (member.user.clerkId !== userId) {
           const conversationChannel = `${member.user.clerkId}_conversations`;
 
@@ -60,15 +63,15 @@ export const addMembers = async (fields: AddMembersFields) => {
         }
       });
 
-      return { success: true, data: updatedGroup };
+      return { success: true, data: updatedConversation };
     } catch (error) {
       const message = (error as Error).message ?? "Failed to create group";
       console.log(message);
-      return { success: false, error: message };
+      throw new Error(message);
     }
   }
 
   if (result.error) {
-    return { success: false, error: result.error.format() };
+    throw new Error(result.error.toString());
   }
 };

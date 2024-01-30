@@ -10,6 +10,7 @@ import {
   deleteMemberSchema,
 } from "../validations/member";
 import { auth } from "@clerk/nextjs";
+import { revalidatePath } from "next/cache";
 
 export const changeMemberRole = async (data: ChangeRoleFields) => {
   const result = changeRoleSchema.safeParse(data);
@@ -28,6 +29,8 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
           role,
         },
       });
+
+      revalidatePath(`/conversations/${conversationId}`);
 
       const conversation = await db.conversation.findFirst({
         where: { id: conversationId },
@@ -111,6 +114,8 @@ export const deleteMember = async (data: DeleteMemberFields) => {
           },
         },
       });
+
+      revalidatePath(`/conversations/${conversationId}`);
 
       conversation?.members.forEach((member) => {
         if (userId !== deletedMember.user.clerkId) {

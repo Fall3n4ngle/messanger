@@ -17,8 +17,7 @@ import { Option } from "@/ui/async-select";
 import { SingleValue } from "react-select";
 import { addMembers } from "@/common/actions/conversation/mutations";
 import { useToast } from "@/common/hooks";
-import { Loader2 } from "lucide-react";
-import { revalidatePathFromClient } from "@/common/actions/revalidatePath";
+import { useMutation } from "@tanstack/react-query";
 
 type Props = {
   userId: string;
@@ -32,32 +31,31 @@ export default function AddUserForm({ userId, onDialogClose }: Props) {
     resolver: zodResolver(formSchema),
   });
 
-  async function onSubmit({ conversation }: FormFields) {
-    const result = await addMembers({
-      id: conversation.value,
-      members: [{ id: userId }],
-    });
-
-    if (result?.success) {
+  const { mutate, isPending } = useMutation({
+    mutationFn: addMembers,
+    onSuccess: () => {
       toast({
         description: (
           <ToastMessage type="success" message="User added successfully" />
         ),
       });
 
-      await revalidatePathFromClient(`/conversations/${conversation.value}`);
       onDialogClose();
       form.reset();
-    }
-
-    if (result?.error) {
+    },
+    onError: () => {
       toast({
-        description: <ToastMessage type="error" message="Error adding user" />,
+        description: <ToastMessage type="error" message="Failed to add user" />,
       });
-    }
-  }
+    },
+  });
 
-  const { isSubmitting } = form.formState;
+  async function onSubmit({ conversation }: FormFields) {
+    mutate({
+      id: conversation.value,
+      members: [{ id: userId }],
+    });
+  }
 
   return (
     <Form {...form}>
@@ -74,7 +72,9 @@ export default function AddUserForm({ userId, onDialogClose }: Props) {
               <FormControl>
                 <AsyncSelect
                   isMulti={false}
-                  noOptionsMessage={() => "No conversations found"}
+                  noOptionsMessage={() => (
+                    <p className="py-2">No conversations found</p>
+                  )}
                   loadOptions={(query) => loadConversations({ query, userId })}
                   closeMenuOnSelect
                   onChange={(data) => {
@@ -89,9 +89,8 @@ export default function AddUserForm({ userId, onDialogClose }: Props) {
             </FormItem>
           )}
         />
-        <Button disabled={isSubmitting} type="submit" className="self-end">
-          Submit{" "}
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button isLoading={isPending} type="submit" className="self-end">
+          Submit
         </Button>
       </form>
     </Form>

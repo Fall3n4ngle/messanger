@@ -3,14 +3,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useState } from "react";
 import { Button, Form } from "@/ui";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useNewConversation } from "../hooks/useNewConversation";
 import { useRouter } from "next/navigation";
 import { FormFields, formSchema } from "../validations/formSchema";
 import { steps } from "../const";
 import IsUploadingProvider from "@/common/context/isUploading";
 import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
-import SubmitButton from "@/components/SubmitButton";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createConversation } from "../actions/conversation";
 
 type Props = {
   onDialogClose: Function;
@@ -19,7 +19,7 @@ type Props = {
 export default function CreateConversationForm({ onDialogClose }: Props) {
   const router = useRouter();
   const { toast } = useToast();
-  const { mutateAsync: createConversation } = useNewConversation();
+  const queryClient = useQueryClient();
 
   const [step, setStep] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -32,46 +32,47 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
     mode: "onChange",
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: createConversation,
+    onSuccess: (result) => {
+      onDialogClose();
+      form.reset();
+      setStep(0);
+
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
+      });
+
+      toast({
+        description: (
+          <ToastMessage
+            type="success"
+            message="Created conversation successfully"
+          />
+        ),
+      });
+
+      if (result?.data.id) {
+        router.push(`/conversations/${result?.data?.id}`);
+      }
+    },
+    onError: () => {
+      toast({
+        description: (
+          <ToastMessage type="error" message="Failed to create conversation" />
+        ),
+      });
+    },
+  });
+
   async function onSubmit(fields: FormFields) {
     const { members, ...data } = fields;
 
-    await createConversation(
-      {
-        isGroup: true,
-        members: members.map(({ value }) => ({ id: value })),
-        ...data,
-      },
-      {
-        onSuccess(result) {
-          onDialogClose();
-          form.reset();
-          setStep(0);
-
-          toast({
-            description: (
-              <ToastMessage
-                type="success"
-                message="Created conversation successfully"
-              />
-            ),
-          });
-
-          if (result?.data.id) {
-            router.push(`/conversations/${result?.data?.id}`);
-          }
-        },
-        onError() {
-          toast({
-            description: (
-              <ToastMessage
-                type="error"
-                message="Failed to create conversation"
-              />
-            ),
-          });
-        },
-      }
-    );
+    mutate({
+      isGroup: true,
+      members: members.map(({ value }) => ({ id: value })),
+      ...data,
+    });
   }
 
   const handlePreviousClick = (e: FormEvent) => {
@@ -121,7 +122,9 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
                 Next <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <SubmitButton />
+              <Button isLoading={isPending} type="submit" className="self-end">
+                Submit
+              </Button>
             )}
           </div>
         </form>

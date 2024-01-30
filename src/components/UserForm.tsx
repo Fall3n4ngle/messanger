@@ -14,13 +14,13 @@ import {
   FormLabel,
   Input,
   FormMessage,
+  Button,
 } from "@/ui";
 import { Dropzone } from "@/components";
 import ToastMessage from "./ToastMessage";
 import { useMutation } from "@tanstack/react-query";
 import IsUploadingProvider from "@/common/context/isUploading";
 import { useState } from "react";
-import SubmitButton from "./SubmitButton";
 
 type Props = {
   id?: string;
@@ -55,16 +55,14 @@ export default function UserForm({
     },
   });
 
-  const { mutateAsync: upsertUser } = useMutation({
+  const { mutate: upsertUser, isPending } = useMutation({
     mutationFn: upsertUserServer,
     onSuccess: () => {
       toast({
         description: <ToastMessage type="success" message={successMessage} />,
       });
 
-      if (onCloseModal) {
-        onCloseModal();
-      }
+      onCloseModal && onCloseModal();
     },
     onError: () => {
       toast({
@@ -75,12 +73,13 @@ export default function UserForm({
 
   async function onSubmit(values: FormFields) {
     if (!id) {
-      await upsertUser({ ...values, clerkId, id });
+      upsertUser({ ...values, clerkId, id });
       return;
     }
 
     if (values.name !== name || values.image !== image) {
-      await upsertUser({ ...values, clerkId, id });
+      upsertUser({ ...values, clerkId, id });
+      return;
     }
 
     onCloseModal && onCloseModal();
@@ -88,7 +87,10 @@ export default function UserForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
         <IsUploadingProvider
           isUploading={isUploading}
           setIsUploading={setIsUploading}
@@ -110,7 +112,7 @@ export default function UserForm({
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="mb-4">
+              <FormItem>
                 <FormLabel>User name</FormLabel>
                 <FormControl>
                   <Input {...field} />
@@ -119,9 +121,9 @@ export default function UserForm({
               </FormItem>
             )}
           />
-          <div className="flex w-full justify-end">
-            <SubmitButton />
-          </div>
+          <Button isLoading={isPending} type="submit" className="self-end">
+            Submit
+          </Button>
         </IsUploadingProvider>
       </form>
     </Form>

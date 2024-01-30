@@ -4,6 +4,7 @@ import DeleteMemberDialog from "./DeleteMemberDialog";
 import MemberRoles from "./MemberRoles";
 import { UserCard } from "@/components";
 import { UserMember } from "@/common/actions/member/queries";
+import { AvailableRoles as AvailableRole } from "../../const";
 
 type Props = {
   members: UserMember[];
@@ -30,7 +31,7 @@ export default function MembersList({ conversationId, members }: Props) {
                 />
                 <MemberRoles
                   id={id}
-                  role={role}
+                  role={role as AvailableRole}
                   conversationId={conversationId}
                 />
               </div>

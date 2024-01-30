@@ -7,7 +7,7 @@ import { useUploadThing } from "@/lib/uploadThing/helpers";
 import { buttonVariants } from "@/ui";
 import { ImageIcon, Loader2 } from "lucide-react";
 import { ChangeEvent } from "react";
-import { useFormContext, useFormState } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import {
   UploadFileResponse,
   generateMimeTypes,
@@ -18,7 +18,6 @@ export default function UploadButton() {
   const { toast } = useToast();
   const { setMessageData } = useMessageForm();
   const { isUploading, setIsUploading } = useIsUploading();
-  const { isSubmitting } = useFormState();
   const { setValue } = useFormContext();
 
   const handleUploadBegin = (files: File[]) => {
@@ -62,8 +61,6 @@ export default function UploadButton() {
     startUpload(Array.from(e.target.files));
   };
 
-  const disabled = isSubmitting || isUploading;
-
   return (
     <label
       className={cn(
@@ -72,7 +69,7 @@ export default function UploadButton() {
           variant: "secondary",
         }),
         "cursor-pointer !mt-0 rounded-full",
-        disabled && "cursor-default opacity-50"
+        isUploading && "cursor-default opacity-50"
       )}
     >
       <input
@@ -81,7 +78,7 @@ export default function UploadButton() {
         className="hidden"
         accept={generateMimeTypes(fileTypes ?? [])?.join(", ")}
         multiple={multiple}
-        disabled={disabled}
+        disabled={isUploading}
       />
       {isUploading ? (
         <Loader2 className="w-5 h-5 animate-spin" />

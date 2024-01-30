@@ -4,10 +4,9 @@ import { useForm } from "react-hook-form";
 import { ToastMessage } from "@/components";
 import { Button, Form } from "@/ui";
 import { GroupMembers } from "@/components";
-import { Loader2 } from "lucide-react";
 import { formMembersSchema, FormMembersFields } from "@/common/validations";
 import { addMembers } from "@/common/actions/conversation/mutations";
-import { revalidatePathFromClient } from "@/common/actions/revalidatePath";
+import { useMutation } from "@tanstack/react-query";
 
 type Props = {
   conversationId: string;
@@ -29,15 +28,9 @@ export default function AddMembersForm({
     },
   });
 
-  async function onSubmit({ members }: FormMembersFields) {
-    const result = await addMembers({
-      id: conversationId,
-      members: members.map((member) => ({ id: member.value })),
-    });
-
-    if (result?.success) {
-      await revalidatePathFromClient(`/conversations/${conversationId}`);
-
+  const { mutate, isPending } = useMutation({
+    mutationFn: addMembers,
+    onSuccess: async () => {
       toast({
         description: (
           <ToastMessage type="success" message="Members added successfully" />
@@ -46,26 +39,29 @@ export default function AddMembersForm({
 
       onDialogClose();
       form.reset();
-    }
-
-    if (result?.error) {
+    },
+    onError: () => {
       toast({
         description: (
-          <ToastMessage type="error" message="Error adding members" />
+          <ToastMessage type="error" message="Failed to add members" />
         ),
       });
-    }
-  }
+    },
+  });
 
-  const { isSubmitting } = form.formState;
+  async function onSubmit({ members }: FormMembersFields) {
+    mutate({
+      id: conversationId,
+      members: members.map((member) => ({ id: member.value })),
+    });
+  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col ">
         <GroupMembers excludedUsers={currentMembers} />
-        <Button disabled={isSubmitting} type="submit" className="self-end">
-          Submit{" "}
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button isLoading={isPending} type="submit" className="self-end">
+          Submit
         </Button>
       </form>
     </Form>

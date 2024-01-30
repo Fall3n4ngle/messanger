@@ -8,6 +8,7 @@ import {
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { ConversationEvent } from "@/common/types/events";
+import { revalidatePath } from "next/cache";
 
 export const editConversation = async (fields: EditConversationFields) => {
   const result = editConversationSchema.safeParse(fields);
@@ -35,6 +36,8 @@ export const editConversation = async (fields: EditConversationFields) => {
         },
       });
 
+      revalidatePath(`/conversations/${id}`);
+
       const { members, ...conversation } = updatedGroup;
 
       members.forEach((member) => {
@@ -51,11 +54,11 @@ export const editConversation = async (fields: EditConversationFields) => {
     } catch (error) {
       const message = (error as Error).message ?? "Failed to create group";
       console.log(message);
-      return { success: false, error: message };
+      throw new Error(message);
     }
   }
 
   if (result.error) {
-    return { success: false, error: result.error.format() };
+    throw new Error(result.error.toString());
   }
 };

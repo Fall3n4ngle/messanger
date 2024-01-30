@@ -15,7 +15,10 @@ import { ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/common/utils";
 import { AvailableRoles, availableMemberRoles } from "../../const";
-import { useChangeRole } from "../../hooks/useChangeRole";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/common/hooks";
+import { changeMemberRole } from "../../actions/member";
+import { ToastMessage } from "@/components";
 
 type Props = {
   id: string;
@@ -24,15 +27,34 @@ type Props = {
 };
 
 export default function MemberRoles({ id, role, conversationId }: Props) {
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const [optimisticRole, setOptimisticRole] = useState(role);
 
-  const { mutate, optimisticRole } = useChangeRole({
-    defaultRole: role,
-    conversationId,
+  const { mutate: changeRole } = useMutation({
+    mutationFn: changeMemberRole,
+    onMutate: ({ role: newRole }) => {
+      setOptimisticRole(newRole);
+
+      toast({
+        description: (
+          <ToastMessage type="success" message="Role changed successfully" />
+        ),
+      });
+    },
+    onError: () => {
+      setOptimisticRole(role);
+
+      toast({
+        description: (
+          <ToastMessage type="error" message="Failed to change role" />
+        ),
+      });
+    },
   });
 
   const handleSelect = async (newRole: AvailableRoles) => {
-    mutate({ memberId: id, role: newRole, conversationId });
+    changeRole({ memberId: id, role: newRole, conversationId });
   };
 
   const currentRoleLabel = availableMemberRoles.find(

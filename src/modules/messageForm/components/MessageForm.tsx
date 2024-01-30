@@ -1,6 +1,13 @@
 "use client";
 
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui";
+import {
+  Button,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,7 +22,7 @@ import ExitEditingButton from "./ExitEditingButton";
 import ImagePreview from "./ImagePreview";
 import UploadButton from "./UploadButton";
 import IsUploadingProvider from "@/common/context/isUploading";
-import SubmitButton from "./SubmitButton";
+import { Check, SendHorizontal } from "lucide-react";
 
 type Props = {
   conversationId: string;
@@ -113,7 +120,14 @@ export default function MessageForm({ conversationId, user }: Props) {
                 </FormItem>
               )}
             />
-            <SubmitButton />
+            <Button
+              size="icon"
+              className="rounded-full"
+              aria-label="Send message"
+              disabled={isUploading}
+            >
+              {messageData.isUpdating ? <Check /> : <SendHorizontal />}
+            </Button>
           </form>
         </IsUploadingProvider>
       </Form>

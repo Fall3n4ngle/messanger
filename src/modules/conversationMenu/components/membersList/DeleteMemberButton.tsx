@@ -1,6 +1,8 @@
 import { Button } from "@/ui";
-import { Loader2 } from "lucide-react";
-import { useDeleteMember } from "../../hooks/useDeleteMember";
+import { useToast } from "@/common/hooks";
+import { useMutation } from "@tanstack/react-query";
+import { deleteMember } from "../../actions/member";
+import { ToastMessage } from "@/components";
 
 type Props = {
   conversationId: string;
@@ -13,16 +15,35 @@ export default function DeleteMemberButton({
   memberId,
   onDialogClose,
 }: Props) {
-  const { mutateAsync, isPending } = useDeleteMember();
+  const { toast } = useToast();
 
-  const handleClick = async () => {
-    await mutateAsync({ conversationId, memberId });
-    onDialogClose();
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteMember,
+    onSuccess: async () => {
+      toast({
+        description: (
+          <ToastMessage type="success" message="Deleted member successfully" />
+        ),
+      });
+
+      onDialogClose();
+    },
+    onError: () => {
+      toast({
+        description: (
+          <ToastMessage type="error" message="Failed to delete member" />
+        ),
+      });
+    },
+  });
+
+  const handleClick = () => {
+    mutate({ conversationId, memberId });
   };
 
   return (
-    <Button onClick={handleClick} disabled={isPending} variant="destructive">
-      Delete {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+    <Button onClick={handleClick} isLoading={isPending} variant="destructive">
+      Delete
     </Button>
   );
 }
