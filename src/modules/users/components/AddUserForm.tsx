@@ -89,6 +89,7 @@ export default function AddUserForm({ userId, onDialogClose }: Props) {
             </FormItem>
           )}
         />
+
         <Button isLoading={isPending} type="submit" className="self-end">
           Submit
         </Button>

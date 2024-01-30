@@ -1,11 +1,11 @@
 import { pusherServer } from "@/lib/pusher/server";
-import { getUserAuth } from "@/common/utils";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
 
 export async function POST(request: Request) {
-  const { session } = await getUserAuth();
+  const { userId } = auth();
 
-  if (!session) {
+  if (!userId) {
     return NextResponse.json(
       { message: "Failed to authorize pusher client" },
       {
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   const data = {
-    user_id: session.user.id,
+    user_id: userId ?? "",
   };
 
   const authResponse = pusherServer.authorizeChannel(

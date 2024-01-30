@@ -12,25 +12,20 @@ export const upsertUser = async (fields: UserFields) => {
     const {
       data: { id, ...data },
     } = parsed;
-    try {
-      const result = await db.user.upsert({
-        create: data,
-        update: data,
-        where: { id: id ?? "" },
-      });
 
-      if (!id) {
-        redirect("/");
-      }
+    const result = await db.user.upsert({
+      create: data,
+      update: data,
+      where: { id: id ?? "" },
+    });
 
-      revalidatePath("/");
-
-      return { success: true, data: result };
-    } catch (error) {
-      const message = (error as Error).message ?? "Failed to upsert user";
-      console.log(message);
-      throw new Error(message);
+    if (!id) {
+      redirect("/");
     }
+
+    revalidatePath("/");
+
+    return { success: true, data: result };
   }
 
   if (parsed.error) {

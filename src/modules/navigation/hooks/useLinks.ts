@@ -1,9 +1,10 @@
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { MessageCircle, Users, LogOut } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
 
 export const useLinks = () => {
+  const router = useRouter();
   const pathname = usePathname();
   const { signOut } = useClerk();
 
@@ -23,7 +24,7 @@ export const useLinks = () => {
       },
       {
         label: "Logout",
-        onClick: () => signOut(),
+        onClick: () => signOut(() => router.push("/sign-in")),
         Icon: LogOut,
         href: "#",
       },

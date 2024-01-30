@@ -26,7 +26,11 @@ export default async function page() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <UserForm clerkId={userId} />
+        <UserForm
+          clerkId={userId}
+          successMessage="Profile created successfully"
+          errorMessage="Failed to create acount"
+        />
       </CardContent>
     </Card>
   );

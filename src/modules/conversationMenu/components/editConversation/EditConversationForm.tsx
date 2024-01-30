@@ -82,7 +82,12 @@ export default function EditConversationForm({
           setIsUploading={setIsUploading}
         >
           <GroupInfo />
-          <Button isLoading={isPending} type="submit" className="self-end">
+          <Button
+            isLoading={isPending}
+            disabled={isUploading}
+            type="submit"
+            className="self-end"
+          >
             Submit
           </Button>
         </IsUploadingProvider>

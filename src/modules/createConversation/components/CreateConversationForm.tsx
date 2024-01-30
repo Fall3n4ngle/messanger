@@ -122,7 +122,12 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
                 Next <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button isLoading={isPending} type="submit" className="self-end">
+              <Button
+                isLoading={isPending}
+                disabled={isUploading}
+                type="submit"
+                className="self-end"
+              >
                 Submit
               </Button>
             )}

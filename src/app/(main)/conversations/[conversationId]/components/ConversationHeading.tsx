@@ -23,7 +23,9 @@ export default function ConversationHeading({
     <div className="flex gap-3 items-center">
       <Avatar>
         {image && <AvatarImage src={image} alt={`${name} image`} />}
-        <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
+        <AvatarFallback className="bg-primary text-primary-foreground">
+          {name[0].toUpperCase()}
+        </AvatarFallback>
       </Avatar>
       <div>
         <h4 className="scroll-m-20 font-semibold tracking-tight whitespace-nowrap mb-1">

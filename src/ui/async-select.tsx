@@ -48,7 +48,9 @@ const CustomOption = <
     >
       <Avatar className="w-7 h-7">
         {image && <AvatarImage src={image} alt="image" />}
-        <AvatarFallback>{label[0].toUpperCase()}</AvatarFallback>
+        <AvatarFallback className="bg-primary text-primary-foreground">
+          {label[0].toUpperCase()}
+        </AvatarFallback>
       </Avatar>
       <span>{label}</span>
     </div>

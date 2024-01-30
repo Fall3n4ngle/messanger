@@ -31,7 +31,7 @@ export default function ConversationCard({
     >
       <Avatar>
         {image && <AvatarImage src={image} alt={`${name} image`} />}
-        <AvatarFallback className={cn(isActive && "bg-background")}>
+        <AvatarFallback className="bg-primary text-primary-foreground">
           {name[0].toUpperCase()}
         </AvatarFallback>
       </Avatar>

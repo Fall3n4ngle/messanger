@@ -5,7 +5,6 @@ import { ThemeProvider } from "./Theme";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ActiveStatus from "@/components/ActiveStatus";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,7 +27,6 @@ export default function Providers({ children }: PropsWithChildren) {
           {children}
         </QueryClientProvider>
         <Toaster />
-        <ActiveStatus />
       </ClerkProvider>
     </ThemeProvider>
   );

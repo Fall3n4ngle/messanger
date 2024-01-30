@@ -3,6 +3,7 @@ import { getUserByClerkId } from "@/common/actions/user/queries";
 import { redirect } from "next/navigation";
 import { PropsWithChildren } from "react";
 import { auth } from "@clerk/nextjs";
+import { ActiveStatus } from "@/components";
 
 export default async function layout({ children }: PropsWithChildren) {
   const { userId } = auth();
@@ -14,6 +15,7 @@ export default async function layout({ children }: PropsWithChildren) {
   return (
     <>
       <Navigation {...currentUser} />
+      <ActiveStatus />
       {children}
     </>
   );
