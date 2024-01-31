@@ -5,7 +5,7 @@ import { userSchema } from "@/common/validations";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { upsertUser as upsertUserServer } from "@/common/actions/user/mutations";
+import { upsertUser as upsertUserServer } from "../actions/user";
 import {
   Form,
   FormControl,
@@ -16,8 +16,8 @@ import {
   FormMessage,
   Button,
 } from "@/ui";
-import { Dropzone } from "@/components";
-import ToastMessage from "./ToastMessage";
+import Dropzone from "../../Dropzone";
+import ToastMessage from "../../ToastMessage";
 import { useMutation } from "@tanstack/react-query";
 import IsUploadingProvider from "@/common/context/isUploading";
 import { useState } from "react";
@@ -27,7 +27,6 @@ type Props = {
   name?: string;
   image?: string | null;
   clerkId: string;
-  errorMessage?: string;
   successMessage?: string;
   onCloseModal?: Function;
 };
@@ -42,7 +41,6 @@ export default function UserForm({
   clerkId,
   onCloseModal,
   successMessage = "Profile updated successfully",
-  errorMessage = "Error updating profile",
 }: Props) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
@@ -64,9 +62,9 @@ export default function UserForm({
 
       onCloseModal && onCloseModal();
     },
-    onError: () => {
+    onError: (error) => {
       toast({
-        description: <ToastMessage type="error" message={errorMessage} />,
+        description: <ToastMessage type="error" message={error.message} />,
       });
     },
   });

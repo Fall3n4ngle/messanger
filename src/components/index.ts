@@ -1,4 +1,4 @@
-export { default as UserForm } from "./UserForm";
+export { UserForm } from "./UserForm";
 export { default as Search } from "./Search";
 export { default as EmptyConversationMessage } from "./EmptyConversationMessage";
 export { default as UserCard } from "./UserCard";
