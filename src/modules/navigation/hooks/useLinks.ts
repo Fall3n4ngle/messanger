@@ -29,5 +29,5 @@ export const useLinks = () => {
         href: "#",
       },
     ];
-  }, [pathname, signOut]);
+  }, [pathname, signOut, router]);
 };

@@ -31,7 +31,12 @@ export default function MediaRoomButton({ conversationId }: Props) {
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <Button size="icon" variant="ghost" className="rounded-full">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full"
+                aria-label="Join call"
+              >
                 <PhoneCall size={22} />
               </Button>
             </DialogTrigger>

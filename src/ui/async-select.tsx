@@ -30,6 +30,8 @@ export const Select = forwardRef<
   );
 });
 
+Select.displayName = "AsyncSelect"
+
 const CustomOption = <
   IsMulti extends boolean = true,
   GroupType extends GroupBase<Option> = GroupBase<Option>

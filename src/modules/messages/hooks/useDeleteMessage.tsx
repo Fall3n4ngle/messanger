@@ -6,8 +6,6 @@ import { Message } from "@/common/actions/messages/queries";
 import { UserConversation } from "@/common/actions/conversation/queries";
 import { useMessageForm } from "@/common/store";
 
-let isLast = false;
-
 export const useDeleteMessage = () => {
   const queryClient = useQueryClient();
   const { messageData, resetMessageData } = useMessageForm();
@@ -34,6 +32,7 @@ export const useDeleteMessage = () => {
         resetMessageData();
       }
 
+      let isLast = false;
       let previousMessage: UserConversation["lastMessage"] | null;
 
       queryClient.setQueryData(
@@ -112,14 +111,12 @@ export const useDeleteMessage = () => {
         context?.previousMessagesData
       );
 
-      if (isLast) {
-        queryClient.setQueriesData(
-          {
-            queryKey: ["conversations"],
-          },
-          context?.previousConversationsData
-        );
-      }
+      queryClient.setQueriesData(
+        {
+          queryKey: ["conversations"],
+        },
+        context?.previousConversationsData
+      );
     },
 
     onSettled: (_data, _error, { conversationId }) => {
@@ -127,11 +124,9 @@ export const useDeleteMessage = () => {
         queryKey: ["messages", conversationId],
       });
 
-      if (isLast) {
-        queryClient.invalidateQueries({
-          queryKey: ["conversations"],
-        });
-      }
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
+      });
     },
   });
 };

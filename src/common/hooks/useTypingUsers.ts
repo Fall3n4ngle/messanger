@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { pusherClient } from "@/lib/pusher/client";
-import { TypingUser } from "../actions/typingUser/mutations";
 import { useAuth } from "@clerk/nextjs";
 
 type Props = {
   conversationId: string;
+};
+
+type User = {
+  userName: string;
+  clerkId: string;
 };
 
 export const useTypingUsers = ({ conversationId }: Props) => {
@@ -14,7 +18,7 @@ export const useTypingUsers = ({ conversationId }: Props) => {
   useEffect(() => {
     pusherClient.subscribe(conversationId);
 
-    const handleStartTyping = (user: TypingUser) => {
+    const handleStartTyping = (user: User) => {
       if (!userId || user.clerkId === userId) return;
       setTypingUsers((prev) => {
         if (prev.find((u) => u === user.userName)) return prev;
@@ -22,7 +26,7 @@ export const useTypingUsers = ({ conversationId }: Props) => {
       });
     };
 
-    const handleStopTyping = ({ userName }: { userName: string }) => {
+    const handleStopTyping = ({ userName }: Pick<User, "userName">) => {
       setTypingUsers((prev) => prev.filter((u) => u !== userName));
     };
 

@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   buttonVariants,
-} from "../../../ui";
+} from "@/ui";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/common/utils";
 
@@ -37,6 +37,7 @@ export default function NavigationItem({
                 variant: active ? "secondary" : "ghost",
               })
             )}
+            aria-label={label}
           >
             <Icon />
           </Link>

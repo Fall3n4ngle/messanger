@@ -53,6 +53,7 @@ export default function MessagesList({
           }
         )}
         onClick={scrollToBottom}
+        aria-label="Scroll to bottom"
       >
         <ChevronsDown className="text-muted-foreground" />
       </Button>

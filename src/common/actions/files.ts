@@ -1,8 +1,11 @@
 "use server";
 
 import { UTApi } from "uploadthing/server";
+import { checkAuth } from "../dataAccess";
 
 export const deleteFiles = async (fileKeys: string) => {
+  checkAuth();
+
   try {
     const result = await new UTApi().deleteFiles(fileKeys);
 

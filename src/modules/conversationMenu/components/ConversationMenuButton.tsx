@@ -46,7 +46,12 @@ export default function ConversationMenuButton({
         <Tooltip>
           <TooltipTrigger asChild>
             <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="ghost" className="rounded-full">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full"
+                aria-label="Options"
+              >
                 <MoreVertical />
               </Button>
             </DropdownMenuTrigger>

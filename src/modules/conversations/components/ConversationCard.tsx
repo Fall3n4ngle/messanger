@@ -24,9 +24,9 @@ export default function ConversationCard({
   return (
     <div
       className={cn(
-        "flex relative items-center justify-between gap-3 cursor-pointer p-2 dark:hover:bg-secondary/70 hover:bg-secondary/80 rounded-md transition-colors",
+        "flex relative items-center justify-between gap-3 cursor-pointer p-2 dark:hover:bg-secondary/60 hover:bg-secondary/70 rounded-md transition-colors",
         isActive &&
-          "bg-secondary hover:bg-secondary/100 dark:hover:bg-secondary/100 cursor-default"
+          "bg-secondary/90 hover:bg-secondary/90 dark:hover:bg-secondary/90 cursor-default"
       )}
     >
       <Avatar>
