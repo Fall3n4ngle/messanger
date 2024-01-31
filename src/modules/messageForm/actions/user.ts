@@ -1,8 +1,7 @@
 "use server";
 
-import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs";
 import { pusherServer } from "@/lib/pusher/server";
+import { getUserAuth } from "@/common/dataAccess";
 
 type Props = {
   userName: string;
@@ -15,8 +14,7 @@ export type TypingUser = {
 };
 
 export const addTypingUser = async ({ conversationId, userName }: Props) => {
-  const { userId } = auth();
-  if (!userId) redirect("/sign-in");
+  const { userId } = await getUserAuth();
 
   pusherServer.trigger(conversationId, "user:start_typing", {
     userName,

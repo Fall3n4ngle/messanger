@@ -16,7 +16,6 @@ import {
   DialogTrigger,
 } from "@/ui";
 import { UserForm } from "@/components";
-import { useAuth } from "@clerk/nextjs";
 import { useActiveUsers } from "@/common/store/useActiveUsers";
 import { cn } from "@/common/utils";
 import { useState } from "react";
@@ -29,7 +28,6 @@ type Props = {
 };
 
 export default function UserButton({ image, name, clerkId, id }: Props) {
-  const { userId } = useAuth();
   const { usersIds } = useActiveUsers();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -37,7 +35,7 @@ export default function UserButton({ image, name, clerkId, id }: Props) {
     setIsOpen(false);
   };
 
-  const isActive = userId && usersIds.includes(userId);
+  const isActive = usersIds.includes(clerkId);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

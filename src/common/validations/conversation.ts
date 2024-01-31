@@ -5,7 +5,7 @@ const memberSchema = z.object({
 });
 
 export const conversationSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   name: z
     .string({
       required_error: "Name is required",

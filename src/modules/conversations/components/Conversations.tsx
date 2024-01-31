@@ -13,19 +13,14 @@ import { UserConversation } from "@/common/actions/conversation/queries";
 
 type Props = {
   intialConversations: UserConversation[];
-  currentUserId: string;
 };
 
-export default function Conversations({
-  intialConversations,
-  currentUserId,
-}: Props) {
+export default function Conversations({ intialConversations }: Props) {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
 
   const { data, error } = useConversations({
-    currentUserId,
     query,
     intialConversations,
   });

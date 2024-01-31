@@ -1,18 +1,14 @@
 "use server";
 
-import { GetConversationsProps } from "@/common/actions/conversation/queries";
-import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
+import { getUserAuth } from "@/common/dataAccess";
+import { GetConversationsProps } from "../types";
 
 export const getConversationsForSelect = async ({
   userId,
   query,
 }: GetConversationsProps) => {
-  const { userId: currentUserClerkId } = auth();
-
-  if (!currentUserClerkId) {
-    return [];
-  }
+  const { userId: currentUserClerkId } = await getUserAuth();
 
   const conversations = await db.conversation.findMany({
     where: {

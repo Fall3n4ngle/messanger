@@ -10,9 +10,16 @@ import {
 } from "@/ui";
 import Dropzone from "./Dropzone";
 import { useFormContext } from "react-hook-form";
+import { KeyboardEvent } from "react";
 
 export default function GroupInfo() {
   const { control } = useFormContext();
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
+  };
 
   return (
     <>
@@ -35,7 +42,7 @@ export default function GroupInfo() {
           <FormItem className="mb-4">
             <FormLabel>Group name</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} onKeyDown={handleKeyDown} />
             </FormControl>
             <FormMessage />
           </FormItem>

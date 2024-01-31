@@ -1,6 +1,5 @@
 "use server";
 
-import { auth } from "@clerk/nextjs";
 import {
   EditMessageFields,
   SendMessageFields,
@@ -9,14 +8,19 @@ import {
 } from "../validations/message";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
+import { canMutateMessage, getUserAuth } from "@/common/dataAccess";
 
 export const sendMessage = async (fields: SendMessageFields) => {
   const result = sendMessageSchema.safeParse(fields);
 
+  if (!result.success) {
+    throw new Error(result.error.toString());
+  }
+
+  const { userId } = await getUserAuth();
+
   if (result.success) {
     try {
-      const { userId } = auth();
-
       const createdMessage = await db.message.create({
         data: result.data,
         select: {
@@ -81,64 +85,63 @@ export const sendMessage = async (fields: SendMessageFields) => {
       throw new Error(message);
     }
   }
-
-  if (result.error) {
-    throw new Error(result.error.toString());
-  }
 };
 
 export const editMessage = async (data: EditMessageFields) => {
   const result = editMessageSchema.safeParse(data);
 
-  if (result.success) {
-    const { id, conversationId, ...data } = result.data;
+  if (!result.success) {
+    throw new Error(result.error.toString());
+  }
 
-    try {
-      const { userId } = auth();
+  const { userId } = await getUserAuth();
+  const { id, conversationId, ...fields } = result.data;
 
-      const updatedMessage = await db.message.update({
-        where: { id },
-        data,
-      });
+  try {
+    if (!canMutateMessage({ clerkId: userId, messageId: id, conversationId })) {
+      throw new Error(
+        "You must be admin, editor or the sender of the message in order to edit it"
+      );
+    }
 
-      const conversation = await db.conversation.findFirst({
-        where: { id: conversationId },
-        select: {
-          members: {
-            select: {
-              user: {
-                select: {
-                  clerkId: true,
-                },
+    const updatedMessage = await db.message.update({
+      where: { id },
+      data: fields,
+    });
+
+    const conversation = await db.conversation.findFirst({
+      where: { id: conversationId },
+      select: {
+        members: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
               },
             },
           },
         },
-      });
+      },
+    });
 
-      if (!conversation) {
-        throw new Error("conversation not found");
-      }
-
-      conversation.members.forEach((member) => {
-        if (member.user.clerkId !== userId) {
-          const messagesChannel = `${member.user.clerkId}_messages`;
-
-          pusherServer.trigger(messagesChannel, "messages:update", {
-            conversationId,
-          });
-        }
-      });
-
-      return { success: true, data: updatedMessage };
-    } catch (error) {
-      const message = (error as Error).message ?? "Failed to update message";
-      console.log({ message });
-      throw new Error(message);
+    if (!conversation) {
+      throw new Error("conversation not found");
     }
-  }
 
-  if (result.error) {
-    throw new Error(result.error.toString());
+    conversation.members.forEach((member) => {
+      if (member.user.clerkId !== userId) {
+        const messagesChannel = `${member.user.clerkId}_messages`;
+
+        pusherServer.trigger(messagesChannel, "messages:update", {
+          conversationId,
+        });
+      }
+    });
+
+    return { success: true, data: updatedMessage };
+  } catch (error) {
+    const message = (error as Error).message ?? "Failed to update message";
+    console.log({ message });
+    throw new Error(message);
   }
 };

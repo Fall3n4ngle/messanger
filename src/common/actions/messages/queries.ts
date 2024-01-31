@@ -1,5 +1,6 @@
 "use server";
 
+import { checkAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
 
 type Props = {
@@ -7,6 +8,8 @@ type Props = {
 };
 
 export const getMessages = async ({ conversationId }: Props) => {
+  await checkAuth();
+
   const messages = await db.message.findMany({
     where: {
       conversationId,

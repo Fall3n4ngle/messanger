@@ -1,21 +1,24 @@
 "use server";
 
+import { getUserAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
 
 export type GetConversationsProps = {
-  userId: string;
   query?: string;
 };
 
 export const getUserConversations = async ({
-  userId,
   query = "",
 }: GetConversationsProps) => {
+  const { userId: clerkId } = await getUserAuth();
+
   const convsersations = await db.conversation.findMany({
     where: {
       members: {
         some: {
-          userId,
+          user: {
+            clerkId,
+          },
         },
       },
       name: {
@@ -34,11 +37,13 @@ export const getUserConversations = async ({
           AND: {
             seenBy: {
               none: {
-                id: userId,
+                clerkId,
               },
             },
-            userId: {
-              not: userId,
+            user: {
+              clerkId: {
+                not: clerkId,
+              },
             },
           },
         },

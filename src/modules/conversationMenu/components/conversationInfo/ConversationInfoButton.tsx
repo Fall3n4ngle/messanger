@@ -27,7 +27,10 @@ export default function ConversationInfoButton({ members, ...props }: Props) {
           View group info
         </button>
       </DialogTrigger>
-      <DialogContent className="h-[500px] space-y-1.5 flex flex-col">
+      <DialogContent
+        className="h-[500px] space-y-1.5 flex flex-col"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Group info</DialogTitle>
         </DialogHeader>
