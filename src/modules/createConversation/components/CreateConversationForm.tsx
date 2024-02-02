@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useState } from "react";
 import { Button, Form } from "@/ui";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormFields, formSchema } from "../validations/formSchema";
 import { steps } from "../const";
@@ -123,12 +123,12 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
               </Button>
             ) : (
               <Button
-                isLoading={isPending}
-                disabled={isUploading}
+                disabled={isUploading || isPending}
                 type="submit"
                 className="self-end"
               >
                 Submit
+                {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
               </Button>
             )}
           </div>

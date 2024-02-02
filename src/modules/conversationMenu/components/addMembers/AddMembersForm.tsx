@@ -7,6 +7,7 @@ import { GroupMembers } from "@/components";
 import { formMembersSchema, FormMembersFields } from "@/common/validations";
 import { addMembers } from "@/common/actions/conversation/mutations";
 import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   conversationId: string;
@@ -60,8 +61,9 @@ export default function AddMembersForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col ">
         <GroupMembers excludedUsers={currentMembers} />
-        <Button isLoading={isPending} type="submit" className="self-end">
+        <Button disabled={isPending} type="submit" className="self-end">
           Submit
+          {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
         </Button>
       </form>
     </Form>

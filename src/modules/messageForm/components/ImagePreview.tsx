@@ -25,7 +25,7 @@ export default function ImagePreview() {
     },
   });
 
-  const { fileKey, isUpdating } = messageData;
+  const { fileKey, isEditing: isUpdating } = messageData;
 
   const handleDelete = () => {
     if (isUpdating || !fileKey) {

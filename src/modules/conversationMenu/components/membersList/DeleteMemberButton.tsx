@@ -3,6 +3,7 @@ import { useToast } from "@/common/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { deleteMember } from "../../actions/member";
 import { ToastMessage } from "@/components";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   conversationId: string;
@@ -42,8 +43,9 @@ export default function DeleteMemberButton({
   };
 
   return (
-    <Button onClick={handleClick} isLoading={isPending} variant="destructive">
+    <Button onClick={handleClick} disabled={isPending} variant="destructive">
       Delete
+      {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
     </Button>
   );
 }

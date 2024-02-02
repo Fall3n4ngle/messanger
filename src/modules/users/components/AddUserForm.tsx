@@ -18,6 +18,7 @@ import { SingleValue } from "react-select";
 import { addMembers } from "@/common/actions/conversation/mutations";
 import { useToast } from "@/common/hooks";
 import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   userId: string;
@@ -89,9 +90,9 @@ export default function AddUserForm({ userId, onDialogClose }: Props) {
             </FormItem>
           )}
         />
-
-        <Button isLoading={isPending} type="submit" className="self-end">
+        <Button disabled={isPending} type="submit" className="self-end">
           Submit
+          {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
         </Button>
       </form>
     </Form>

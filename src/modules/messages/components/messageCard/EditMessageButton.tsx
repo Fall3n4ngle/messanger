@@ -8,7 +8,7 @@ export default function EditMessageButton(props: Props) {
   const { setMessageData } = useMessageForm();
 
   const handleClick = () => {
-    setMessageData({ ...props, isUpdating: true });
+    setMessageData({ ...props, isEditing: true });
   };
 
   return (

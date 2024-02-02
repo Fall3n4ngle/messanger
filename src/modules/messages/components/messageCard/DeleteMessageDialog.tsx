@@ -9,9 +9,13 @@ import {
   AlertDialogTrigger,
   Button,
 } from "@/ui";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { useDeleteMessage } from "../../hooks/useDeleteMessage";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMessageForm } from "@/common/store";
+import { useToast } from "@/common/hooks";
+import { deleteMessage } from "../../actions/message";
+import { ToastMessage } from "@/components";
 
 type Props = {
   messageId: string;
@@ -24,12 +28,47 @@ export default function DeleteMessageButton({
   messageId,
   previousMessageId,
 }: Props) {
+  const queryClient = useQueryClient();
+  const { messageData, resetMessageData } = useMessageForm();
+  const { toast } = useToast();
+
   const [isOpen, setIsOpen] = useState(false);
-  const { mutate } = useDeleteMessage();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteMessage,
+    onError: () => {
+      toast({
+        description: (
+          <ToastMessage type="error" message="Failed to delete message" />
+        ),
+      });
+    },
+    onSuccess: (_, { messageId }) => {
+      toast({
+        description: (
+          <ToastMessage type="success" message="Deleted message successfully" />
+        ),
+      });
+
+      if (messageId === messageData.id) {
+        resetMessageData();
+      }
+
+      setIsOpen(false);
+    },
+    onSettled: (_data, _error, { conversationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["messages", conversationId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
+      });
+    },
+  });
 
   const handleClick = () => {
     mutate({ conversationId, messageId, previousMessageId });
-    setIsOpen(false);
   };
 
   return (
@@ -49,8 +88,14 @@ export default function DeleteMessageButton({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button variant="destructive" onClick={handleClick}>
+          <Button
+            className="self-end"
+            variant="destructive"
+            disabled={isPending}
+            onClick={handleClick}
+          >
             Delete
+            {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

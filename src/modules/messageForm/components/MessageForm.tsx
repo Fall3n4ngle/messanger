@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/ui";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,14 +8,13 @@ import { z } from "zod";
 import ContentInput from "./ContentInput";
 import { sendMessageSchema } from "../validations/message";
 import { useSendMessage, useEditMessage } from "../hooks";
-import { v4 as uuidv4 } from "uuid";
 import { useMessageForm } from "@/common/store/useMessageForm";
 import { Message } from "@/common/actions/messages/queries";
 import ExitEditingButton from "./ExitEditingButton";
 import ImagePreview from "./ImagePreview";
 import UploadButton from "./UploadButton";
 import IsUploadingProvider from "@/common/context/isUploading";
-import { Check, SendHorizontal } from "lucide-react";
+import SubmitButton from "./SubmitButton";
 
 type Props = {
   conversationId: string;
@@ -33,8 +25,8 @@ type FormFields = z.infer<typeof formSchema>;
 
 export default function MessageForm({ conversationId, user }: Props) {
   const { messageData, resetMessageData } = useMessageForm();
-  const { mutate: sendMessage } = useSendMessage({ user });
-  const { mutate: updateMessage } = useEditMessage();
+  const { mutate: sendMessage, isPending: isSendingForm } = useSendMessage();
+  const { mutate: updateMessage, isPending: isEditingForm } = useEditMessage();
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -49,13 +41,11 @@ export default function MessageForm({ conversationId, user }: Props) {
   const onSubmit = async (fields: FormFields) => {
     if (isUploading) return;
 
-    if (!messageData.isUpdating || !messageData.id) {
+    if (!messageData.isEditing || !messageData.id) {
       sendMessage({
         ...fields,
         conversationId,
         userId: user.id,
-        id: uuidv4(),
-        updatedAt: new Date(),
       });
 
       form.reset();
@@ -86,7 +76,7 @@ export default function MessageForm({ conversationId, user }: Props) {
         >
           <div className="flex w-full items-center justify-between">
             <ImagePreview />
-            {messageData.isUpdating && <ExitEditingButton />}
+            {messageData.isEditing && <ExitEditingButton />}
           </div>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -120,14 +110,11 @@ export default function MessageForm({ conversationId, user }: Props) {
                 </FormItem>
               )}
             />
-            <Button
-              size="icon"
-              className="rounded-full"
-              aria-label="Send message"
-              disabled={isUploading}
-            >
-              {messageData.isUpdating ? <Check /> : <SendHorizontal />}
-            </Button>
+            <SubmitButton
+              isSubmitting={isSendingForm || isEditingForm}
+              isEditing={messageData.isEditing}
+              isUploading={isUploading}
+            />
           </form>
         </IsUploadingProvider>
       </Form>

@@ -4,7 +4,7 @@ type Data = {
   id: string | null;
   file?: string | null;
   content: string | null;
-  isUpdating: boolean;
+  isEditing: boolean;
   fileKey: string | null;
 };
 
@@ -17,7 +17,7 @@ type Store = {
 const defaultMessageData: Data = {
   content: null,
   id: null,
-  isUpdating: false,
+  isEditing: false,
   file: null,
   fileKey: null,
 };
