@@ -6,18 +6,25 @@ import Image from "next/image";
 import { deleteFiles as deleteFilesServer } from "@/common/actions/files";
 import { UploadFileResponse } from "uploadthing/client";
 import { useToast } from "@/common/hooks";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { ToastMessage } from ".";
-
-import "@uploadthing/react/styles.css";
 import { useIsUploading } from "@/common/context/isUploading";
 
-export default function Dropzone() {
+import "@uploadthing/react/styles.css";
+
+type Props = {
+  isUploading: boolean;
+  setIsUploading: Dispatch<SetStateAction<boolean>>;
+};
+
+export default function Dropzone({
+  isUploading,
+  setIsUploading
+}: Props) {
   const { toast } = useToast();
   const { setValue, watch } = useFormContext();
-  const { isUploading, setIsUploading } = useIsUploading();
 
   const [fileKey, setFileKey] = useState<string | null>(null);
 

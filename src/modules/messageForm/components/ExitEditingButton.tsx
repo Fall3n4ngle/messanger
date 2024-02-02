@@ -1,4 +1,3 @@
-import { useIsUploading } from "@/common/context/isUploading";
 import { useMessageForm } from "@/common/store";
 import {
   Button,
@@ -11,7 +10,6 @@ import { X } from "lucide-react";
 
 export default function ExitEditingButton() {
   const { resetMessageData } = useMessageForm();
-  const { isUploading } = useIsUploading();
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -22,7 +20,6 @@ export default function ExitEditingButton() {
             size="icon"
             onClick={resetMessageData}
             className="rounded-full ml-auto mb-5"
-            disabled={isUploading}
           >
             <X className="w-4.5 h-4.5" />
           </Button>

@@ -6,10 +6,10 @@ import { Button, Form } from "@/ui";
 import { editConversationSchema } from "../../validations/conversation";
 import { z } from "zod";
 import { useState } from "react";
-import IsUploadingProvider from "@/common/context/isUploading";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { editConversation } from "../../actions/conversation";
 import { useToast } from "@/common/hooks";
+import { Loader2 } from "lucide-react";
 
 const formSchema = editConversationSchema.pick({ name: true, image: true });
 type FormFields = z.infer<typeof formSchema>;
@@ -77,20 +77,15 @@ export default function EditConversationForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
-        <IsUploadingProvider
-          isUploading={isUploading}
-          setIsUploading={setIsUploading}
+        <GroupInfo isUploading={isUploading} setIsUploading={setIsUploading} />
+        <Button
+          disabled={isPending || isUploading}
+          type="submit"
+          className="self-end"
         >
-          <GroupInfo />
-          <Button
-            isLoading={isPending}
-            disabled={isUploading}
-            type="submit"
-            className="self-end"
-          >
-            Submit
-          </Button>
-        </IsUploadingProvider>
+          Submit
+          {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+        </Button>
       </form>
     </Form>
   );

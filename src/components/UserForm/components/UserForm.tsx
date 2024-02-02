@@ -19,8 +19,8 @@ import {
 import Dropzone from "../../Dropzone";
 import ToastMessage from "../../ToastMessage";
 import { useMutation } from "@tanstack/react-query";
-import IsUploadingProvider from "@/common/context/isUploading";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   id?: string;
@@ -89,45 +89,43 @@ export default function UserForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-4"
       >
-        <IsUploadingProvider
-          isUploading={isUploading}
-          setIsUploading={setIsUploading}
+        <FormField
+          control={form.control}
+          name="image"
+          render={() => (
+            <FormItem className="mb-2">
+              <FormLabel>Profile image</FormLabel>
+              <FormControl>
+                <Dropzone
+                  isUploading={isUploading}
+                  setIsUploading={setIsUploading}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>User name</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button
+          disabled={isPending || isUploading}
+          type="submit"
+          className="self-end"
         >
-          <FormField
-            control={form.control}
-            name="image"
-            render={() => (
-              <FormItem className="mb-2">
-                <FormLabel>Profile image</FormLabel>
-                <FormControl>
-                  <Dropzone />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>User name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button
-            isLoading={isPending}
-            disabled={isUploading}
-            type="submit"
-            className="self-end"
-          >
-            Submit
-          </Button>
-        </IsUploadingProvider>
+          Submit
+          {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+        </Button>
       </form>
     </Form>
   );

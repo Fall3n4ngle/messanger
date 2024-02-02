@@ -10,9 +10,14 @@ import {
 } from "@/ui";
 import Dropzone from "./Dropzone";
 import { useFormContext } from "react-hook-form";
-import { KeyboardEvent } from "react";
+import { Dispatch, KeyboardEvent, SetStateAction } from "react";
 
-export default function GroupInfo() {
+type Props = {
+  isUploading: boolean;
+  setIsUploading: Dispatch<SetStateAction<boolean>>;
+};
+
+export default function GroupInfo(props: Props) {
   const { control } = useFormContext();
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -30,7 +35,7 @@ export default function GroupInfo() {
           <FormItem className="mb-2">
             <FormLabel>Group image</FormLabel>
             <FormControl>
-              <Dropzone />
+              <Dropzone {...props} />
             </FormControl>
           </FormItem>
         )}

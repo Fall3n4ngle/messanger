@@ -13,7 +13,6 @@ import { Message } from "@/common/actions/messages/queries";
 import ExitEditingButton from "./ExitEditingButton";
 import ImagePreview from "./ImagePreview";
 import UploadButton from "./UploadButton";
-import IsUploadingProvider from "@/common/context/isUploading";
 import SubmitButton from "./SubmitButton";
 
 type Props = {
@@ -67,56 +66,57 @@ export default function MessageForm({ conversationId, user }: Props) {
     form.reset();
   };
 
+  const isSubmitting = isSendingForm || isEditingForm;
+
   return (
     <div className="px-6 py-4 max-w-[1000px] w-full">
       <Form {...form}>
-        <IsUploadingProvider
-          isUploading={isUploading}
-          setIsUploading={setIsUploading}
+        <div className="flex w-full items-center justify-between">
+          <ImagePreview />
+          {messageData.isEditing && <ExitEditingButton />}
+        </div>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex items-end gap-3"
         >
-          <div className="flex w-full items-center justify-between">
-            <ImagePreview />
-            {messageData.isEditing && <ExitEditingButton />}
-          </div>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex items-end gap-3"
-          >
-            <FormField
-              name="file"
-              control={form.control}
-              render={() => (
-                <FormItem>
-                  <FormLabel className="sr-only">Image</FormLabel>
-                  <FormControl>
-                    <UploadButton />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="content"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="grow">
-                  <FormLabel className="sr-only">Message</FormLabel>
-                  <FormControl>
-                    <ContentInput
-                      conversationId={conversationId}
-                      userName={user.name}
-                      {...field}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <SubmitButton
-              isSubmitting={isSendingForm || isEditingForm}
-              isEditing={messageData.isEditing}
-              isUploading={isUploading}
-            />
-          </form>
-        </IsUploadingProvider>
+          <FormField
+            name="file"
+            control={form.control}
+            render={() => (
+              <FormItem>
+                <FormLabel className="sr-only">Image</FormLabel>
+                <FormControl>
+                  <UploadButton
+                    isSubmitting={isSubmitting}
+                    isUploading={isUploading}
+                    setIsUploading={setIsUploading}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="content"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem className="grow">
+                <FormLabel className="sr-only">Message</FormLabel>
+                <FormControl>
+                  <ContentInput
+                    conversationId={conversationId}
+                    userName={user.name}
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <SubmitButton
+            isSubmitting={isSubmitting}
+            isEditing={messageData.isEditing}
+            isUploading={isUploading}
+          />
+        </form>
       </Form>
     </div>
   );

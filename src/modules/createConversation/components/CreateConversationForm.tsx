@@ -5,12 +5,16 @@ import { Button, Form } from "@/ui";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormFields, formSchema } from "../validations/formSchema";
-import { steps } from "../const";
-import IsUploadingProvider from "@/common/context/isUploading";
 import { useToast } from "@/common/hooks";
-import { ToastMessage } from "@/components";
+import { GroupInfo, GroupMembers, ToastMessage } from "@/components";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createConversation } from "../actions/conversation";
+
+type Step = {
+  id: string;
+  fields: (keyof FormFields)[];
+  component: JSX.Element;
+};
 
 type Props = {
   onDialogClose: Function;
@@ -93,47 +97,53 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
     setStep((prev) => prev + 1);
   };
 
+  const steps: Step[] = [
+    {
+      id: "info",
+      fields: ["name", "image"],
+      component: (
+        <GroupInfo isUploading={isUploading} setIsUploading={setIsUploading} />
+      ),
+    },
+    {
+      id: "members",
+      fields: ["members"],
+      component: <GroupMembers />,
+    },
+  ];
+
   return (
     <Form {...form}>
-      <IsUploadingProvider
-        isUploading={isUploading}
-        setIsUploading={setIsUploading}
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col justify-between grow"
       >
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col justify-between grow"
-        >
-          {steps[step].component}
-          <div className="flex items-center justify-between">
-            <Button
-              onClick={handlePreviousClick}
-              variant="secondary"
-              disabled={step === 0}
-              type="button"
-            >
-              <ChevronLeft className="mr-2 h-4 w-4" /> Back
+        {steps[step].component}
+        <div className="flex items-center justify-between">
+          <Button
+            onClick={handlePreviousClick}
+            variant="secondary"
+            disabled={step === 0}
+            type="button"
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" /> Back
+          </Button>
+          {step < steps.length - 1 ? (
+            <Button onClick={handleNextClick} variant="secondary" type="button">
+              Next <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
-            {step < steps.length - 1 ? (
-              <Button
-                onClick={handleNextClick}
-                variant="secondary"
-                type="button"
-              >
-                Next <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                disabled={isUploading || isPending}
-                type="submit"
-                className="self-end"
-              >
-                Submit
-                {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
-              </Button>
-            )}
-          </div>
-        </form>
-      </IsUploadingProvider>
+          ) : (
+            <Button
+              disabled={isUploading || isPending}
+              type="submit"
+              className="self-end"
+            >
+              Submit
+              {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+            </Button>
+          )}
+        </div>
+      </form>
     </Form>
   );
 }

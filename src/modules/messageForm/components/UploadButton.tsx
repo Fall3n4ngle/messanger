@@ -1,4 +1,3 @@
-import { useIsUploading } from "@/common/context/isUploading";
 import { useToast } from "@/common/hooks";
 import { useMessageForm } from "@/common/store";
 import { cn } from "@/common/utils";
@@ -6,7 +5,7 @@ import { ToastMessage } from "@/components";
 import { useUploadThing } from "@/lib/uploadThing/helpers";
 import { buttonVariants } from "@/ui";
 import { ImageIcon, Loader2 } from "lucide-react";
-import { ChangeEvent } from "react";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   UploadFileResponse,
@@ -14,10 +13,19 @@ import {
   generatePermittedFileTypes,
 } from "uploadthing/client";
 
-export default function UploadButton() {
+type Props = {
+  isUploading: boolean;
+  isSubmitting: boolean;
+  setIsUploading: Dispatch<SetStateAction<boolean>>;
+};
+
+export default function UploadButton({
+  isSubmitting,
+  isUploading,
+  setIsUploading,
+}: Props) {
   const { toast } = useToast();
   const { setMessageData } = useMessageForm();
-  const { isUploading, setIsUploading } = useIsUploading();
   const { setValue } = useFormContext();
 
   const handleUploadBegin = (files: File[]) => {
@@ -61,6 +69,8 @@ export default function UploadButton() {
     startUpload(Array.from(e.target.files));
   };
 
+  const disabled = isUploading || isSubmitting;
+
   return (
     <label
       className={cn(
@@ -69,7 +79,7 @@ export default function UploadButton() {
           variant: "secondary",
         }),
         "cursor-pointer !mt-0 rounded-full",
-        isUploading && "cursor-default opacity-50"
+        disabled && "cursor-default opacity-50"
       )}
     >
       <input
@@ -78,7 +88,7 @@ export default function UploadButton() {
         className="hidden"
         accept={generateMimeTypes(fileTypes ?? [])?.join(", ")}
         multiple={multiple}
-        disabled={isUploading}
+        disabled={disabled}
       />
       {isUploading ? (
         <Loader2 className="w-5 h-5 animate-spin" />
