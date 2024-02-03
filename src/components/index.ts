@@ -3,7 +3,6 @@ export { default as Search } from "./Search";
 export { default as EmptyConversationMessage } from "./EmptyConversationMessage";
 export { default as UserCard } from "./UserCard";
 export { default as ToastMessage } from "./ToastMessage";
-export { default as GroupInfo } from "./GroupInfo";
 export { default as ActiveStatus } from "./ActiveStatus";
 export { default as Dropzone } from "./Dropzone";
 export { default as UploadImage } from "./UploadImage";

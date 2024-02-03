@@ -8,21 +8,25 @@ import {
   FormMessage,
   Input,
 } from "@/ui";
-import Dropzone from "./Dropzone";
+import { Dropzone } from "@/components";
 import { useFormContext } from "react-hook-form";
-import { Dispatch, KeyboardEvent, SetStateAction } from "react";
+import { Dispatch, FormEvent, KeyboardEvent, SetStateAction } from "react";
 
 type Props = {
   isUploading: boolean;
   setIsUploading: Dispatch<SetStateAction<boolean>>;
+  onSubmit: (e: FormEvent) => void;
 };
 
-export default function GroupInfo(props: Props) {
+export default function GroupInfo({
+  onSubmit,
+  ...props
+}: Props) {
   const { control } = useFormContext();
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      e.preventDefault();
+      onSubmit(e);
     }
   };
 

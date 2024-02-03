@@ -1,8 +1,17 @@
 import { Conversation } from "../../types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GroupInfo, ToastMessage } from "@/components";
-import { Button, Form } from "@/ui";
+import { Dropzone, ToastMessage } from "@/components";
+import {
+  Button,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+} from "@/ui";
 import { editConversationSchema } from "../../validations/conversation";
 import { z } from "zod";
 import { useState } from "react";
@@ -77,7 +86,34 @@ export default function EditConversationForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
-        <GroupInfo isUploading={isUploading} setIsUploading={setIsUploading} />
+        <FormField
+          control={form.control}
+          name="image"
+          render={() => (
+            <FormItem className="mb-2">
+              <FormLabel>Group image</FormLabel>
+              <FormControl>
+                <Dropzone
+                  isUploading={isUploading}
+                  setIsUploading={setIsUploading}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="mb-4">
+              <FormLabel>Group name</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button
           disabled={isPending || isUploading}
           type="submit"

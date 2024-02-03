@@ -1,4 +1,6 @@
+import { checkAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
 
 type Props = {
   conversationId: string;
@@ -6,6 +8,8 @@ type Props = {
 };
 
 export const getUserMember = async ({ conversationId, clerkId }: Props) => {
+  await checkAuth();
+
   const member = await db.member.findFirst({
     where: {
       conversationId,
@@ -26,6 +30,10 @@ export const getUserMember = async ({ conversationId, clerkId }: Props) => {
       },
     },
   });
+
+  if (!member) {
+    redirect("/onboarding");
+  }
 
   return member;
 };

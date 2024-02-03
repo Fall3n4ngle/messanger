@@ -6,9 +6,10 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormFields, formSchema } from "../validations/formSchema";
 import { useToast } from "@/common/hooks";
-import { GroupInfo, GroupMembers, ToastMessage } from "@/components";
+import { GroupMembers, ToastMessage } from "@/components";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createConversation } from "../actions/conversation";
+import GroupInfo from "./GroupInfo";
 
 type Step = {
   id: string;
@@ -102,7 +103,11 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
       id: "info",
       fields: ["name", "image"],
       component: (
-        <GroupInfo isUploading={isUploading} setIsUploading={setIsUploading} />
+        <GroupInfo
+          isUploading={isUploading}
+          setIsUploading={setIsUploading}
+          onSubmit={handleNextClick}
+        />
       ),
     },
     {

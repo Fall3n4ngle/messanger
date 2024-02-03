@@ -1,13 +1,13 @@
 import { getConversationById } from "./actions/conversation";
 import { getUserMember } from "@/common/actions/member/queries";
 import { getMessages } from "@/common/actions/messages/queries";
-import { auth } from "@clerk/nextjs";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Messages } from "@/modules/messages";
 import { MessageForm } from "@/modules/messageForm";
 import ConversationHeading from "./components/ConversationHeading";
 import { MediaRoomButton } from "@/modules/mediaRoom";
 import { ConversationMenuButton } from "@/modules/conversationMenu";
+import { getUserAuth } from "@/common/dataAccess";
 
 type Props = {
   params: {
@@ -18,23 +18,15 @@ type Props = {
 export default async function Conversation({
   params: { conversationId },
 }: Props) {
-  const { userId: clerkId } = auth();
-
-  if (!clerkId) redirect("/sign-in");
-
-  const conversationPromise = getConversationById(conversationId);
-  const messagesPromise = getMessages({ conversationId });
-  const userMemberPromise = getUserMember({ conversationId, clerkId });
+  const { userId: clerkId } = await getUserAuth();
 
   const [conversation, messages, userMember] = await Promise.all([
-    conversationPromise,
-    messagesPromise,
-    userMemberPromise,
+    getConversationById(conversationId),
+    getMessages({ conversationId }),
+    getUserMember({ conversationId, clerkId }),
   ]);
 
   if (!conversation) notFound();
-  if (!userMember) redirect("/onboarding");
-
   const { id, name, image, isGroup, members } = conversation;
 
   return (
