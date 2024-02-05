@@ -1,8 +1,9 @@
 "use client";
 
-import NavigationItem from "./NavigationItem";
-import UserButton from "./UserButton";
 import { useLinks } from "../hooks/useLinks";
+import { useParams } from "next/navigation";
+import DesktopNavigation from "./DesktopNavigation";
+import MobileNavigation from "./MobileNavigation";
 
 type Props = {
   id: string;
@@ -12,20 +13,13 @@ type Props = {
 };
 
 export default function Navigation(props: Props) {
+  const isOnConversationPage = !!useParams()?.conversationId;
   const links = useLinks();
 
   return (
-    <aside className="p-4 pb-7 border-r flex flex-col justify-between">
-      <nav>
-        <ul className="flex flex-col gap-3">
-          {links.map((link) => (
-            <li key={link.href}>
-              <NavigationItem {...link} />
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <UserButton {...props} />
-    </aside>
+    <>
+      <DesktopNavigation links={links} {...props} />
+      {!isOnConversationPage && <MobileNavigation links={links} {...props} />}
+    </>
   );
 }

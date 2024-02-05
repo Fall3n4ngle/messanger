@@ -69,7 +69,7 @@ export default function MessageForm({ conversationId, user }: Props) {
   const isSubmitting = isSendingForm || isEditingForm;
 
   return (
-    <div className="px-6 py-4 max-w-[1000px] w-full">
+    <div className="max-w-[1000px] w-full">
       <Form {...form}>
         <div className="flex w-full items-center justify-between">
           <ImagePreview />

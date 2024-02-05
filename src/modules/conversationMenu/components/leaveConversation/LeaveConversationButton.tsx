@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/ui";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/common/hooks";
 import { deleteMember } from "../../actions/member";

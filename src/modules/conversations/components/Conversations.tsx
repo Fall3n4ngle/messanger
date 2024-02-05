@@ -17,8 +17,7 @@ type Props = {
 
 export default function Conversations({ intialConversations }: Props) {
   const { toast } = useToast();
-  const searchParams = useSearchParams();
-  const query = searchParams.get("query");
+  const query = useSearchParams().get("query");
 
   const { data, error } = useConversations({
     query,

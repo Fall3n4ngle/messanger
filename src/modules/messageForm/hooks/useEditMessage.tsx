@@ -9,7 +9,16 @@ export const useEditMessage = () => {
 
   return useMutation({
     mutationFn: editMessage,
-    onSuccess: () => {
+    onSuccess: (_, { conversationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["messages", conversationId],
+        stale: true,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
+      });
+
       toast({
         description: (
           <ToastMessage type="success" message="Edited message successfully" />
@@ -21,16 +30,6 @@ export const useEditMessage = () => {
         description: (
           <ToastMessage type="error" message="Failed to update message" />
         ),
-      });
-    },
-    onSettled: (_data, _error, { conversationId }) => {
-      queryClient.invalidateQueries({
-        queryKey: ["messages", conversationId],
-        stale: true,
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["conversations"],
       });
     },
   });

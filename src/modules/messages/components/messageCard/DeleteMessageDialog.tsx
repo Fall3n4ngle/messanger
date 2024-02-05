@@ -23,11 +23,7 @@ type Props = {
   previousMessageId: string | null;
 };
 
-export default function DeleteMessageButton({
-  conversationId,
-  messageId,
-  previousMessageId,
-}: Props) {
+export default function DeleteMessageButton(props: Props) {
   const queryClient = useQueryClient();
   const { messageData, resetMessageData } = useMessageForm();
   const { toast } = useToast();
@@ -43,7 +39,15 @@ export default function DeleteMessageButton({
         ),
       });
     },
-    onSuccess: (_, { messageId }) => {
+    onSuccess: (_, { messageId, conversationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["messages", conversationId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["conversations"],
+      });
+
       toast({
         description: (
           <ToastMessage type="success" message="Deleted message successfully" />
@@ -56,19 +60,10 @@ export default function DeleteMessageButton({
 
       setIsOpen(false);
     },
-    onSettled: (_data, _error, { conversationId }) => {
-      queryClient.invalidateQueries({
-        queryKey: ["messages", conversationId],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["conversations"],
-      });
-    },
   });
 
   const handleClick = () => {
-    mutate({ conversationId, messageId, previousMessageId });
+    mutate(props);
   };
 
   return (
@@ -89,7 +84,6 @@ export default function DeleteMessageButton({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Button
-            className="self-end"
             variant="destructive"
             disabled={isPending}
             onClick={handleClick}

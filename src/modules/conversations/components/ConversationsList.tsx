@@ -20,43 +20,41 @@ export default function ConversationsList({ conversations }: Props) {
   }
 
   return (
-    <ScrollArea className="px-4">
-      <ul className="flex flex-col gap-3">
-        {conversations.map(
-          ({
-            id,
-            lastMessage,
-            messages: unreadMessages,
-            updatedAt,
+    <ul className="flex flex-col gap-3 px-4">
+      {conversations.map(
+        ({
+          id,
+          lastMessage,
+          messages: unreadMessages,
+          updatedAt,
+          isGroup,
+          ...props
+        }) => {
+          const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
+          const isActive = pathname.includes(id);
+          const unreadMessagesCount = unreadMessages?.length;
+          const { message, seen } = getLastMessageData({
+            currentUserClerkId: userId,
             isGroup,
-            ...props
-          }) => {
-            const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
-            const isActive = pathname.includes(id);
-            const unreadMessagesCount = unreadMessages?.length;
-            const { message, seen } = getLastMessageData({
-              currentUserClerkId: userId,
-              isGroup,
-              lastMessage,
-            });
+            lastMessage,
+          });
 
-            return (
-              <li key={id}>
-                <Link href={`/conversations/${id}`}>
-                  <ConversationCard
-                    isActive={isActive}
-                    lastMessageAt={date}
-                    lastMessageContent={message}
-                    unreadMessagesCount={unreadMessagesCount}
-                    seen={seen}
-                    {...props}
-                  />
-                </Link>
-              </li>
-            );
-          }
-        )}
-      </ul>
-    </ScrollArea>
+          return (
+            <li key={id}>
+              <Link href={`/conversations/${id}`}>
+                <ConversationCard
+                  isActive={isActive}
+                  lastMessageAt={date}
+                  lastMessageContent={message}
+                  unreadMessagesCount={unreadMessagesCount}
+                  seen={seen}
+                  {...props}
+                />
+              </Link>
+            </li>
+          );
+        }
+      )}
+    </ul>
   );
 }

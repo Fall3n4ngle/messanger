@@ -6,40 +6,34 @@ import {
   TooltipTrigger,
   buttonVariants,
 } from "@/ui";
-import { LucideIcon } from "lucide-react";
 import { cn } from "@/common/utils";
+import { NavigationItem } from "../types";
 
-type Props = {
-  href: string;
-  Icon: LucideIcon;
-  onClick?: () => void;
-  active?: boolean;
-  label: string;
-};
-
-export default function NavigationItem({
+export default function DesktopItem({
   href,
-  Icon,
+  icon,
   label,
-  active,
+  isActive,
   onClick,
-}: Props) {
+}: NavigationItem) {
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
           <Link
             href={href}
-            onClick={onClick}
+            onClick={() => {
+              onClick && onClick();
+            }}
             className={cn(
               buttonVariants({
                 size: "icon",
-                variant: active ? "secondary" : "ghost",
+                variant: isActive ? "secondary" : "ghost",
               })
             )}
             aria-label={label}
           >
-            <Icon />
+            {icon}
           </Link>
         </TooltipTrigger>
         <TooltipContent side="right">{label}</TooltipContent>

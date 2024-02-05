@@ -41,7 +41,7 @@ export default function MessagesList({
   }, [dataUpdatedAt, isScrolledToBottom]);
 
   return (
-    <ScrollArea className="flex-1 px-6 pb-6 pt-3 relative">
+    <ScrollArea className="flex-1 px-4 md:px-6 py-6 relative">
       <Button
         variant="secondary"
         size="icon"

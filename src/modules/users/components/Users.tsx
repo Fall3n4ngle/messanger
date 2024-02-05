@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { ScrollArea } from "@/ui";
 import { useInView } from "react-intersection-observer";
 import { useAuth } from "@clerk/nextjs";
 import { useInfiniteUsers } from "../hooks/useInfiniteUsers";
@@ -50,10 +49,10 @@ export default function Users({ initialUsers, query }: Props) {
   }
 
   return (
-    <ScrollArea>
+    <>
       <UsersList users={data.pages} />
       {isFetchingNextPage && <UserCardSkeleton />}
       <div ref={bottomRef} className="pt-4" />
-    </ScrollArea>
+    </>
   );
 }
