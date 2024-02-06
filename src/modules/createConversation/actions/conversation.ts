@@ -32,7 +32,7 @@ export const createConversation = async (fields: CreateConversationFields) => {
       }))
       .concat({
         userId: currentUser.id,
-        role: "ADMIN",
+        role: "ADMIN" as MemberRole,
       });
 
     const createdConversation = await db.conversation.create({
@@ -50,7 +50,6 @@ export const createConversation = async (fields: CreateConversationFields) => {
         name: true,
         image: true,
         updatedAt: true,
-        isGroup: true,
         messages: {
           where: {
             AND: {

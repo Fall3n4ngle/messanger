@@ -8,7 +8,6 @@ export const getConversationById = async (conversationId: string) => {
         id: true,
         name: true,
         image: true,
-        isGroup: true,
         members: {
           include: {
             user: {

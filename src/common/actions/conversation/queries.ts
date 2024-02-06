@@ -32,7 +32,6 @@ export const getUserConversations = async ({
         name: true,
         image: true,
         updatedAt: true,
-        isGroup: true,
         messages: {
           where: {
             AND: {

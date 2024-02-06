@@ -30,7 +30,7 @@ export default async function Conversation({
     getUserMember({ conversationId, clerkId }),
   ]);
 
-  const { id, name, image, isGroup, members } = conversation;
+  const { id, name, image, members } = conversation;
 
   return (
     <div className="w-full h-screen">
@@ -52,7 +52,6 @@ export default async function Conversation({
               <MediaRoomButton conversationId={conversationId} />
               <ConversationMenuButton
                 memberRole={userMember.role}
-                isGroup={isGroup}
                 members={members}
                 conversationId={conversationId}
                 userMemberId={userMember.id}

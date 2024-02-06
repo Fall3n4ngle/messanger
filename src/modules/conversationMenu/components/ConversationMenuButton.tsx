@@ -21,7 +21,6 @@ import LeaveConversationButton from "./leaveConversation/LeaveConversationDialog
 
 type Props = {
   memberRole: MemberRole;
-  isGroup: boolean;
   members: UserMember[];
   conversationId: string;
   name: string;
@@ -30,7 +29,6 @@ type Props = {
 };
 
 export default function ConversationMenuButton({
-  isGroup,
   memberRole,
   members,
   conversationId,
@@ -38,7 +36,7 @@ export default function ConversationMenuButton({
   image,
   name,
 }: Props) {
-  const canEdit = isGroup && memberRole === "ADMIN";
+  const canMutate = memberRole === "ADMIN";
 
   return (
     <DropdownMenu>
@@ -63,7 +61,7 @@ export default function ConversationMenuButton({
         <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
           <ConversationInfoButton name={name} image={image} members={members} />
         </DropdownMenuItem>
-        {canEdit && (
+        {canMutate && (
           <>
             <DropdownMenuItem
               onSelect={(e) => e.preventDefault()}

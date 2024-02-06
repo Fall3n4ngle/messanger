@@ -37,7 +37,6 @@ model Conversation {
   id            String    @id @default(uuid())
   name          String
   image         String?
-  isGroup       Boolean   @default(false)
   lastMessage   Message?  @relation("LastMessage", fields: [lastMessageId], references: [id])
   lastMessageId String?   @unique
   createdAt     DateTime  @unique @default(now())
