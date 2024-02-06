@@ -6,7 +6,7 @@ import { ActiveStatus } from "@/components";
 import { getUserAuth } from "@/common/dataAccess";
 
 export default async function layout({ children }: PropsWithChildren) {
-  const { userId } = await getUserAuth()
+  const { userId } = await getUserAuth();
 
   const currentUser = await getUserByClerkId(userId);
   if (!currentUser) redirect("/onboarding");

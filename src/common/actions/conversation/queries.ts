@@ -12,71 +12,75 @@ export const getUserConversations = async ({
 }: GetConversationsProps) => {
   const { userId: clerkId } = await getUserAuth();
 
-  const convsersations = await db.conversation.findMany({
-    where: {
-      members: {
-        some: {
-          user: {
-            clerkId,
-          },
-        },
-      },
-      name: {
-        contains: query,
-        mode: "insensitive",
-      },
-    },
-    select: {
-      id: true,
-      name: true,
-      image: true,
-      updatedAt: true,
-      isGroup: true,
-      messages: {
-        where: {
-          AND: {
-            seenBy: {
-              none: {
-                clerkId,
-              },
-            },
+  try {
+    const convsersations = await db.conversation.findMany({
+      where: {
+        members: {
+          some: {
             user: {
-              clerkId: {
-                not: clerkId,
+              clerkId,
+            },
+          },
+        },
+        name: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        updatedAt: true,
+        isGroup: true,
+        messages: {
+          where: {
+            AND: {
+              seenBy: {
+                none: {
+                  clerkId,
+                },
+              },
+              user: {
+                clerkId: {
+                  not: clerkId,
+                },
+              },
+            },
+          },
+          select: {
+            id: true,
+          },
+        },
+        lastMessage: {
+          select: {
+            id: true,
+            content: true,
+            updatedAt: true,
+            file: true,
+            user: {
+              select: {
+                clerkId: true,
+                name: true,
+              },
+            },
+            _count: {
+              select: {
+                seenBy: true,
               },
             },
           },
         },
-        select: {
-          id: true,
-        },
       },
-      lastMessage: {
-        select: {
-          id: true,
-          content: true,
-          updatedAt: true,
-          file: true,
-          user: {
-            select: {
-              clerkId: true,
-              name: true,
-            },
-          },
-          _count: {
-            select: {
-              seenBy: true,
-            },
-          },
-        },
+      orderBy: {
+        updatedAt: "desc",
       },
-    },
-    orderBy: {
-      updatedAt: "desc",
-    },
-  });
+    });
 
-  return convsersations;
+    return convsersations;
+  } catch {
+    throw new Error("Failed to get your conversations");
+  }
 };
 
 export type UserConversation = Awaited<

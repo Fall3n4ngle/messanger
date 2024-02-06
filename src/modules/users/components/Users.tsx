@@ -9,15 +9,16 @@ import UsersList from "./UsersList";
 import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
 import { User } from "@/common/actions/user/queries";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   initialUsers: User[];
-  query?: string;
 };
 
-export default function Users({ initialUsers, query }: Props) {
+export default function Users({ initialUsers }: Props) {
   const { userId } = useAuth();
   const { toast } = useToast();
+  const query = useSearchParams().get("query") ?? undefined;
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,

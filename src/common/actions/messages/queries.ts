@@ -10,36 +10,40 @@ type Props = {
 export const getMessages = async ({ conversationId }: Props) => {
   await checkAuth();
 
-  const messages = await db.message.findMany({
-    where: {
-      conversationId,
-    },
-    select: {
-      id: true,
-      content: true,
-      file: true,
-      updatedAt: true,
-      conversationId: true,
-      user: {
-        select: {
-          id: true,
-          image: true,
-          name: true,
-          clerkId: true,
+  try {
+    const messages = await db.message.findMany({
+      where: {
+        conversationId,
+      },
+      select: {
+        id: true,
+        content: true,
+        file: true,
+        updatedAt: true,
+        conversationId: true,
+        user: {
+          select: {
+            id: true,
+            image: true,
+            name: true,
+            clerkId: true,
+          },
+        },
+        seenBy: {
+          select: {
+            id: true,
+          },
         },
       },
-      seenBy: {
-        select: {
-          id: true,
-        },
+      orderBy: {
+        createdAt: "asc",
       },
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-  });
+    });
 
-  return messages;
+    return messages;
+  } catch {
+    throw new Error("Failed to get messages");
+  }
 };
 
 export type Message = Awaited<ReturnType<typeof getMessages>>[number];

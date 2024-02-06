@@ -7,3 +7,4 @@ export { default as ActiveStatus } from "./ActiveStatus";
 export { default as Dropzone } from "./Dropzone";
 export { default as UploadImage } from "./UploadImage";
 export { GroupMembers } from "./GroupMembers";
+export { default as Loader } from "./Loader";

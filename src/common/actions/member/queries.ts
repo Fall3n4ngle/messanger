@@ -1,6 +1,5 @@
 import { checkAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
-import { redirect } from "next/navigation";
 
 type Props = {
   conversationId: string;
@@ -10,32 +9,36 @@ type Props = {
 export const getUserMember = async ({ conversationId, clerkId }: Props) => {
   await checkAuth();
 
-  const member = await db.member.findFirst({
-    where: {
-      conversationId,
-      user: {
-        clerkId,
-      },
-    },
-    select: {
-      id: true,
-      role: true,
-      user: {
-        select: {
-          id: true,
-          name: true,
-          image: true,
-          clerkId: true,
+  try {
+    const member = await db.member.findFirst({
+      where: {
+        conversationId,
+        user: {
+          clerkId,
         },
       },
-    },
-  });
+      select: {
+        id: true,
+        role: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            clerkId: true,
+          },
+        },
+      },
+    });
 
-  if (!member) {
-    redirect("/onboarding");
+    if (!member) {
+      throw new Error("User member not found");
+    }
+
+    return member;
+  } catch (error) {
+    throw new Error("Failed to get your member");
   }
-
-  return member;
 };
 
 export type UserMember = NonNullable<Awaited<ReturnType<typeof getUserMember>>>;

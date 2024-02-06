@@ -28,7 +28,7 @@ export default function ConversationsClient({ initialConversations }: Props) {
         </div>
         <CreateConversationButton />
       </div>
-      <ScrollArea className="max-w-[450px] w-full mx-auto md:mx-0">
+      <ScrollArea className="max-w-[450px] w-full mx-auto md:mx-0 pb-10 sm:pb-0">
         <Conversations intialConversations={initialConversations} />
       </ScrollArea>
     </div>

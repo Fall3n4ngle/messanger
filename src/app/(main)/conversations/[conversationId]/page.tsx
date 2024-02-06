@@ -22,13 +22,14 @@ export default async function Conversation({
 }: Props) {
   const { userId: clerkId } = await getUserAuth();
 
-  const [conversation, messages, userMember] = await Promise.all([
-    getConversationById(conversationId),
+  const conversation = await getConversationById(conversationId);
+  if (!conversation) notFound();
+
+  const [messages, userMember] = await Promise.all([
     getMessages({ conversationId }),
     getUserMember({ conversationId, clerkId }),
   ]);
 
-  if (!conversation) notFound();
   const { id, name, image, isGroup, members } = conversation;
 
   return (
