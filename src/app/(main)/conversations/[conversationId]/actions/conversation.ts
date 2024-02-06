@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
+import { cache } from "react";
 
-export const getConversationById = async (conversationId: string) => {
+export const getConversationById = cache(async (conversationId: string) => {
   try {
     const conversation = await db.conversation.findFirst({
       where: { id: conversationId },
@@ -27,4 +28,4 @@ export const getConversationById = async (conversationId: string) => {
   } catch {
     throw new Error("Failed to get conversation");
   }
-};
+});

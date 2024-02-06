@@ -4,6 +4,7 @@ import { Search } from "@/components";
 import { Users } from "@/modules/users";
 import { ScrollArea } from "@/ui";
 import { EmptyConversationMessage } from "@/components";
+import { Metadata } from "next";
 
 export default async function UsersPage() {
   const { userId } = await getUserAuth();
@@ -25,3 +26,8 @@ export default async function UsersPage() {
     </>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Users",
+  description: "A list of users registered in app",
+};

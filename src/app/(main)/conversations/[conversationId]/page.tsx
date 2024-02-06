@@ -10,6 +10,7 @@ import { ConversationMenuButton } from "@/modules/conversationMenu";
 import { getUserAuth } from "@/common/dataAccess";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from "next";
 
 type Props = {
   params: {
@@ -74,3 +75,14 @@ export default async function Conversation({
     </div>
   );
 }
+
+export const generateMetadata = async ({
+  params: { conversationId },
+}: Props) => {
+  const conversation = await getConversationById(conversationId);
+  if (!conversation) notFound();
+
+  return {
+    title: conversation.name,
+  } as Metadata;
+};
