@@ -8,17 +8,12 @@ import UserCardSkeleton from "./UserCardSkeleton";
 import UsersList from "./UsersList";
 import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
-import { User } from "@/common/actions/user/queries";
 import { useSearchParams } from "next/navigation";
 
-type Props = {
-  initialUsers: User[];
-};
-
-export default function Users({ initialUsers }: Props) {
+export default function Users() {
   const { userId } = useAuth();
   const { toast } = useToast();
-  const query = useSearchParams().get("query") ?? undefined;
+  const query = useSearchParams().get("query");
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,
@@ -26,8 +21,7 @@ export default function Users({ initialUsers }: Props) {
 
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteUsers({
-      userId: userId!,
-      initialUsers,
+      userId,
       query,
     });
 
@@ -45,7 +39,7 @@ export default function Users({ initialUsers }: Props) {
     return null;
   }
 
-  if (!data.pages[0].length) {
+  if (!data?.pages[0].length) {
     return <p className="ml-3">No users found</p>;
   }
 

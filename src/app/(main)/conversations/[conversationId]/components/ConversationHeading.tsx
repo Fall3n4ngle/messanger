@@ -1,23 +1,17 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui";
-import { useTypingUsers } from "@/common/hooks";
+import { useConversation, useTypingUsers } from "@/common/hooks";
 import { formatTypingUsers } from "@/common/utils";
+import { useParams } from "next/navigation";
 
-type Props = {
-  image: string | null;
-  name: string;
-  conversationId: string;
-  membersCount: number;
-};
-
-export default function ConversationHeading({
-  image,
-  name,
-  conversationId,
-  membersCount,
-}: Props) {
+export default function ConversationHeading() {
+  const conversationId = useParams().conversationId as string;
   const typingUsers = useTypingUsers({ conversationId });
+  const { data } = useConversation({ conversationId });
+
+  if (!data) return null;
+  const { image, name, members } = data;
 
   return (
     <div className="flex gap-3 items-center">
@@ -37,7 +31,7 @@ export default function ConversationHeading({
               {formatTypingUsers(typingUsers)}
             </span>
           ) : (
-            `${membersCount} members`
+            `${members.length} members`
           )}
         </p>
       </div>

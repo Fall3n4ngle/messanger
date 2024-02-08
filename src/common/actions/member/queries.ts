@@ -1,3 +1,5 @@
+"use server";
+
 import { checkAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
 
@@ -8,6 +10,7 @@ type Props = {
 
 export const getUserMember = async ({ conversationId, clerkId }: Props) => {
   await checkAuth();
+  console.log("getUserMember");
 
   try {
     const member = await db.member.findFirst({
@@ -24,8 +27,8 @@ export const getUserMember = async ({ conversationId, clerkId }: Props) => {
           select: {
             id: true,
             name: true,
-            image: true,
             clerkId: true,
+            image: true,
           },
         },
       },

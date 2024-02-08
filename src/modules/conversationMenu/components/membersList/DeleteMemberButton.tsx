@@ -1,6 +1,6 @@
 import { Button } from "@/ui";
 import { useToast } from "@/common/hooks";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteMember } from "../../actions/member";
 import { ToastMessage } from "@/components";
 import { Loader2 } from "lucide-react";
@@ -17,10 +17,15 @@ export default function DeleteMemberButton({
   onDialogClose,
 }: Props) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationFn: deleteMember,
     onSuccess: async () => {
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", conversationId],
+      });
+
       toast({
         description: (
           <ToastMessage type="success" message="Deleted member successfully" />

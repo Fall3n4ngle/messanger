@@ -6,15 +6,12 @@ type GetLastMessageContent = {
   content: string | null;
   file?: string | null;
   senderName: string;
-  isGroup: boolean;
 };
 
 const getLastMessageContent = ({
   content,
-  file,
   isOwn,
   senderName,
-  isGroup,
 }: GetLastMessageContent) => {
   let message;
 
@@ -23,16 +20,14 @@ const getLastMessageContent = ({
       maxLength: 18,
       sentence: content,
     });
-  } 
+  }
 
   let sender;
 
-  if (isGroup) {
-    if (isOwn) {
-      sender = "You:";
-    } else {
-      sender = `${senderName}:`;
-    }
+  if (isOwn) {
+    sender = "You:";
+  } else {
+    sender = `${senderName}:`;
   }
 
   return (
@@ -44,14 +39,12 @@ const getLastMessageContent = ({
 };
 
 type GetLastMessageDataProps = {
-  isGroup: boolean;
   currentUserClerkId: string;
   lastMessage?: UserConversation["lastMessage"];
 };
 
 export const getLastMessageData = ({
   currentUserClerkId,
-  isGroup,
   lastMessage,
 }: GetLastMessageDataProps) => {
   if (!lastMessage) {
@@ -70,7 +63,6 @@ export const getLastMessageData = ({
   const message = getLastMessageContent({
     content,
     file,
-    isGroup,
     isOwn,
     senderName: user.name,
   });

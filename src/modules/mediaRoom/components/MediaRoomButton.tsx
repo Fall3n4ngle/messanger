@@ -13,12 +13,10 @@ import {
 import { PhoneCall } from "lucide-react";
 import MediaRoom from "./MediaRoom";
 import { useState } from "react";
+import { useParams } from "next/navigation";
 
-type Props = {
-  conversationId: string;
-};
-
-export default function MediaRoomButton({ conversationId }: Props) {
+export default function MediaRoomButton() {
+  const conversationId = useParams().conversationId as string;
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDisconnect = () => {

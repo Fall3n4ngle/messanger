@@ -45,7 +45,7 @@ export default function DeleteMessageButton(props: Props) {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
 
       toast({

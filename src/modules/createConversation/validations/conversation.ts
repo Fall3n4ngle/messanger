@@ -4,7 +4,6 @@ import { z } from "zod";
 export const createConversationSchema = conversationSchema.pick({
   name: true,
   image: true,
-  isGroup: true,
   members: true,
 });
 

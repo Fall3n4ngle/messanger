@@ -5,10 +5,32 @@ import { Users } from "@/modules/users";
 import { ScrollArea } from "@/ui";
 import { EmptyConversationMessage } from "@/components";
 import { Metadata } from "next";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
 
-export default async function UsersPage() {
+type Props = {
+  searchParams: {
+    query?: string;
+  };
+};
+
+export default async function UsersPage({ searchParams }: Props) {
   const { userId } = await getUserAuth();
-  const users = await getUsers({ currentUserClerkId: userId });
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: ["users", searchParams.query ?? null],
+    queryFn: ({ pageParam }: { pageParam?: string }) =>
+      getUsers({
+        currentUserClerkId: userId,
+        query: null,
+        lastCursor: pageParam,
+      }),
+    initialPageParam: undefined,
+  });
 
   return (
     <>
@@ -17,7 +39,9 @@ export default async function UsersPage() {
           <Search id="searchUsers" label="Search users" />
         </div>
         <ScrollArea className="max-w-[450px] w-full mx-auto md:mx-0 pb-10 sm:pb-0">
-          <Users initialUsers={users} />
+          <HydrationBoundary state={dehydrate(queryClient)}>
+            <Users />
+          </HydrationBoundary>
         </ScrollArea>
       </div>
       <main className="hidden md:flex px-4 items-center justify-center w-full min-h-screen ">

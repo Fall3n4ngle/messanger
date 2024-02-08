@@ -60,6 +60,8 @@ export default function MessagesList({
       <div className="flex-1 flex flex-col gap-6" ref={messagesListRef}>
         {messages.map(({ user, ...props }, messageIndex) => {
           if (!user || !userId) return;
+          console.log(user);
+          
           const { clerkId } = user;
           const isOwn = clerkId === userId;
           const isActive = usersIds.includes(clerkId);

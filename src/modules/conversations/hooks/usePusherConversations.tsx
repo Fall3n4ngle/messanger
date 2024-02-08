@@ -2,7 +2,6 @@ import { pusherClient } from "@/lib/pusher/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { DeleteMemberEvent } from "@/common/types/events";
-import { revalidatePathFromClient } from "../actions/cache";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/common/hooks";
@@ -24,7 +23,7 @@ export const usePusherConversations = () => {
 
     const handleNewConversation = () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
     };
 
@@ -34,9 +33,9 @@ export const usePusherConversations = () => {
       conversationName,
     }: DeleteMemberEvent) => {
       if (userId !== currentUserId) {
-        if (pathname.includes(conversationId)) {
-          await revalidatePathFromClient(`/conversations/${conversationId}`);
-        }
+        queryClient.invalidateQueries({
+          queryKey: ["conversations", conversationId],
+        });
 
         return;
       }
@@ -44,7 +43,7 @@ export const usePusherConversations = () => {
       router.push("/conversations");
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
 
       toast({
@@ -61,20 +60,30 @@ export const usePusherConversations = () => {
       conversationId,
     }: ConversationEvent) => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
 
-      await revalidatePathFromClient(`/conversations/${conversationId}`);
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", conversationId],
+      });
     };
 
     const handleAddMembers = async ({ conversationId }: ConversationEvent) => {
-      await revalidatePathFromClient(`/conversations/${conversationId}`);
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", conversationId],
+      });
     };
 
     const handleMemberUpdate = async ({
       conversationId,
     }: ConversationEvent) => {
-      await revalidatePathFromClient(`/conversations/${conversationId}`);
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", conversationId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["member", conversationId, currentUserId],
+      });
     };
 
     pusherClient.bind("conversation:new", handleNewConversation);

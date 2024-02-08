@@ -27,7 +27,6 @@ export default function ConversationsList({ conversations }: Props) {
           lastMessage,
           messages: unreadMessages,
           updatedAt,
-          isGroup,
           ...props
         }) => {
           const date = formatDate(lastMessage?.updatedAt ?? updatedAt);
@@ -35,7 +34,6 @@ export default function ConversationsList({ conversations }: Props) {
           const unreadMessagesCount = unreadMessages?.length;
           const { message, seen } = getLastMessageData({
             currentUserClerkId: userId,
-            isGroup,
             lastMessage,
           });
 

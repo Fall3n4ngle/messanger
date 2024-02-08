@@ -11,6 +11,7 @@ import { getUserAuth } from "@/common/dataAccess";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
+import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
 
 type Props = {
   params: {
@@ -22,57 +23,50 @@ export default async function Conversation({
   params: { conversationId },
 }: Props) {
   const { userId: clerkId } = await getUserAuth();
+  const queryClient = new QueryClient();
 
-  const conversation = await getConversationById(conversationId);
-  if (!conversation) notFound();
+  await queryClient.prefetchQuery({
+    queryKey: ["conversations", conversationId],
+    queryFn: () => getConversationById(conversationId),
+  });
 
-  const [messages, userMember] = await Promise.all([
-    getMessages({ conversationId }),
-    getUserMember({ conversationId, clerkId }),
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["messages", conversationId],
+      queryFn: () => getMessages({ conversationId }),
+    }),
+
+    queryClient.prefetchQuery({
+      queryKey: ["member", conversationId, clerkId],
+      queryFn: () => getUserMember({ conversationId, clerkId }),
+    }),
   ]);
 
-  const { id, name, image, members } = conversation;
-
   return (
-    <div className="w-full h-screen">
-      <div className="flex flex-col h-full">
-        <div className="p-3 md:px-6 border-b w-full">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Link href="/conversations" className="mt-1 min-[900px]:hidden">
-                <ChevronLeft />
-              </Link>
-              <ConversationHeading
-                name={name}
-                image={image}
-                membersCount={members.length}
-                conversationId={conversationId}
-              />
-            </div>
-            <div className="flex items-center gap-1">
-              <MediaRoomButton conversationId={conversationId} />
-              <ConversationMenuButton
-                memberRole={userMember.role}
-                members={members}
-                conversationId={conversationId}
-                userMemberId={userMember.id}
-                name={name}
-                image={image}
-              />
+    <HydrationBoundary state={dehydrate(queryClient)} >
+      <div className="w-full h-screen">
+        <div className="flex flex-col h-full">
+          <div className="p-3 md:px-6 border-b w-full">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Link href="/conversations" className="mt-1 min-[900px]:hidden">
+                  <ChevronLeft />
+                </Link>
+                <ConversationHeading />
+              </div>
+              <div className="flex items-center gap-1">
+                <MediaRoomButton />
+                <ConversationMenuButton />
+              </div>
             </div>
           </div>
-        </div>
-        <Messages
-          initialMessages={messages}
-          conversationId={id}
-          memberRole={userMember.role}
-          currentUserId={userMember.user.id}
-        />
-        <div className="self-center w-full px-3 md:px-6 py-4 flex justify-center border-t">
-          <MessageForm conversationId={id} user={userMember.user} />
+          <Messages />
+          <div className="self-center w-full px-3 md:px-6 py-4 flex justify-center border-t">
+            <MessageForm />
+          </div>
         </div>
       </div>
-    </div>
+    </HydrationBoundary>
   );
 }
 

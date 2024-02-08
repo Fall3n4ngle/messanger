@@ -9,6 +9,7 @@ export const useSendMessage = () => {
 
   return useMutation({
     mutationFn: sendMessage,
+
     onError: () => {
       toast({
         description: (
@@ -22,7 +23,7 @@ export const useSendMessage = () => {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
     },
   });

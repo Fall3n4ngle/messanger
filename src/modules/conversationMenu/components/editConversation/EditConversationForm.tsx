@@ -49,7 +49,11 @@ export default function EditConversationForm({
     mutationFn: editConversation,
     onSuccess: async () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", id],
       });
 
       onDialogClose();

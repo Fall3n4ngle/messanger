@@ -1,7 +1,9 @@
 "use server";
 
-import { getUserAuth } from "@/common/dataAccess";
+import { checkAuth, getUserAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 
 export type GetConversationsProps = {
   query?: string;
@@ -85,3 +87,33 @@ export const getUserConversations = async ({
 export type UserConversation = Awaited<
   ReturnType<typeof getUserConversations>
 >[number];
+
+export const getConversationById = cache(async (conversationId: string) => {
+  console.log("getConversationById");
+  await checkAuth();
+
+  const conversation = await db.conversation.findFirst({
+    where: { id: conversationId },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      members: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              clerkId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!conversation) notFound();
+
+  return conversation;
+});

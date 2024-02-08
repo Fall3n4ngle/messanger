@@ -38,8 +38,6 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
       },
     });
 
-    revalidatePath(`/conversations/${conversationId}`);
-
     const conversation = await db.conversation.findFirst({
       where: { id: conversationId },
       select: {
@@ -124,8 +122,6 @@ export const deleteMember = async (data: DeleteMemberFields) => {
         },
       },
     });
-
-    revalidatePath(`/conversations/${conversationId}`);
 
     conversation?.members.forEach((member) => {
       if (userId !== deletedMember.user.clerkId) {

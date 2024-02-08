@@ -45,7 +45,7 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
       setStep(0);
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
 
       toast({
@@ -74,7 +74,6 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
     const { members, ...data } = fields;
 
     mutate({
-      isGroup: true,
       members: members.map(({ value }) => ({ id: value })),
       ...data,
     });

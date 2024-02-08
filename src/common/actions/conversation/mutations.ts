@@ -53,8 +53,6 @@ export const addMembers = async (fields: AddMembersFields) => {
       },
     });
 
-    revalidatePath(`/conversations/${id}`);
-
     updatedConversation.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
         const conversationChannel = `${member.user.clerkId}_conversations`;

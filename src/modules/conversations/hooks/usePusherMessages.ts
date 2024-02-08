@@ -22,7 +22,7 @@ export const usePusherMessages = () => {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
     };
 

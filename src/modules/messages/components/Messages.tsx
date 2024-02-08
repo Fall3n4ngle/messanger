@@ -1,26 +1,16 @@
 "use client";
 
-import { MemberRole } from "@prisma/client";
-import { Message } from "@/common/actions/messages/queries";
 import { useMessages } from "../hooks/useMessages";
 import MessagesList from "./MessagesList";
-import { useToast } from "@/common/hooks";
+import { useMember, useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
+import { useParams } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
-type Props = {
-  initialMessages: Message[];
-  conversationId: string;
-  memberRole: MemberRole;
-  currentUserId: string;
-};
-
-export default function Messages({
-  conversationId,
-  initialMessages,
-  memberRole,
-  currentUserId,
-}: Props) {
+export default function Messages() {
   const { toast } = useToast();
+  const conversationId = useParams().conversationId as string;
+  const { userId: clerkId } = useAuth();
 
   const {
     data: messages,
@@ -28,7 +18,11 @@ export default function Messages({
     error,
   } = useMessages({
     conversationId,
-    initialMessages,
+  });
+
+  const { data: member } = useMember({
+    conversationId,
+    clerkId: clerkId ?? "",
   });
 
   if (error) {
@@ -41,7 +35,7 @@ export default function Messages({
     return null;
   }
 
-  if (messages.length < 1) {
+  if (!messages?.length) {
     return (
       <div className="flex items-center justify-center h-full w-full">
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
@@ -53,8 +47,8 @@ export default function Messages({
 
   return (
     <MessagesList
-      currentUserId={currentUserId}
-      memberRole={memberRole}
+      currentUserId={member?.user.id ?? ""}
+      memberRole={member?.role ?? "VIEW"}
       messages={messages}
       dataUpdatedAt={dataUpdatedAt}
     />

@@ -9,20 +9,20 @@ import ContentInput from "./ContentInput";
 import { sendMessageSchema } from "../validations/message";
 import { useSendMessage, useEditMessage } from "../hooks";
 import { useMessageForm } from "@/common/store/useMessageForm";
-import { Message } from "@/common/actions/messages/queries";
 import ExitEditingButton from "./ExitEditingButton";
 import ImagePreview from "./ImagePreview";
 import UploadButton from "./UploadButton";
 import SubmitButton from "./SubmitButton";
-
-type Props = {
-  conversationId: string;
-} & Pick<Message, "user">;
+import { useAuth } from "@clerk/nextjs";
+import { useParams } from "next/navigation";
+import { useMember } from "@/common/hooks";
 
 const formSchema = sendMessageSchema.pick({ content: true, file: true });
 type FormFields = z.infer<typeof formSchema>;
 
-export default function MessageForm({ conversationId, user }: Props) {
+export default function MessageForm() {
+  const { userId: clerkId } = useAuth();
+  const conversationId = useParams().conversationId as string;
   const { messageData, resetMessageData } = useMessageForm();
   const { mutate: sendMessage, isPending: isSendingForm } = useSendMessage();
   const { mutate: updateMessage, isPending: isEditingForm } = useEditMessage();
@@ -37,6 +37,13 @@ export default function MessageForm({ conversationId, user }: Props) {
     },
   });
 
+  const { data: member } = useMember({
+    conversationId,
+    clerkId: clerkId ?? "",
+  });
+
+  if (!member) return null;
+
   const onSubmit = async (fields: FormFields) => {
     if (isUploading) return;
 
@@ -44,7 +51,7 @@ export default function MessageForm({ conversationId, user }: Props) {
       sendMessage({
         ...fields,
         conversationId,
-        userId: user.id,
+        userId: member.user.id,
       });
 
       form.reset();
@@ -104,7 +111,7 @@ export default function MessageForm({ conversationId, user }: Props) {
                 <FormControl>
                   <ContentInput
                     conversationId={conversationId}
-                    userName={user.name}
+                    userName={member.user.name}
                     {...field}
                   />
                 </FormControl>

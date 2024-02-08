@@ -1,18 +1,17 @@
-import { User, getUsers } from "@/common/actions/user/queries";
+import { getUsers } from "@/common/actions/user/queries";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 type Props = {
-  initialUsers: User[];
-  query?: string;
-  userId: string;
+  query: string | null;
+  userId?: string | null;
 };
 
 const take = 25;
 
-export const useInfiniteUsers = ({ initialUsers, query, userId }: Props) => {
+export const useInfiniteUsers = ({ query, userId }: Props) => {
   const getData = async ({ pageParam }: { pageParam?: string }) => {
     const users = await getUsers({
-      currentUserClerkId: userId,
+      currentUserClerkId: userId ?? "",
       lastCursor: pageParam,
       query,
       take,
@@ -31,10 +30,6 @@ export const useInfiniteUsers = ({ initialUsers, query, userId }: Props) => {
       }
 
       return lastPage[lastPage.length - 1].id;
-    },
-    initialData: {
-      pages: [initialUsers],
-      pageParams: [undefined],
     },
   });
 };

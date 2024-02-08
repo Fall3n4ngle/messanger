@@ -9,6 +9,7 @@ type Props = {
 
 export const getMessages = async ({ conversationId }: Props) => {
   await checkAuth();
+  console.log("getMessages");
 
   try {
     const messages = await db.message.findMany({

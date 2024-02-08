@@ -12,31 +12,30 @@ import {
   TooltipTrigger,
 } from "@/ui";
 import { MoreVertical } from "lucide-react";
-import { MemberRole } from "@prisma/client";
-import { UserMember } from "@/common/actions/member/queries";
 import ConversationInfoButton from "./conversationInfo/ConversationInfoButton";
 import ManageMembersButton from "./ManageMembersButton";
 import EditConversationButton from "./editConversation/EditConversationButton";
 import LeaveConversationButton from "./leaveConversation/LeaveConversationDialog";
+import { useParams } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+import { useConversation, useMember } from "@/common/hooks";
 
-type Props = {
-  memberRole: MemberRole;
-  members: UserMember[];
-  conversationId: string;
-  name: string;
-  image: string | null;
-  userMemberId: string;
-};
+export default function ConversationMenuButton() {
+  const conversationId = useParams().conversationId as string;
+  const { userId: clerkId } = useAuth();
 
-export default function ConversationMenuButton({
-  memberRole,
-  members,
-  conversationId,
-  userMemberId,
-  image,
-  name,
-}: Props) {
-  const canMutate = memberRole === "ADMIN";
+  const { data: conversation } = useConversation({ conversationId });
+  const { data: member } = useMember({
+    clerkId: clerkId ?? "",
+    conversationId,
+  });
+
+  if (!member || !conversation) return null;
+
+  const { name, image, members } = conversation;
+  const { id: memberId, role } = member;
+
+  const canMutate = role === "ADMIN";
 
   return (
     <DropdownMenu>
@@ -82,7 +81,7 @@ export default function ConversationMenuButton({
         <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
           <LeaveConversationButton
             conversationId={conversationId}
-            memberId={userMemberId}
+            memberId={memberId}
           />
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -12,16 +12,16 @@ export const useMarkAsSeen = () => {
     mutationFn: markAsSeen,
     onMutate: async ({ conversationId, messageId }) => {
       await queryClient.cancelQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
 
       const previousData = queryClient.getQueriesData({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
 
       queryClient.setQueriesData(
         {
-          queryKey: ["conversations"],
+          queryKey: ["conversations", "list"],
         },
         (oldData: UserConversation[] | undefined) => {
           if (!oldData) return [];
@@ -48,7 +48,7 @@ export const useMarkAsSeen = () => {
     onError: (_error, _variables, context) => {
       queryClient.setQueriesData(
         {
-          queryKey: ["conversations"],
+          queryKey: ["conversations", "list"],
         },
         context?.previousData
       );

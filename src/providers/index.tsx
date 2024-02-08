@@ -5,6 +5,7 @@ import { ThemeProvider } from "./Theme";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +26,7 @@ export default function Providers({ children }: PropsWithChildren) {
       <ClerkProvider>
         <QueryClientProvider client={queryClient}>
           {children}
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
         <Toaster />
       </ClerkProvider>

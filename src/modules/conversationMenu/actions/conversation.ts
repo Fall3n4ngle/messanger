@@ -7,7 +7,6 @@ import {
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { ConversationEvent } from "@/common/types/events";
-import { revalidatePath } from "next/cache";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
 
 export const editConversation = async (data: EditConversationFields) => {
@@ -43,8 +42,6 @@ export const editConversation = async (data: EditConversationFields) => {
         },
       },
     });
-
-    revalidatePath(`/conversations/${id}`);
 
     const { members, ...conversation } = updatedGroup;
 

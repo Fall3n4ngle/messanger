@@ -17,7 +17,7 @@ export const getUserByClerkId = async (clerkId: string) => {
 
 type Props = {
   currentUserClerkId: string;
-  query?: string;
+  query: string | null;
   take?: number;
   lastCursor?: string;
 };
@@ -37,7 +37,7 @@ export const getUsers = async ({
           clerkId: currentUserClerkId,
         },
         name: {
-          contains: query,
+          contains: query ?? "",
           mode: "insensitive",
         },
       },

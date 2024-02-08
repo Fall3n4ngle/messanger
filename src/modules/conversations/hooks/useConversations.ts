@@ -14,7 +14,7 @@ export const useConversations = ({
   query,
 }: UseInfiniteConversationsProps) => {
   return useQuery({
-    queryKey: ["conversations", query],
+    queryKey: ["conversations", "list", query],
     queryFn: () => getUserConversations({ query: query ?? "" }),
     initialData: intialConversations,
   });

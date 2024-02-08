@@ -15,7 +15,7 @@ import { ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/common/utils";
 import { AvailableRoles, availableMemberRoles } from "../../const";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/common/hooks";
 import { changeMemberRole } from "../../actions/member";
 import { ToastMessage } from "@/components";
@@ -28,6 +28,7 @@ type Props = {
 
 export default function MemberRoles({ id, role, conversationId }: Props) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [optimisticRole, setOptimisticRole] = useState(role);
 
@@ -49,6 +50,11 @@ export default function MemberRoles({ id, role, conversationId }: Props) {
         description: (
           <ToastMessage type="error" message="Failed to change role" />
         ),
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", conversationId],
       });
     },
   });

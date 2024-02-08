@@ -6,7 +6,7 @@ import { Button, Form } from "@/ui";
 import { GroupMembers } from "@/components";
 import { formMembersSchema, FormMembersFields } from "@/common/validations";
 import { addMembers } from "@/common/actions/conversation/mutations";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
 type Props = {
@@ -21,6 +21,7 @@ export default function AddMembersForm({
   currentMembers,
 }: Props) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<FormMembersFields>({
     resolver: zodResolver(formMembersSchema),
@@ -32,6 +33,10 @@ export default function AddMembersForm({
   const { mutate, isPending } = useMutation({
     mutationFn: addMembers,
     onSuccess: async () => {
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", conversationId],
+      });
+
       toast({
         description: (
           <ToastMessage type="success" message="Members added successfully" />

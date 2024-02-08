@@ -16,7 +16,7 @@ export const useEditMessage = () => {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ["conversations", "list"],
       });
 
       toast({
