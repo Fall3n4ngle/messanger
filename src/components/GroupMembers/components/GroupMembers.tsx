@@ -10,22 +10,18 @@ import {
 } from "@/ui";
 import { useFormContext } from "react-hook-form";
 import { loadUsers } from "../api/loadUsers";
-import { useAuth } from "@clerk/nextjs";
 
 type Props = {
   excludedUsers?: string[];
 };
 
 export default function GroupMembersForm({ excludedUsers }: Props) {
-  const { userId } = useAuth();
   const { control, getValues } = useFormContext();
 
   const filterOption = (option: { value: string }) => {
     if (excludedUsers?.length === 0) return true;
     return !excludedUsers?.includes(option.value);
   };
-
-  if (!userId) return null;
 
   return (
     <FormField
@@ -43,7 +39,7 @@ export default function GroupMembersForm({ excludedUsers }: Props) {
                 defaultValue={getValues("members")}
                 filterOption={filterOption}
                 loadOptions={(query) =>
-                  loadUsers({ query, currentUserClerkId: userId })
+                  loadUsers({ query })
                 }
                 onChange={(data) => {
                   onChange(data);

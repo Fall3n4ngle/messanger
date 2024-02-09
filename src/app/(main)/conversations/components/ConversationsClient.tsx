@@ -3,16 +3,11 @@
 import { UserConversation } from "@/common/actions/conversation/queries";
 import { cn } from "@/common/utils";
 import { Search } from "@/components";
-import { Conversations } from "@/modules/conversations";
 import { CreateConversationButton } from "@/modules/createConversation";
-import { ScrollArea } from "@/ui";
 import { useParams } from "next/navigation";
+import { PropsWithChildren } from "react";
 
-type Props = {
-  initialConversations: UserConversation[];
-};
-
-export default function ConversationsClient({ initialConversations }: Props) {
+export default function ConversationsClient({ children }: PropsWithChildren) {
   const isOnConversationPage = !!useParams()?.conversationId;
 
   return (
@@ -28,9 +23,7 @@ export default function ConversationsClient({ initialConversations }: Props) {
         </div>
         <CreateConversationButton />
       </div>
-      <ScrollArea className="max-w-[450px] w-full mx-auto md:mx-0 pb-10 sm:pb-0">
-        <Conversations intialConversations={initialConversations} />
-      </ScrollArea>
+      {children}
     </div>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import { useAuth } from "@clerk/nextjs";
 import { useInfiniteUsers } from "../hooks/useInfiniteUsers";
 import UserCardSkeleton from "./UserCardSkeleton";
 import UsersList from "./UsersList";
@@ -10,8 +9,7 @@ import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
 import { useSearchParams } from "next/navigation";
 
-export default function Users() {
-  const { userId } = useAuth();
+export default function UsersClient() {
   const { toast } = useToast();
   const query = useSearchParams().get("query");
 
@@ -21,7 +19,6 @@ export default function Users() {
 
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteUsers({
-      userId,
       query,
     });
 

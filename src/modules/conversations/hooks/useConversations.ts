@@ -1,21 +1,13 @@
-import {
-  UserConversation,
-  getUserConversations,
-} from "@/common/actions/conversation/queries";
+import { getUserConversations } from "@/common/actions/conversation/queries";
 import { useQuery } from "@tanstack/react-query";
 
 type UseInfiniteConversationsProps = {
   query: string | null;
-  intialConversations: UserConversation[];
 };
 
-export const useConversations = ({
-  intialConversations,
-  query,
-}: UseInfiniteConversationsProps) => {
+export const useConversations = ({ query }: UseInfiniteConversationsProps) => {
   return useQuery({
     queryKey: ["conversations", "list", query],
     queryFn: () => getUserConversations({ query: query ?? "" }),
-    initialData: intialConversations,
   });
 };

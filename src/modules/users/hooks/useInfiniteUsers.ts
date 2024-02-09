@@ -3,15 +3,13 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 type Props = {
   query: string | null;
-  userId?: string | null;
 };
 
 const take = 25;
 
-export const useInfiniteUsers = ({ query, userId }: Props) => {
+export const useInfiniteUsers = ({ query }: Props) => {
   const getData = async ({ pageParam }: { pageParam?: string }) => {
     const users = await getUsers({
-      currentUserClerkId: userId ?? "",
       lastCursor: pageParam,
       query,
       take,

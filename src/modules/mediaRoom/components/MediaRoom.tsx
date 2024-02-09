@@ -1,26 +1,23 @@
-"use client";
-
 import "@livekit/components-styles";
 import {
   LiveKitRoom,
   GridLayout,
   ParticipantTile,
-  useTracks,
   RoomAudioRenderer,
   ControlBar,
-  Chat,
+  useTracks,
 } from "@livekit/components-react";
 import { useEffect, useState } from "react";
 import { Track } from "livekit-client";
 import { useUser } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
+import { Loader } from "@/components";
 
 type Props = {
   conversationId: string;
   onDisconected: () => void;
 };
 
-export default function MediaRoom({ conversationId, onDisconected }: Props) {
+export default function Page({ conversationId, onDisconected }: Props) {
   const { user } = useUser();
   const [token, setToken] = useState("");
 
@@ -43,11 +40,7 @@ export default function MediaRoom({ conversationId, onDisconected }: Props) {
   }, [conversationId, user?.firstName, user?.lastName]);
 
   if (token === "") {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
@@ -63,7 +56,6 @@ export default function MediaRoom({ conversationId, onDisconected }: Props) {
       <MyVideoConference />
       <RoomAudioRenderer />
       <ControlBar />
-      <Chat />
     </LiveKitRoom>
   );
 }

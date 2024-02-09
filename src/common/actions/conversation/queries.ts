@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 export type GetConversationsProps = {
-  query?: string;
+  query: string | null;
 };
 
 export const getUserConversations = async ({
@@ -25,7 +25,7 @@ export const getUserConversations = async ({
           },
         },
         name: {
-          contains: query,
+          contains: query ?? "",
           mode: "insensitive",
         },
       },

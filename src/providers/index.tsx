@@ -26,7 +26,6 @@ export default function Providers({ children }: PropsWithChildren) {
       <ClerkProvider>
         <QueryClientProvider client={queryClient}>
           {children}
-          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
         <Toaster />
       </ClerkProvider>

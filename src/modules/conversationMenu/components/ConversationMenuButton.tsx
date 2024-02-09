@@ -17,16 +17,13 @@ import ManageMembersButton from "./ManageMembersButton";
 import EditConversationButton from "./editConversation/EditConversationButton";
 import LeaveConversationButton from "./leaveConversation/LeaveConversationDialog";
 import { useParams } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import { useConversation, useMember } from "@/common/hooks";
 
 export default function ConversationMenuButton() {
   const conversationId = useParams().conversationId as string;
-  const { userId: clerkId } = useAuth();
 
   const { data: conversation } = useConversation({ conversationId });
   const { data: member } = useMember({
-    clerkId: clerkId ?? "",
     conversationId,
   });
 

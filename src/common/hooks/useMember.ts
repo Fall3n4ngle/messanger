@@ -3,13 +3,12 @@ import { getUserMember } from "../actions/member/queries";
 
 type Props = {
   conversationId: string;
-  clerkId: string;
 };
 
-export const useMember = ({ clerkId, conversationId }: Props) => {
+export const useMember = ({ conversationId }: Props) => {
   return useQuery({
-    queryKey: ["member", conversationId, clerkId],
-    queryFn: () => getUserMember({ conversationId, clerkId }),
-    enabled: !!conversationId && !!clerkId,
+    queryKey: ["member", conversationId],
+    queryFn: () => getUserMember({ conversationId }),
+    enabled: !!conversationId,
   });
 };

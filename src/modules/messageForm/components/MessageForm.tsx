@@ -13,7 +13,6 @@ import ExitEditingButton from "./ExitEditingButton";
 import ImagePreview from "./ImagePreview";
 import UploadButton from "./UploadButton";
 import SubmitButton from "./SubmitButton";
-import { useAuth } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { useMember } from "@/common/hooks";
 
@@ -21,7 +20,6 @@ const formSchema = sendMessageSchema.pick({ content: true, file: true });
 type FormFields = z.infer<typeof formSchema>;
 
 export default function MessageForm() {
-  const { userId: clerkId } = useAuth();
   const conversationId = useParams().conversationId as string;
   const { messageData, resetMessageData } = useMessageForm();
   const { mutate: sendMessage, isPending: isSendingForm } = useSendMessage();
@@ -39,7 +37,6 @@ export default function MessageForm() {
 
   const { data: member } = useMember({
     conversationId,
-    clerkId: clerkId ?? "",
   });
 
   if (!member) return null;

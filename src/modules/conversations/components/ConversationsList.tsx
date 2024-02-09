@@ -1,5 +1,4 @@
 import { usePathname } from "next/navigation";
-import { ScrollArea } from "@/ui";
 import { formatDate } from "@/common/utils";
 import { getLastMessageData } from "../utils/getLastMessage";
 import Link from "next/link";
@@ -20,7 +19,7 @@ export default function ConversationsList({ conversations }: Props) {
   }
 
   return (
-    <ul className="flex flex-col gap-3 px-4">
+    <ul className="flex flex-col gap-3">
       {conversations.map(
         ({
           id,

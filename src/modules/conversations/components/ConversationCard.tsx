@@ -32,7 +32,7 @@ export default function ConversationCard({
       <Avatar>
         {image && <AvatarImage src={image} alt={`${name} image`} />}
         <AvatarFallback className="bg-primary text-primary-foreground">
-          {name[0].toUpperCase()}
+          {name && name[0].toUpperCase()}
         </AvatarFallback>
       </Avatar>
       <div className="grow">

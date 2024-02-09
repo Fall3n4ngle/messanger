@@ -10,7 +10,6 @@ import { useAuth } from "@clerk/nextjs";
 export default function Messages() {
   const { toast } = useToast();
   const conversationId = useParams().conversationId as string;
-  const { userId: clerkId } = useAuth();
 
   const {
     data: messages,
@@ -22,7 +21,6 @@ export default function Messages() {
 
   const { data: member } = useMember({
     conversationId,
-    clerkId: clerkId ?? "",
   });
 
   if (error) {

@@ -7,11 +7,15 @@ import { MessageForm } from "@/modules/messageForm";
 import ConversationHeading from "./components/ConversationHeading";
 import { MediaRoomButton } from "@/modules/mediaRoom";
 import { ConversationMenuButton } from "@/modules/conversationMenu";
-import { getUserAuth } from "@/common/dataAccess";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
-import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
+import { ScrollArea } from "@/ui";
 
 type Props = {
   params: {
@@ -22,7 +26,6 @@ type Props = {
 export default async function Conversation({
   params: { conversationId },
 }: Props) {
-  const { userId: clerkId } = await getUserAuth();
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
@@ -37,19 +40,23 @@ export default async function Conversation({
     }),
 
     queryClient.prefetchQuery({
-      queryKey: ["member", conversationId, clerkId],
-      queryFn: () => getUserMember({ conversationId, clerkId }),
+      queryKey: ["member", conversationId],
+      queryFn: () => getUserMember({ conversationId }),
     }),
   ]);
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)} >
-      <div className="w-full h-screen">
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="w-full h-full">
         <div className="flex flex-col h-full">
           <div className="p-3 md:px-6 border-b w-full">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <Link href="/conversations" className="mt-1 min-[900px]:hidden">
+                <Link
+                  href="/conversations"
+                  className="mt-1 min-[900px]:hidden"
+                  aria-label="Back to conversations"
+                >
                   <ChevronLeft />
                 </Link>
                 <ConversationHeading />
@@ -60,7 +67,9 @@ export default async function Conversation({
               </div>
             </div>
           </div>
-          <Messages />
+          <ScrollArea className="flex-1 px-4 md:px-6 py-6 relative">
+            <Messages />
+          </ScrollArea>
           <div className="self-center w-full px-3 md:px-6 py-4 flex justify-center border-t">
             <MessageForm />
           </div>

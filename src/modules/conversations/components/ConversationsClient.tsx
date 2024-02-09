@@ -9,19 +9,13 @@ import {
 import ConversationsList from "./ConversationsList";
 import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
-import { UserConversation } from "@/common/actions/conversation/queries";
 
-type Props = {
-  intialConversations: UserConversation[];
-};
-
-export default function Conversations({ intialConversations }: Props) {
+export default function ConversationsClient() {
   const { toast } = useToast();
   const query = useSearchParams().get("query");
 
   const { data, error } = useConversations({
     query,
-    intialConversations,
   });
 
   usePusherConversations();
@@ -37,7 +31,7 @@ export default function Conversations({ intialConversations }: Props) {
     return null;
   }
 
-  if (!data.length) {
+  if (!data?.length) {
     return <p className="pl-3">No conversations found</p>;
   }
 

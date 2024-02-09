@@ -1,15 +1,14 @@
 "use server";
 
-import { checkAuth } from "@/common/dataAccess";
+import { getUserAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
 
 type Props = {
   conversationId: string;
-  clerkId: string;
 };
 
-export const getUserMember = async ({ conversationId, clerkId }: Props) => {
-  await checkAuth();
+export const getUserMember = async ({ conversationId }: Props) => {
+  const { userId } = await getUserAuth();
   console.log("getUserMember");
 
   try {
@@ -17,7 +16,7 @@ export const getUserMember = async ({ conversationId, clerkId }: Props) => {
       where: {
         conversationId,
         user: {
-          clerkId,
+          clerkId: userId,
         },
       },
       select: {

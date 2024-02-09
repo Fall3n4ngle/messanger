@@ -1,5 +1,6 @@
 "use server";
 
+import { getUserAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
 
 export const getUserByClerkId = async (clerkId: string) => {
@@ -16,25 +17,24 @@ export const getUserByClerkId = async (clerkId: string) => {
 };
 
 type Props = {
-  currentUserClerkId: string;
   query: string | null;
   take?: number;
   lastCursor?: string;
 };
 
 export const getUsers = async ({
-  currentUserClerkId,
   query = "",
   lastCursor,
   take = 25,
 }: Props) => {
+  const { userId } = await getUserAuth();
   const cursor = lastCursor ? { id: lastCursor } : undefined;
 
   try {
     const users = await db.user.findMany({
       where: {
         NOT: {
-          clerkId: currentUserClerkId,
+          clerkId: userId,
         },
         name: {
           contains: query ?? "",
