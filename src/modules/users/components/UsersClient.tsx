@@ -14,7 +14,7 @@ export default function UsersClient() {
     threshold: 1,
   });
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, error } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteUsers({
       query,
     });
@@ -24,10 +24,6 @@ export default function UsersClient() {
       fetchNextPage();
     }
   }, [hasNextPage, inView, fetchNextPage]);
-
-  if (error) {
-    return "error"
-  }
 
   if (!data?.pages[0].length) {
     return <p className="ml-3">No users found</p>;

@@ -1,7 +1,7 @@
 import { Message } from "@/common/actions/messages/queries";
 import { useActiveUsers } from "@/common/store";
 import { cn } from "@/common/utils";
-import { Button } from "@/ui";
+import { Button, ScrollArea } from "@/ui";
 import { useAuth } from "@clerk/nextjs";
 import { ChevronsDown } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -41,7 +41,7 @@ export default function MessagesList({
   }, [dataUpdatedAt, isScrolledToBottom]);
 
   return (
-    <>
+    <ScrollArea className="flex-1 h-full px-4 md:px-6 py-6 relative">
       <Button
         variant="secondary"
         size="icon"
@@ -85,6 +85,6 @@ export default function MessagesList({
         })}
       </div>
       <div ref={bottomRef} />
-    </>
+    </ScrollArea>
   );
 }

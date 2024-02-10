@@ -7,12 +7,17 @@ import { cache } from "react";
 
 export type GetConversationsProps = {
   query: string | null;
+  take?: number;
+  lastCursor?: string;
 };
 
 export const getUserConversations = async ({
   query = "",
+  lastCursor,
+  take,
 }: GetConversationsProps) => {
   const { userId: clerkId } = await getUserAuth();
+  const cursor = lastCursor ? { id: lastCursor } : undefined;
 
   try {
     const convsersations = await db.conversation.findMany({
@@ -76,6 +81,9 @@ export const getUserConversations = async ({
       orderBy: {
         updatedAt: "desc",
       },
+      take,
+      cursor,
+      skip: cursor ? 1 : 0,
     });
 
     return convsersations;

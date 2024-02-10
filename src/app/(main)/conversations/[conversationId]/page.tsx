@@ -15,7 +15,6 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { ScrollArea } from "@/ui";
 
 type Props = {
   params: {
@@ -67,9 +66,7 @@ export default async function Conversation({
               </div>
             </div>
           </div>
-          <ScrollArea className="flex-1 px-4 md:px-6 py-6 relative">
-            <Messages />
-          </ScrollArea>
+          <Messages />
           <div className="self-center w-full px-3 md:px-6 py-4 flex justify-center border-t">
             <MessageForm />
           </div>
