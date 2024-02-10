@@ -13,7 +13,7 @@ export default function Error() {
         Error
       </h2>
       <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-        Failed to load users
+        Failed to load conversation
       </h4>
       <Button onClick={reset}>Try again</Button>
       <Link href="/conversations">

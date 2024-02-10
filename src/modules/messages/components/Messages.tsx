@@ -5,7 +5,6 @@ import MessagesList from "./MessagesList";
 import { useMember, useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
 import { useParams } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 
 export default function Messages() {
   const { toast } = useToast();

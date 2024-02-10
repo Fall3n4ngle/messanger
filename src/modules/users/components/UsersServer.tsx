@@ -15,7 +15,7 @@ type Props = {
 export default async function UsersServer({ searchParams }: Props) {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchInfiniteQuery({
+  await queryClient.fetchInfiniteQuery({
     queryKey: ["users", searchParams.query ?? null],
     queryFn: ({ pageParam }: { pageParam?: string }) =>
       getUsers({

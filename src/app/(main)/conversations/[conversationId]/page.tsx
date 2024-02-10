@@ -28,18 +28,18 @@ export default async function Conversation({
 }: Props) {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
+  await queryClient.fetchQuery({
     queryKey: ["conversations", conversationId],
     queryFn: () => getConversationById(conversationId),
   });
 
   await Promise.all([
-    queryClient.prefetchQuery({
+    queryClient.fetchQuery({
       queryKey: ["messages", conversationId],
       queryFn: () => getMessages({ conversationId }),
     }),
 
-    queryClient.prefetchQuery({
+    queryClient.fetchQuery({
       queryKey: ["member", conversationId],
       queryFn: () => getUserMember({ conversationId }),
     }),

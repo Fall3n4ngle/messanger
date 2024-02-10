@@ -9,7 +9,7 @@ import ConversationsClient from "./ConversationsClient";
 export default async function ConversationsServer() {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
+  await queryClient.fetchQuery({
     queryKey: ["conversations", "list", null],
     queryFn: () => getUserConversations({ query: null }),
   });

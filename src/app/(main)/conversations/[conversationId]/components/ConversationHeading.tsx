@@ -8,10 +8,10 @@ import { useParams } from "next/navigation";
 export default function ConversationHeading() {
   const conversationId = useParams().conversationId as string;
   const typingUsers = useTypingUsers({ conversationId });
-  const { data } = useConversation({ conversationId });
+  const { data: conversation } = useConversation({ conversationId });
 
-  if (!data) return null;
-  const { image, name, members } = data;
+  if (!conversation) return null;
+  const { image, name, members } = conversation;
 
   return (
     <div className="flex gap-3 items-center">

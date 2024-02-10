@@ -29,5 +29,6 @@ export const useInfiniteUsers = ({ query }: Props) => {
 
       return lastPage[lastPage.length - 1].id;
     },
+    throwOnError: true,
   });
 };

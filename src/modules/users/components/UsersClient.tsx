@@ -5,19 +5,16 @@ import { useInView } from "react-intersection-observer";
 import { useInfiniteUsers } from "../hooks/useInfiniteUsers";
 import UserCardSkeleton from "./UserCardSkeleton";
 import UsersList from "./UsersList";
-import { useToast } from "@/common/hooks";
-import { ToastMessage } from "@/components";
 import { useSearchParams } from "next/navigation";
 
 export default function UsersClient() {
-  const { toast } = useToast();
   const query = useSearchParams().get("query");
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,
   });
 
-  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, error } =
     useInfiniteUsers({
       query,
     });
@@ -29,11 +26,7 @@ export default function UsersClient() {
   }, [hasNextPage, inView, fetchNextPage]);
 
   if (error) {
-    toast({
-      description: <ToastMessage type="error" message="Failed to load users" />,
-    });
-
-    return null;
+    return "error"
   }
 
   if (!data?.pages[0].length) {

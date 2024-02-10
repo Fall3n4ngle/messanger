@@ -2,7 +2,6 @@
 
 import { Button } from "@/ui";
 import { useQueryErrorResetBoundary } from "@tanstack/react-query";
-import Link from "next/link";
 
 export default function Error() {
   const { reset } = useQueryErrorResetBoundary();
@@ -13,12 +12,9 @@ export default function Error() {
         Error
       </h2>
       <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-        Failed to load users
+        Failed to load conversations
       </h4>
       <Button onClick={reset}>Try again</Button>
-      <Link href="/conversations">
-        <Button variant="link">Back to conversations</Button>
-      </Link>
     </div>
   );
 }
