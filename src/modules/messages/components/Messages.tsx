@@ -3,34 +3,18 @@
 import { useMessages } from "../hooks/useMessages";
 import MessagesList from "./MessagesList";
 import { useMember, useToast } from "@/common/hooks";
-import { ToastMessage } from "@/components";
 import { useParams } from "next/navigation";
 
 export default function Messages() {
-  const { toast } = useToast();
   const conversationId = useParams().conversationId as string;
 
-  const {
-    data: messages,
-    dataUpdatedAt,
-    error,
-  } = useMessages({
+  const { data: messages, dataUpdatedAt } = useMessages({
     conversationId,
   });
 
   const { data: member } = useMember({
     conversationId,
   });
-
-  if (error) {
-    toast({
-      description: (
-        <ToastMessage type="error" message="Failed to get messages" />
-      ),
-    });
-
-    return null;
-  }
 
   if (!messages?.length) {
     return (

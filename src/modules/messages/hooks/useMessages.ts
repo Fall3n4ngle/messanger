@@ -9,5 +9,6 @@ export const useMessages = ({ conversationId }: Props) => {
   return useQuery({
     queryKey: ["messages", conversationId],
     queryFn: () => getMessages({ conversationId }),
+    throwOnError: true,
   });
 };
