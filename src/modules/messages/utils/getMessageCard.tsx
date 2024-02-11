@@ -11,7 +11,6 @@ type Props = {
   memberRole: MemberRole;
   isOwn: boolean;
   isActive: boolean;
-  previousMessageId: string | null;
   userId: string;
 } & Message;
 
@@ -23,7 +22,6 @@ export const getMessageCard = ({
   conversationId,
   updatedAt,
   isActive,
-  previousMessageId,
   user,
   userId,
   ...props
@@ -53,7 +51,6 @@ export const getMessageCard = ({
         conversationId={conversationId}
         messageId={id}
         key={id}
-        previousMessageId={previousMessageId}
         {...props}
       >
         {result}

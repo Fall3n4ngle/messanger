@@ -1,21 +1,20 @@
 "use server";
 
 import { checkAuth, getUserAuth } from "@/common/dataAccess";
+import { PaginationProps } from "@/common/types/pagination";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
-export type GetConversationsProps = {
+type Props = {
   query: string | null;
-  take?: number;
-  lastCursor?: string;
-};
+} & PaginationProps;
 
 export const getUserConversations = async ({
-  query = "",
+  query,
   lastCursor,
   take,
-}: GetConversationsProps) => {
+}: Props) => {
   const { userId: clerkId } = await getUserAuth();
   const cursor = lastCursor ? { id: lastCursor } : undefined;
 
@@ -97,7 +96,6 @@ export type UserConversation = Awaited<
 >[number];
 
 export const getConversationById = cache(async (conversationId: string) => {
-  console.log("getConversationById");
   await checkAuth();
 
   const conversation = await db.conversation.findFirst({

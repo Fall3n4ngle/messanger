@@ -1,6 +1,7 @@
 "use server";
 
 import { getUserAuth } from "@/common/dataAccess";
+import { PaginationProps } from "@/common/types/pagination";
 import { db } from "@/lib/db";
 
 export const getUserByClerkId = async (clerkId: string) => {
@@ -18,15 +19,9 @@ export const getUserByClerkId = async (clerkId: string) => {
 
 type Props = {
   query: string | null;
-  take?: number;
-  lastCursor?: string;
-};
+} & PaginationProps;
 
-export const getUsers = async ({
-  query = "",
-  lastCursor,
-  take = 25,
-}: Props) => {
+export const getUsers = async ({ query, lastCursor, take = 25 }: Props) => {
   const { userId } = await getUserAuth();
   const cursor = lastCursor ? { id: lastCursor } : undefined;
 

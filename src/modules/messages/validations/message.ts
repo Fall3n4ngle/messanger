@@ -3,7 +3,6 @@ import { z } from "zod";
 export const deleteMessageSchema = z.object({
   messageId: z.string(),
   conversationId: z.string(),
-  previousMessageId: z.string().nullable(),
 });
 
 export const markAsSeenSchema = z.object({

@@ -2,7 +2,7 @@
 
 import { useMessages } from "../hooks/useMessages";
 import MessagesList from "./MessagesList";
-import { useMember, useToast } from "@/common/hooks";
+import { useMember } from "@/common/hooks";
 import { useParams } from "next/navigation";
 
 export default function Messages() {
@@ -27,11 +27,14 @@ export default function Messages() {
   }
 
   return (
-    <MessagesList
-      currentUserId={member?.user.id ?? ""}
-      memberRole={member?.role ?? "VIEW"}
-      messages={messages}
-      dataUpdatedAt={dataUpdatedAt}
-    />
+    <>
+    
+      <MessagesList
+        currentUserId={member?.user.id ?? ""}
+        memberRole={member?.role ?? "VIEW"}
+        messages={messages}
+        dataUpdatedAt={dataUpdatedAt}
+      />
+    </>
   );
 }

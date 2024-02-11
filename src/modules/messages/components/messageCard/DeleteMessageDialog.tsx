@@ -20,7 +20,6 @@ import { ToastMessage } from "@/components";
 type Props = {
   messageId: string;
   conversationId: string;
-  previousMessageId: string | null;
 };
 
 export default function DeleteMessageButton(props: Props) {

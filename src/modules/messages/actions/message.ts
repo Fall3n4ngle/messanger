@@ -18,7 +18,7 @@ export const deleteMessage = async (data: DeleteMessageFields) => {
   }
 
   const { userId } = await getUserAuth();
-  const { conversationId, messageId, previousMessageId } = result.data;
+  const { conversationId, messageId } = result.data;
 
   try {
     if (!canMutateMessage({ clerkId: userId, conversationId, messageId })) {
@@ -30,7 +30,7 @@ export const deleteMessage = async (data: DeleteMessageFields) => {
     const deletedMessage = await db.message.delete({
       where: { id: messageId },
       select: {
-        id: true,
+        createdAt: true,
         conversation: {
           select: {
             lastMessageId: true,
@@ -43,10 +43,22 @@ export const deleteMessage = async (data: DeleteMessageFields) => {
     let conversation;
 
     if (isLast) {
+      const previousMessage = await db.message.findMany({
+        take: 1,
+        where: {
+          createdAt: {
+            lt: deletedMessage.createdAt,
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
       conversation = await db.conversation.update({
         where: { id: conversationId },
         data: {
-          lastMessageId: previousMessageId,
+          lastMessageId: previousMessage[0]?.id,
         },
         select: {
           members: {
