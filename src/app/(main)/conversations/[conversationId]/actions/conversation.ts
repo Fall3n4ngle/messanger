@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 export const getConversationById = cache(async (conversationId: string) => {
-  console.log("getConversationById");
   await checkAuth();
 
   const conversation = await db.conversation.findFirst({

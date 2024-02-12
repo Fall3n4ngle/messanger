@@ -22,8 +22,9 @@ type FormFields = z.infer<typeof formSchema>;
 export default function MessageForm() {
   const conversationId = useParams().conversationId as string;
   const { messageData, resetMessageData } = useMessageForm();
-  const { mutate: sendMessage, isPending: isSendingForm } = useSendMessage();
-  const { mutate: updateMessage, isPending: isEditingForm } = useEditMessage();
+  const { mutate: sendMessage, isPending: isSendingMessage } = useSendMessage();
+  const { mutate: updateMessage, isPending: isEditingMessage } =
+    useEditMessage();
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -70,7 +71,7 @@ export default function MessageForm() {
     form.reset();
   };
 
-  const isSubmitting = isSendingForm || isEditingForm;
+  const isSubmitting = isSendingMessage || isEditingMessage;
 
   return (
     <div className="max-w-[1000px] w-full">

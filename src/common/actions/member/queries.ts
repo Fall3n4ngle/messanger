@@ -9,7 +9,6 @@ type Props = {
 
 export const getUserMember = async ({ conversationId }: Props) => {
   const { userId } = await getUserAuth();
-  console.log("getUserMember");
 
   try {
     const member = await db.member.findFirst({

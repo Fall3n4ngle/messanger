@@ -8,14 +8,25 @@ export type MessageCardPorps = {
   isOwn: boolean;
   isActive: boolean;
   seen: ReactNode;
-} & Pick<Message, "content" | "file" | "updatedAt" | "user">;
+} & Pick<Message, "content" | "file" | "updatedAt" | "user" | "createdAt">;
 
 const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
   (
-    { content, file, updatedAt, user, isOwn, isActive, seen, ...props },
+    {
+      content,
+      file,
+      updatedAt,
+      createdAt,
+      user,
+      isOwn,
+      isActive,
+      seen,
+      ...props
+    },
     ref
   ) => {
     const { image, name } = user;
+    const isEdited = updatedAt.toString() !== createdAt.toString();
 
     return (
       <div
@@ -48,8 +59,13 @@ const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
               {isOwn ? "You" : name}
             </span>
             <span className="text-sm mt-[3px] text-muted-foreground">
-              {formatDate(updatedAt)}
+              {formatDate(createdAt)}
             </span>
+            {isEdited && (
+              <span className="text-sm mt-[3px] text-muted-foreground">
+                (edited)
+              </span>
+            )}
             <span className="mt-[4.5px]">{seen}</span>
           </div>
           {file && (

@@ -27,14 +27,11 @@ export default function Messages() {
   }
 
   return (
-    <>
-    
-      <MessagesList
-        currentUserId={member?.user.id ?? ""}
-        memberRole={member?.role ?? "VIEW"}
-        messages={messages}
-        dataUpdatedAt={dataUpdatedAt}
-      />
-    </>
+    <MessagesList
+      currentUserId={member?.user.id ?? ""}
+      memberRole={member?.role ?? "VIEW"}
+      messages={messages}
+      dataUpdatedAt={dataUpdatedAt}
+    />
   );
 }

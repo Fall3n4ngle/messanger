@@ -9,7 +9,6 @@ export const useSendMessage = () => {
 
   return useMutation({
     mutationFn: sendMessage,
-
     onError: () => {
       toast({
         description: (

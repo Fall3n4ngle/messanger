@@ -58,24 +58,18 @@ export default function MessagesList({
         <ChevronsDown className="text-muted-foreground" />
       </Button>
       <div className="flex-1 flex flex-col gap-6" ref={messagesListRef}>
-        {messages.map(({ user, ...props }, messageIndex) => {
+        {messages.map(({ user, ...props }) => {
           if (!user || !userId) return;
 
           const { clerkId } = user;
           const isOwn = clerkId === userId;
           const isActive = usersIds.includes(clerkId);
 
-          let previousMessageId: string | null = null;
-          if (messageIndex > 0) {
-            previousMessageId = messages[messageIndex - 1].id;
-          }
-
           const card = getMessageCard({
             ...props,
             isActive,
             isOwn,
             memberRole,
-            previousMessageId,
             userId: currentUserId,
             user,
           });

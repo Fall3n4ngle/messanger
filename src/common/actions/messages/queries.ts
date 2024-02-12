@@ -1,20 +1,14 @@
 "use server";
 
 import { checkAuth } from "@/common/dataAccess";
-import { PaginationProps } from "@/common/types/pagination";
 import { db } from "@/lib/db";
 
 type Props = {
   conversationId: string;
-} & PaginationProps;
+};
 
-export const getMessages = async ({
-  conversationId,
-  lastCursor,
-  take,
-}: Props) => {
+export const getMessages = async ({ conversationId }: Props) => {
   await checkAuth();
-  const cursor = lastCursor ? { id: lastCursor } : undefined;
 
   try {
     const messages = await db.message.findMany({
@@ -26,6 +20,7 @@ export const getMessages = async ({
         content: true,
         file: true,
         updatedAt: true,
+        createdAt: true,
         conversationId: true,
         user: {
           select: {
@@ -44,9 +39,6 @@ export const getMessages = async ({
       orderBy: {
         createdAt: "asc",
       },
-      take,
-      cursor,
-      skip: cursor ? 1 : 0,
     });
 
     return messages;
