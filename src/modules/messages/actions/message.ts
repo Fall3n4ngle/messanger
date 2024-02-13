@@ -9,6 +9,8 @@ import {
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { canMutateMessage, getUserAuth } from "@/common/dataAccess";
+import { getMessagesChannel } from "@/common/utils";
+import { messageEvents } from "@/common/const";
 
 export const deleteMessage = async (data: DeleteMessageFields) => {
   const result = deleteMessageSchema.safeParse(data);
@@ -92,9 +94,11 @@ export const deleteMessage = async (data: DeleteMessageFields) => {
 
     conversation?.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
-        const messagesChannel = `${member.user.clerkId}_messages`;
+        const messagesChannel = getMessagesChannel({
+          userId: member.user.clerkId,
+        });
 
-        pusherServer.trigger(messagesChannel, "messages:delete", {
+        pusherServer.trigger(messagesChannel, messageEvents.deleteMessage, {
           conversationId,
         });
       }
@@ -136,7 +140,9 @@ export const markAsSeen = async (data: MarkAsSeenFields) => {
       },
     });
 
-    const messagesChannel = `${updatedMessage.user.clerkId}_messages`;
+    const messagesChannel = getMessagesChannel({
+      userId: updatedMessage.user.clerkId,
+    });
 
     pusherServer.trigger(messagesChannel, "messages:seen", {
       conversationId,

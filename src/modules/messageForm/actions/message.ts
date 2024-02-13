@@ -9,6 +9,8 @@ import {
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { canMutateMessage, getUserAuth } from "@/common/dataAccess";
+import { getMessagesChannel } from "@/common/utils";
+import { messageEvents } from "@/common/const";
 
 export const sendMessage = async (fields: SendMessageFields) => {
   const result = sendMessageSchema.safeParse(fields);
@@ -70,9 +72,11 @@ export const sendMessage = async (fields: SendMessageFields) => {
 
       updatedConversation.members.forEach((member) => {
         if (member.user.clerkId !== userId) {
-          const conversationsChannel = `${member.user.clerkId}_messages`;
+          const messagesChannel = getMessagesChannel({
+            userId: member.user.clerkId,
+          });
 
-          pusherServer.trigger(conversationsChannel, "messages:new", {
+          pusherServer.trigger(messagesChannel, messageEvents.newMessage, {
             conversationId: createdMessage.conversationId,
           });
         }
@@ -130,9 +134,11 @@ export const editMessage = async (data: EditMessageFields) => {
 
     conversation.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
-        const messagesChannel = `${member.user.clerkId}_messages`;
+        const messagesChannel = getMessagesChannel({
+          userId: member.user.clerkId,
+        });
 
-        pusherServer.trigger(messagesChannel, "messages:update", {
+        pusherServer.trigger(messagesChannel, messageEvents.updateMessage, {
           conversationId,
         });
       }

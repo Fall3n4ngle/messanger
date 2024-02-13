@@ -10,6 +10,8 @@ import { MemberRole } from "@prisma/client";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { getUserAuth } from "@/common/dataAccess";
+import { getConversationsChannel } from "@/common/utils";
+import { conversationEvents } from "@/common/const";
 
 export const createConversation = async (fields: CreateConversationFields) => {
   const result = createConversationSchema.safeParse(fields);
@@ -97,9 +99,15 @@ export const createConversation = async (fields: CreateConversationFields) => {
 
     members.forEach((member) => {
       if (member.user.clerkId !== userId) {
-        const conversationChannel = `${member.user.clerkId}_conversations`;
+        const conversationChannel = getConversationsChannel({
+          userId: member.user.clerkId,
+        });
 
-        pusherServer.trigger(conversationChannel, "conversation:new", {});
+        pusherServer.trigger(
+          conversationChannel,
+          conversationEvents.newConversation,
+          null
+        );
       }
     });
 

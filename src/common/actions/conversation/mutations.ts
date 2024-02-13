@@ -9,6 +9,8 @@ import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { ConversationEvent } from "@/common/types";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
+import { getConversationsChannel } from "@/common/utils";
+import { conversationEvents } from "@/common/const";
 
 export const addMembers = async (fields: AddMembersFields) => {
   const result = addMembersSchema.safeParse(fields);
@@ -54,17 +56,23 @@ export const addMembers = async (fields: AddMembersFields) => {
 
     updatedConversation.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
-        const conversationChannel = `${member.user.clerkId}_conversations`;
+        const conversationChannel = getConversationsChannel({
+          userId: member.user.clerkId,
+        });
 
-        pusherServer.trigger(conversationChannel, "conversation:add_members", {
-          conversationId: id,
-        } as ConversationEvent);
+        pusherServer.trigger(
+          conversationChannel,
+          conversationEvents.addMembers,
+          {
+            conversationId: id,
+          } as ConversationEvent
+        );
       }
     });
 
     return { success: true, data: updatedConversation };
   } catch (error) {
-    const message = (error as Error).message ?? "Failed to create group";
+    const message = (error as Error).message ?? "Failed to add members";
     console.log(message);
     throw new Error(message);
   }

@@ -7,6 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
 import { ConversationEvent } from "@/common/types";
+import { conversationEvents } from "@/common/const";
+import { getConversationsChannel } from "@/common/utils";
 
 export const usePusherConversations = () => {
   const router = useRouter();
@@ -18,7 +20,10 @@ export const usePusherConversations = () => {
   useEffect(() => {
     if (!currentUserId) return;
 
-    const conversationsChannel = `${currentUserId}_conversations`;
+    const conversationsChannel = getConversationsChannel({
+      userId: currentUserId,
+    });
+
     pusherClient.subscribe(conversationsChannel);
 
     const handleNewConversation = () => {
@@ -86,19 +91,40 @@ export const usePusherConversations = () => {
       });
     };
 
-    pusherClient.bind("conversation:new", handleNewConversation);
-    pusherClient.bind("conversation:delete_member", handleDeleteMember);
-    pusherClient.bind("conversation:update", handleConversationUpdate);
-    pusherClient.bind("conversation:add_members", handleAddMembers);
-    pusherClient.bind("conversation:update_member", handleMemberUpdate);
+    pusherClient.bind(
+      conversationEvents.newConversation,
+      handleNewConversation
+    );
+
+    pusherClient.bind(conversationEvents.deleteMember, handleDeleteMember);
+
+    pusherClient.bind(
+      conversationEvents.updateConversation,
+      handleConversationUpdate
+    );
+
+    pusherClient.bind(conversationEvents.addMembers, handleAddMembers);
+
+    pusherClient.bind(conversationEvents.updateMember, handleMemberUpdate);
 
     return () => {
       pusherClient.unsubscribe(conversationsChannel);
-      pusherClient.unbind("conversation:new", handleNewConversation);
-      pusherClient.unbind("member:delete", handleDeleteMember);
-      pusherClient.unbind("conversation:update", handleConversationUpdate);
-      pusherClient.unbind("conversation:add_members", handleAddMembers);
-      pusherClient.unbind("conversation:update_member", handleMemberUpdate);
+
+      pusherClient.unbind(
+        conversationEvents.newConversation,
+        handleNewConversation
+      );
+
+      pusherClient.unbind(conversationEvents.deleteMember, handleDeleteMember);
+
+      pusherClient.unbind(
+        conversationEvents.updateConversation,
+        handleConversationUpdate
+      );
+
+      pusherClient.unbind(conversationEvents.addMembers, handleAddMembers);
+
+      pusherClient.unbind(conversationEvents.updateMember, handleMemberUpdate);
     };
   }, [queryClient, currentUserId, router, toast, pathname]);
 };

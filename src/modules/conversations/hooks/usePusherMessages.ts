@@ -1,3 +1,5 @@
+import { messageEvents } from "@/common/const";
+import { getMessagesChannel } from "@/common/utils";
 import { pusherClient } from "@/lib/pusher/client";
 import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,7 +11,7 @@ export const usePusherMessages = () => {
 
   useEffect(() => {
     if (!userId) return;
-    const messagesCahannel = `${userId}_messages`;
+    const messagesCahannel = getMessagesChannel({ userId });
     pusherClient.subscribe(messagesCahannel);
 
     const handleMessageEvent = ({
@@ -26,17 +28,17 @@ export const usePusherMessages = () => {
       });
     };
 
-    pusherClient.bind("messages:new", handleMessageEvent);
-    pusherClient.bind("messages:delete", handleMessageEvent);
-    pusherClient.bind("messages:update", handleMessageEvent);
-    pusherClient.bind("messages:seen", handleMessageEvent);
+    pusherClient.bind(messageEvents.newMessage, handleMessageEvent);
+    pusherClient.bind(messageEvents.deleteMessage, handleMessageEvent);
+    pusherClient.bind(messageEvents.updateMessage, handleMessageEvent);
+    pusherClient.bind(messageEvents.markAsSeen, handleMessageEvent);
 
     return () => {
       pusherClient.unsubscribe(messagesCahannel);
-      pusherClient.unbind("messages:new", handleMessageEvent);
-      pusherClient.unbind("messages:delete", handleMessageEvent);
-      pusherClient.unbind("messages:update", handleMessageEvent);
-      pusherClient.unbind("messages:seen", handleMessageEvent);
+      pusherClient.unbind(messageEvents.newMessage, handleMessageEvent);
+      pusherClient.unbind(messageEvents.deleteMessage, handleMessageEvent);
+      pusherClient.unbind(messageEvents.updateMessage, handleMessageEvent);
+      pusherClient.unbind(messageEvents.markAsSeen, handleMessageEvent);
     };
   }, [queryClient, userId]);
 };

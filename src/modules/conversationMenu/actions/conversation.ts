@@ -8,6 +8,8 @@ import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { ConversationEvent } from "@/common/types";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
+import { getConversationsChannel } from "@/common/utils";
+import { conversationEvents } from "@/common/const";
 
 export const editConversation = async (data: EditConversationFields) => {
   const result = editConversationSchema.safeParse(data);
@@ -47,11 +49,17 @@ export const editConversation = async (data: EditConversationFields) => {
 
     members.forEach((member) => {
       if (member.user.clerkId !== userId) {
-        const conversationChannel = `${member.user.clerkId}_conversations`;
+        const conversationChannel = getConversationsChannel({
+          userId: member.user.clerkId,
+        });
 
-        pusherServer.trigger(conversationChannel, "conversation:update", {
-          conversationId: conversation.id,
-        } as ConversationEvent);
+        pusherServer.trigger(
+          conversationChannel,
+          conversationEvents.updateConversation,
+          {
+            conversationId: conversation.id,
+          } as ConversationEvent
+        );
       }
     });
 

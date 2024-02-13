@@ -10,6 +10,8 @@ import {
   deleteMemberSchema,
 } from "../validations/member";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
+import { getConversationsChannel } from "@/common/utils";
+import { conversationEvents } from "@/common/const";
 
 export const changeMemberRole = async (data: ChangeRoleFields) => {
   const result = changeRoleSchema.safeParse(data);
@@ -54,11 +56,13 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
 
     conversation?.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
-        const conversationsChannel = `${member.user.clerkId}_conversations`;
+        const conversationsChannel = getConversationsChannel({
+          userId: member.user.clerkId,
+        });
 
         pusherServer.trigger(
           conversationsChannel,
-          "conversation:update_member",
+          conversationEvents.updateMember,
           {
             conversationId,
           } as ConversationEvent
@@ -124,11 +128,13 @@ export const deleteMember = async (data: DeleteMemberFields) => {
 
     conversation?.members.forEach((member) => {
       if (userId !== deletedMember.user.clerkId) {
-        const conversationsChannel = `${member.user.clerkId}_conversations`;
+        const conversationsChannel = getConversationsChannel({
+          userId: member.user.clerkId,
+        });
 
         pusherServer.trigger(
           conversationsChannel,
-          "conversation:delete_member",
+          conversationEvents.deleteMember,
           {
             conversationId,
             userId: deletedMember.user.clerkId,
