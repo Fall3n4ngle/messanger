@@ -38,7 +38,7 @@ model Conversation {
   name          String
   image         String?
   lastMessage   Message?  @relation("LastMessage", fields: [lastMessageId], references: [id])
-  lastMessageId String?   @unique
+  lastMessageId String?   @unique 
   createdAt     DateTime  @unique @default(now())
   updatedAt     DateTime  @updatedAt()
   messages      Message[] @relation("Messages")

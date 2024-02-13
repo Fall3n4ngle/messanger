@@ -1,5 +1,5 @@
 import { UserForm } from "@/components";
-import { getUserByClerkId } from "@/common/actions/user/queries";
+import { getUser } from "@/common/actions/user/queries";
 import { redirect } from "next/navigation";
 import {
   Card,
@@ -8,16 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/ui";
-import { auth, currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs";
 
 export default async function page() {
-  const { userId } = auth();
-  const user = await currentUser();
-
-  if (!userId) redirect("/sign-in");
-
-  const existingUser = await getUserByClerkId(userId);
+  const existingUser = await getUser();
   if (existingUser) redirect("/");
+
+  const user = await currentUser();
+  if (!user?.id) redirect("/sign-in");
 
   return (
     <Card className="max-w-[450px] w-full">
@@ -29,7 +27,7 @@ export default async function page() {
       </CardHeader>
       <CardContent>
         <UserForm
-          clerkId={userId}
+          clerkId={user?.id}
           name={user?.username ?? ""}
           successMessage="Profile created successfully"
         />

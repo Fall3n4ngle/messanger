@@ -25,5 +25,3 @@ export const addMembersSchema = conversationSchema.pick({
 });
 
 export type AddMembersFields = z.infer<typeof addMembersSchema>;
-
-export type ConversationFields = z.infer<typeof conversationSchema>;

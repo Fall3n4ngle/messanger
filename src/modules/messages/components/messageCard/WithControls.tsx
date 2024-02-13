@@ -4,16 +4,16 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/ui";
-import DeleteMessageButton from "./DeleteMessageDialog";
+import DeleteMessageButton from "./deleteMessage/DeleteMessageDialog";
 import EditMessageButton from "./EditMessageButton";
 import { PropsWithChildren } from "react";
+import { DeleteMessageFields } from "../../validations/message";
 
 type Props = {
-  messageId: string;
-  conversationId: string;
   content: string | null;
   file: string | null;
-} & PropsWithChildren;
+} & DeleteMessageFields &
+  PropsWithChildren;
 
 export default function WithControls({
   content,

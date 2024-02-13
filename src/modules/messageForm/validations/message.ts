@@ -1,5 +1,12 @@
-import { messageSchema } from "prisma/zod";
 import { z } from "zod";
+
+const messageSchema = z.object({
+  id: z.string(),
+  content: z.string().nullish(),
+  file: z.string().nullish(),
+  conversationId: z.string(),
+  userId: z.string(),
+});
 
 export const sendMessageSchema = messageSchema
   .pick({

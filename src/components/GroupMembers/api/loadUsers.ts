@@ -5,11 +5,15 @@ type Props = {
 };
 
 export const loadUsers = async ({ query }: Props) => {
-  const users = await getUsers({ query });
+  try {
+    const users = await getUsers({ query });
 
-  return users.map(({ id, name, image }) => ({
-    label: name,
-    value: id,
-    image,
-  }));
+    return users.map(({ id, name, image }) => ({
+      label: name,
+      value: id,
+      image,
+    }));
+  } catch (error) {
+    throw new Error("Failed to load users");
+  }
 };

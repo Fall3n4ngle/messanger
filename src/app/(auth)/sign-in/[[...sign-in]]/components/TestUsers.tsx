@@ -1,6 +1,4 @@
-import React from "react";
-
-export const testUsers = [
+const testUsers = [
   {
     userName: "user1",
     password: "user1_password",
@@ -13,7 +11,7 @@ export const testUsers = [
 
 export default function TestUsers() {
   return (
-    <div className="px-8 mb-6">
+    <>
       <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mb-4">
         Test users
       </h4>
@@ -32,6 +30,6 @@ export default function TestUsers() {
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 }

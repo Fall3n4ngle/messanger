@@ -7,8 +7,7 @@ import {
 import { MemberRole } from "@prisma/client";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
-import { ConversationEvent } from "@/common/types/events";
-import { revalidatePath } from "next/cache";
+import { ConversationEvent } from "@/common/types";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
 
 export const addMembers = async (fields: AddMembersFields) => {

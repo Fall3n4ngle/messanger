@@ -18,10 +18,7 @@ type Props = {
   setIsUploading: Dispatch<SetStateAction<boolean>>;
 };
 
-export default function Dropzone({
-  isUploading,
-  setIsUploading
-}: Props) {
+export default function Dropzone({ isUploading, setIsUploading }: Props) {
   const { toast } = useToast();
   const { setValue, watch } = useFormContext();
 
@@ -60,7 +57,7 @@ export default function Dropzone({
 
   const handleUploadComplete = (
     res: UploadFileResponse<{
-      uploadedBy: null;
+      uploadedBy: string;
     }>[]
   ) => {
     const { key, url } = res[0];

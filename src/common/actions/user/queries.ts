@@ -1,10 +1,12 @@
 "use server";
 
 import { getUserAuth } from "@/common/dataAccess";
-import { PaginationProps } from "@/common/types/pagination";
+import { PaginationProps } from "@/common/types";
 import { db } from "@/lib/db";
 
-export const getUserByClerkId = async (clerkId: string) => {
+export const getUser = async () => {
+  const { userId: clerkId } = await getUserAuth();
+
   try {
     const user = await db.user.findFirst({
       where: { clerkId },
@@ -12,7 +14,7 @@ export const getUserByClerkId = async (clerkId: string) => {
     });
 
     return user;
-  } catch {
+  } catch (error) {
     throw new Error("Failed to get your user");
   }
 };

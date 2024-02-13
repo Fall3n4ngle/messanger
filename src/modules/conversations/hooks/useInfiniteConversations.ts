@@ -1,6 +1,6 @@
 import { getUserConversations } from "@/common/actions/conversation/queries";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { PER_PAGE } from "../const";
+import { CONVERSATIONS_PER_PAGE } from "../const";
 
 type UseInfiniteConversationsProps = {
   query: string | null;
@@ -13,7 +13,7 @@ export const useInfiniteConversations = ({
     return await getUserConversations({
       lastCursor: pageParam,
       query,
-      take: PER_PAGE,
+      take: CONVERSATIONS_PER_PAGE,
     });
   };
 
@@ -22,7 +22,7 @@ export const useInfiniteConversations = ({
     queryFn: getData,
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => {
-      if (lastPage.length < PER_PAGE) {
+      if (lastPage.length < CONVERSATIONS_PER_PAGE) {
         return;
       }
 

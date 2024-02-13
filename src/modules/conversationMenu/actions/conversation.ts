@@ -6,7 +6,7 @@ import {
 } from "../validations/conversation";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
-import { ConversationEvent } from "@/common/types/events";
+import { ConversationEvent } from "@/common/types";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
 
 export const editConversation = async (data: EditConversationFields) => {

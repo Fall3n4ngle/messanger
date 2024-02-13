@@ -35,7 +35,7 @@ export default function UploadButton({
 
   const handleUploadComplete = (
     result: UploadFileResponse<{
-      uploadedBy: null;
+      uploadedBy: string;
     }>[]
   ) => {
     const { key, url } = result[0];

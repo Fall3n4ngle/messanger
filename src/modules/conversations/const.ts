@@ -1,1 +1,1 @@
-export const PER_PAGE = 10;
+export const CONVERSATIONS_PER_PAGE = 10;

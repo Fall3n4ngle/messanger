@@ -5,7 +5,7 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 import UsersClient from "./UsersClient";
-import { PER_PAGE } from "../const";
+import { USERS_PER_PAGE } from "../const";
 
 type Props = {
   searchParams: {
@@ -22,7 +22,7 @@ export default async function UsersServer({ searchParams }: Props) {
       getUsers({
         query: null,
         lastCursor: pageParam,
-        take: PER_PAGE,
+        take: USERS_PER_PAGE,
       }),
     initialPageParam: undefined,
   });

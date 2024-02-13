@@ -26,12 +26,10 @@ export default function ManageMembersButton({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <DropdownMenuItem onSelect={e => e.preventDefault()} className="p-0">
-          <button className="flex items-center gap-3 px-2 py-1.5">
-            <SlidersHorizontal className="h-4 w-4" />
-            Manage members
-          </button>
-        </DropdownMenuItem>
+        <button className="flex items-center gap-3 px-2 py-1.5">
+          <SlidersHorizontal className="h-4 w-4" />
+          Manage members
+        </button>
       </DialogTrigger>
       <DialogContent className="h-[500px] max-w-[600px] flex flex-col gap-5">
         <DialogHeader>

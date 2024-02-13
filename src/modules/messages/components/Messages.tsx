@@ -16,6 +16,8 @@ export default function Messages() {
     conversationId,
   });
 
+  if (!member) return null;
+
   if (!messages?.length) {
     return (
       <div className="flex items-center justify-center h-full w-full">
@@ -28,8 +30,8 @@ export default function Messages() {
 
   return (
     <MessagesList
-      currentUserId={member?.user.id ?? ""}
-      memberRole={member?.role ?? "VIEW"}
+      currentUserId={member.user.id}
+      memberRole={member.role}
       messages={messages}
       dataUpdatedAt={dataUpdatedAt}
     />

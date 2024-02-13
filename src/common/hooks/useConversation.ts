@@ -10,5 +10,6 @@ export const useConversation = ({ conversationId }: Props) => {
     queryKey: ["conversations", conversationId],
     queryFn: () => getConversationById(conversationId),
     enabled: !!conversationId,
+    throwOnError: true,
   });
 };

@@ -5,7 +5,6 @@ import Link from "next/link";
 import ConversationCard from "./ConversationCard";
 import { useAuth } from "@clerk/nextjs";
 import { UserConversation } from "@/common/actions/conversation/queries";
-import { Fragment } from "react";
 import { InfiniteData } from "@tanstack/react-query";
 
 type Props = {

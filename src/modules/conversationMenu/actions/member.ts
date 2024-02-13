@@ -2,14 +2,13 @@
 
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
-import { ConversationEvent, DeleteMemberEvent } from "@/common/types/events";
+import { ConversationEvent, DeleteMemberEvent } from "@/common/types";
 import {
   ChangeRoleFields,
   DeleteMemberFields,
   changeRoleSchema,
   deleteMemberSchema,
 } from "../validations/member";
-import { revalidatePath } from "next/cache";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
 
 export const changeMemberRole = async (data: ChangeRoleFields) => {

@@ -10,5 +10,6 @@ export const useMember = ({ conversationId }: Props) => {
     queryKey: ["member", conversationId],
     queryFn: () => getUserMember({ conversationId }),
     enabled: !!conversationId,
+    throwOnError: true,
   });
 };

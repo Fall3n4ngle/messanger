@@ -5,18 +5,18 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 import ConversationsClient from "./ConversationsClient";
-import { PER_PAGE } from "../const";
+import { CONVERSATIONS_PER_PAGE } from "../const";
 
 export default async function ConversationsServer() {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchInfiniteQuery({
+  await queryClient.fetchInfiniteQuery({
     queryKey: ["conversations", "list", null],
     queryFn: ({ pageParam }: { pageParam?: string }) =>
       getUserConversations({
         query: null,
         lastCursor: pageParam,
-        take: PER_PAGE
+        take: CONVERSATIONS_PER_PAGE,
       }),
     initialPageParam: undefined,
   });

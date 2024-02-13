@@ -1,7 +1,7 @@
 "use server";
 
 import { checkAuth, getUserAuth } from "@/common/dataAccess";
-import { PaginationProps } from "@/common/types/pagination";
+import { PaginationProps } from "@/common/types";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { cache } from "react";

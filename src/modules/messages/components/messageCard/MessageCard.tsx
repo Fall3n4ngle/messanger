@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ReactNode, forwardRef } from "react";
 import { Message } from "@/common/actions/messages/queries";
 
-export type MessageCardPorps = {
+type MessageCardPorps = {
   isOwn: boolean;
   isActive: boolean;
   seen: ReactNode;

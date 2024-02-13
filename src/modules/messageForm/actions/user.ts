@@ -8,11 +8,6 @@ type Props = {
   conversationId: string;
 };
 
-export type TypingUser = {
-  userName: string;
-  clerkId: string;
-};
-
 export const addTypingUser = async ({ conversationId, userName }: Props) => {
   const { userId } = await getUserAuth();
 

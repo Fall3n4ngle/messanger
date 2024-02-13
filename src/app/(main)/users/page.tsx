@@ -1,5 +1,5 @@
 import { EmptyConversationMessage, Search } from "@/components";
-import UsersServer from "@/modules/users/components/UsersServer";
+import { Users } from "@/modules/users";
 import { Suspense } from "react";
 import UsersSkeleton from "./components/UsersSkeleton";
 import { ScrollArea } from "@/ui";
@@ -19,7 +19,7 @@ export default async function UsersPage({ searchParams }: Props) {
         </div>
         <Suspense fallback={<UsersSkeleton />}>
           <ScrollArea className="max-w-[450px] w-full mx-auto md:mx-0 pb-10 sm:pb-0">
-            <UsersServer searchParams={searchParams} />
+            <Users searchParams={searchParams} />
           </ScrollArea>
         </Suspense>
       </div>

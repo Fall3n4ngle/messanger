@@ -6,7 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
-import { ConversationEvent } from "@/common/types/events";
+import { ConversationEvent } from "@/common/types";
 
 export const usePusherConversations = () => {
   const router = useRouter();

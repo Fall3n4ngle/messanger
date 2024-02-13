@@ -5,7 +5,7 @@ import {
   createConversationSchema,
 } from "../validations/conversation";
 import { redirect } from "next/navigation";
-import { getUserByClerkId } from "@/common/actions/user/queries";
+import { getUser } from "@/common/actions/user/queries";
 import { MemberRole } from "@prisma/client";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
@@ -22,7 +22,7 @@ export const createConversation = async (fields: CreateConversationFields) => {
   const { members: newMembers, ...values } = result.data;
 
   try {
-    const currentUser = await getUserByClerkId(userId);
+    const currentUser = await getUser();
     if (!currentUser) redirect("/onboarding");
 
     const mappedMembers = newMembers
