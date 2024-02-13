@@ -9,35 +9,42 @@ import {
 } from "@livekit/components-react";
 import { useEffect, useState } from "react";
 import { Track } from "livekit-client";
-import { useUser } from "@clerk/nextjs";
-import { Loader } from "@/components";
+import { Loader, ToastMessage } from "@/components";
+import { useMember, useToast } from "@/common/hooks";
 
 type Props = {
   conversationId: string;
   onDisconected: () => void;
 };
 
-export default function Page({ conversationId, onDisconected }: Props) {
-  const { user } = useUser();
+export default function MediaRoom({ conversationId, onDisconected }: Props) {
+  const { toast } = useToast();
+  const { data: member } = useMember({ conversationId });
+
   const [token, setToken] = useState("");
 
   useEffect(() => {
-    if (!user?.firstName || !user?.lastName) return;
-
-    const name = `${user.firstName} ${user.lastName}`;
+    if (!member?.user.name) return;
 
     (async () => {
       try {
         const resp = await fetch(
-          `/api/get-participant-token?room=${conversationId}&username=${name}`
+          `/api/get-participant-token?room=${conversationId}&username=${member.user.name}`
         );
         const data = await resp.json();
+
         setToken(data.token);
-      } catch (e) {
-        console.error(e);
+      } catch {
+        onDisconected();
+
+        toast({
+          description: (
+            <ToastMessage type="error" message="Failed to join call" />
+          ),
+        });
       }
     })();
-  }, [conversationId, user?.firstName, user?.lastName]);
+  }, [conversationId, member?.user.name]);
 
   if (token === "") {
     return <Loader />;

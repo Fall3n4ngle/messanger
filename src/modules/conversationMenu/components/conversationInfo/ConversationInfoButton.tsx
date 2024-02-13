@@ -28,17 +28,17 @@ export default function ConversationInfoButton({ members, ...props }: Props) {
         </button>
       </DialogTrigger>
       <DialogContent
-        className="h-[500px] space-y-1.5 flex flex-col"
+        className="h-[500px] space-y-4 flex flex-col"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>Group info</DialogTitle>
         </DialogHeader>
+        <ConversationDescription membersCount={members.length} {...props} />
         <div>
-          <ConversationDescription membersCount={members.length} {...props} />
+          <h4 className="scroll-m-20 font-semibold tracking-tight mb-3">Members</h4>
+          <MembersList members={members} />
         </div>
-        <h4 className="scroll-m-20 font-semibold tracking-tight">Members</h4>
-        <MembersList members={members} />
       </DialogContent>
     </Dialog>
   );

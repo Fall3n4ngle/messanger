@@ -35,7 +35,7 @@ export default function MembersList({ members }: Props) {
 
   return (
     <ScrollArea>
-      <ul>
+      <ul className="flex flex-col gap-1.5">
         {members.map(({ id, role, user }) => {
           const { clerkId, ...props } = user;
           const isActive = usersIds.includes(clerkId);
