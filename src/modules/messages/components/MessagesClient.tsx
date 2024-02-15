@@ -5,7 +5,7 @@ import MessagesList from "./MessagesList";
 import { useMember } from "@/common/hooks";
 import { useParams } from "next/navigation";
 
-export default function Messages() {
+export default function MessagesClient() {
   const conversationId = useParams().conversationId as string;
 
   const { data: messages, dataUpdatedAt } = useMessages({

@@ -1,6 +1,5 @@
 import { getConversationById } from "./actions/conversation";
 import { getUserMember } from "@/common/actions/member/queries";
-import { getMessages } from "@/common/actions/messages/queries";
 import { notFound } from "next/navigation";
 import { Messages } from "@/modules/messages";
 import { MessageForm } from "@/modules/messageForm";
@@ -15,7 +14,9 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { conversationKeys, memberKeys, messageKeys } from "@/common/const";
+import { conversationKeys, memberKeys } from "@/common/const";
+import { Suspense } from "react";
+import { Loader } from "@/components";
 
 type Props = {
   params: {
@@ -33,17 +34,10 @@ export default async function Conversation({
     queryFn: () => getConversationById(conversationId),
   });
 
-  await Promise.all([
-    queryClient.fetchQuery({
-      queryKey: messageKeys.list(conversationId),
-      queryFn: () => getMessages({ conversationId }),
-    }),
-
-    queryClient.fetchQuery({
-      queryKey: memberKeys.detail(conversationId),
-      queryFn: () => getUserMember({ conversationId }),
-    }),
-  ]);
+  await queryClient.fetchQuery({
+    queryKey: memberKeys.detail(conversationId),
+    queryFn: () => getUserMember({ conversationId }),
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -67,7 +61,9 @@ export default async function Conversation({
               </div>
             </div>
           </div>
-          <Messages />
+          <Suspense fallback={<Loader />}>
+            <Messages conversationId={conversationId} />
+          </Suspense>
           <div className="self-center w-full px-3 md:px-6 py-4 flex justify-center border-t">
             <MessageForm />
           </div>
