@@ -3,12 +3,13 @@ import { Loader, ToastMessage } from "@/components";
 import {
   ControlBar,
   LiveKitRoom,
-  RoomAudioRenderer
+  RoomAudioRenderer,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MyVideoConference } from "./VideoConference";
+import { env } from "@/lib/env.mjs";
 
 type Props = {
   onDisconected: () => void;
@@ -53,7 +54,7 @@ export default function MediaRoom({ onDisconected }: Props) {
       video={false}
       audio={false}
       token={token}
-      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+      serverUrl={env.NEXT_PUBLIC_LIVEKIT_URL}
       data-lk-theme="default"
       style={{ marginBottom: "2rem" }}
       onDisconnected={onDisconected}
