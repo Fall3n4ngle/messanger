@@ -3,13 +3,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useState } from "react";
 import { Button, Form } from "@/ui";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { FormFields, formSchema } from "../validations/formSchema";
 import { useToast } from "@/common/hooks";
 import { GroupMembers, ToastMessage } from "@/components";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createConversation } from "../actions/conversation";
 import GroupInfo from "./GroupInfo";
+import { conversationKeys } from "@/common/const";
 
 type Step = {
   id: string;
@@ -22,7 +22,6 @@ type Props = {
 };
 
 export default function CreateConversationForm({ onDialogClose }: Props) {
-  const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -39,13 +38,13 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createConversation,
-    onSuccess: (result) => {
+    onSuccess: () => {
       onDialogClose();
       form.reset();
       setStep(0);
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       toast({

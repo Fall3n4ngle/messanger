@@ -19,6 +19,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { editConversation } from "../../actions/conversation";
 import { useToast } from "@/common/hooks";
 import { Loader2 } from "lucide-react";
+import { conversationKeys } from "@/common/const";
 
 const formSchema = editConversationSchema.pick({ name: true, image: true });
 type FormFields = z.infer<typeof formSchema>;
@@ -49,11 +50,11 @@ export default function EditConversationForm({
     mutationFn: editConversation,
     onSuccess: async () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations", id],
+        queryKey: conversationKeys.detail(id),
       });
 
       onDialogClose();

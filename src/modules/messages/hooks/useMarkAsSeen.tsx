@@ -7,6 +7,7 @@ import {
 import { ToastMessage } from "@/components";
 import { UserConversation } from "@/common/actions/conversation/queries";
 import { markAsSeen } from "../actions/message";
+import { conversationKeys } from "@/common/const";
 
 export const useMarkAsSeen = () => {
   const queryClient = useQueryClient();
@@ -17,16 +18,16 @@ export const useMarkAsSeen = () => {
     mutationKey: ["messages", "mark_as_seen"],
     onMutate: async ({ conversationId, messageId }) => {
       await queryClient.cancelQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       const previousData = queryClient.getQueriesData({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       queryClient.setQueriesData(
         {
-          queryKey: ["conversations", "list"],
+          queryKey: conversationKeys.lists(),
         },
         (oldData: InfiniteData<UserConversation[]> | undefined) => {
           if (!oldData)
@@ -34,7 +35,7 @@ export const useMarkAsSeen = () => {
               pageParams: [],
               pages: [],
             };
-            
+
           const { pageParams, pages } = oldData;
 
           const newPages = pages.map((page) => {
@@ -66,7 +67,7 @@ export const useMarkAsSeen = () => {
     onError: (_error, _variables, context) => {
       queryClient.setQueriesData(
         {
-          queryKey: ["conversations", "list"],
+          queryKey: conversationKeys.lists(),
         },
         context?.previousData
       );
@@ -84,7 +85,7 @@ export const useMarkAsSeen = () => {
         }) === 1
       ) {
         queryClient.invalidateQueries({
-          queryKey: ["conversations", "list"],
+          queryKey: conversationKeys.lists(),
         });
       }
     },

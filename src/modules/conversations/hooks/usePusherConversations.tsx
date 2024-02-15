@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/common/hooks";
 import { getConversationsChannel } from "@/common/utils";
 import { ConversationEvent } from "@/common/types";
-import { conversationEvents } from "@/common/const";
+import { conversationEvents, conversationKeys } from "@/common/const";
 
 export const usePusherConversations = () => {
   const router = useRouter();
@@ -26,17 +26,17 @@ export const usePusherConversations = () => {
 
     const handleConversation = ({ conversationId }: ConversationEvent) => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations", conversationId],
+        queryKey: conversationKeys.detail(conversationId),
       });
     };
 
     const handleMember = ({ conversationId }: ConversationEvent) => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", conversationId],
+        queryKey: conversationKeys.detail(conversationId),
       });
     };
 

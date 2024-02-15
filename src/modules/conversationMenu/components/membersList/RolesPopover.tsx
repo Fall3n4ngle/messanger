@@ -14,7 +14,11 @@ import {
 import { ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/common/utils";
-import { AvailableRoles, availableMemberRoles } from "@/common/const";
+import {
+  AvailableRoles,
+  availableMemberRoles,
+  conversationKeys,
+} from "@/common/const";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/common/hooks";
 import { changeMemberRole } from "../../actions/member";
@@ -26,7 +30,7 @@ type Props = {
   conversationId: string;
 };
 
-export default function MemberRoles({ id, role, conversationId }: Props) {
+export default function RolesPopover({ id, role, conversationId }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
@@ -34,7 +38,7 @@ export default function MemberRoles({ id, role, conversationId }: Props) {
 
   const { mutate: changeRole } = useMutation({
     mutationFn: changeMemberRole,
-    onMutate: ({ role: newRole }) => {
+    onMutate: ({ role: newRole,  }) => {
       setOptimisticRole(newRole);
 
       toast({
@@ -54,7 +58,7 @@ export default function MemberRoles({ id, role, conversationId }: Props) {
     },
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", conversationId],
+        queryKey: conversationKeys.detail(conversationId),
       });
     },
   });

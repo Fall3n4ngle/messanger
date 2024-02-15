@@ -1,4 +1,4 @@
-import { messageEvents } from "@/common/const";
+import { conversationKeys, messageEvents, messageKeys } from "@/common/const";
 import { getMessagesChannel } from "@/common/utils";
 import { pusherClient } from "@/lib/pusher/client";
 import { useAuth } from "@clerk/nextjs";
@@ -20,11 +20,11 @@ export const usePusherMessages = () => {
       conversationId: string;
     }) => {
       queryClient.invalidateQueries({
-        queryKey: ["messages", conversationId],
+        queryKey: messageKeys.list(conversationId),
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
     };
 

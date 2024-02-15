@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 type Props = {
-  query: string | null;
+  query: string;
 } & PaginationProps;
 
 export const getUserConversations = async ({

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getMessages } from "@/common/actions/messages/queries";
+import { messageKeys } from "@/common/const";
 
 type Props = {
   conversationId: string;
@@ -7,7 +8,7 @@ type Props = {
 
 export const useMessages = ({ conversationId }: Props) => {
   return useQuery({
-    queryKey: ["messages", conversationId],
+    queryKey: messageKeys.list(conversationId),
     queryFn: () => getMessages({ conversationId }),
     throwOnError: true,
   });

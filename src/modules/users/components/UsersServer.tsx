@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import UsersClient from "./UsersClient";
 import { USERS_PER_PAGE } from "../const";
+import { userKeys } from "@/common/const";
 
 type Props = {
   searchParams: {
@@ -15,12 +16,13 @@ type Props = {
 
 export default async function UsersServer({ searchParams }: Props) {
   const queryClient = new QueryClient();
+  const query = searchParams.query ?? "";
 
   await queryClient.fetchInfiniteQuery({
-    queryKey: ["users", searchParams.query ?? null],
+    queryKey: userKeys.list(query),
     queryFn: ({ pageParam }: { pageParam?: string }) =>
       getUsers({
-        query: null,
+        query,
         lastCursor: pageParam,
         take: USERS_PER_PAGE,
       }),

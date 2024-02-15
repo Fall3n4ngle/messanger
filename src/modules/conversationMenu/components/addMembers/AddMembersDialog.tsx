@@ -14,7 +14,7 @@ type Props = {
   currentMembers: string[];
 };
 
-export default function AddMembersButton({
+export default function AddMembersDialog({
   conversationId,
   currentMembers,
 }: Props) {

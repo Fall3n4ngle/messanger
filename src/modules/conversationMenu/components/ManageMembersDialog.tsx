@@ -10,7 +10,7 @@ import {
 import { SlidersHorizontal } from "lucide-react";
 import { UserMember } from "@/common/actions/member/queries";
 import MembersList from "./membersList/MembersList";
-import AddMembersButton from "./addMembers/AddMembersButton";
+import AddMembersDialog from "./addMembers/AddMembersDialog";
 
 type Props = {
   members: UserMember[];
@@ -40,7 +40,7 @@ export default function ManageMembersButton({
         </DialogHeader>
         <MembersList conversationId={conversationId} members={members} />
         <div className="self-end mt-auto">
-          <AddMembersButton
+          <AddMembersDialog
             conversationId={conversationId}
             currentMembers={currentMembers}
           />

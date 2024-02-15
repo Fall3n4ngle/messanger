@@ -12,10 +12,10 @@ import {
   TooltipTrigger,
 } from "@/ui";
 import { MoreVertical } from "lucide-react";
-import ConversationInfoButton from "./conversationInfo/ConversationInfoButton";
-import ManageMembersButton from "./ManageMembersButton";
-import EditConversationButton from "./editConversation/EditConversationButton";
-import LeaveConversationButton from "./leaveConversation/LeaveConversationDialog";
+import ConversationInfoDialog from "./conversationInfo/ConversationInfoDialog";
+import ManageMembersDialog from "./ManageMembersDialog";
+import EditConversationDialog from "./editConversation/EditConversationDialog";
+import LeaveConversationDialog from "./leaveConversation/LeaveConversationDialog";
 import { useParams } from "next/navigation";
 import { useConversation, useMember } from "@/common/hooks";
 
@@ -55,7 +55,7 @@ export default function ConversationMenuButton() {
       </TooltipProvider>
       <DropdownMenuContent className="p-1.5 space-y-0.5">
         <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
-          <ConversationInfoButton name={name} image={image} members={members} />
+          <ConversationInfoDialog name={name} image={image} members={members} />
         </DropdownMenuItem>
         {canMutate && (
           <>
@@ -63,7 +63,7 @@ export default function ConversationMenuButton() {
               onSelect={(e) => e.preventDefault()}
               className="p-0"
             >
-              <EditConversationButton
+              <EditConversationDialog
                 id={conversationId}
                 name={name}
                 image={image}
@@ -73,7 +73,7 @@ export default function ConversationMenuButton() {
               onSelect={(e) => e.preventDefault()}
               className="p-0"
             >
-              <ManageMembersButton
+              <ManageMembersDialog
                 members={members}
                 conversationId={conversationId}
               />
@@ -81,7 +81,7 @@ export default function ConversationMenuButton() {
           </>
         )}
         <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
-          <LeaveConversationButton
+          <LeaveConversationDialog
             conversationId={conversationId}
             memberId={memberId}
           />

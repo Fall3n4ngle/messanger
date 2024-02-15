@@ -15,6 +15,7 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import { conversationKeys, memberKeys, messageKeys } from "@/common/const";
 
 type Props = {
   params: {
@@ -28,18 +29,18 @@ export default async function Conversation({
   const queryClient = new QueryClient();
 
   await queryClient.fetchQuery({
-    queryKey: ["conversations", conversationId],
+    queryKey: conversationKeys.detail(conversationId),
     queryFn: () => getConversationById(conversationId),
   });
 
   await Promise.all([
     queryClient.fetchQuery({
-      queryKey: ["messages", conversationId],
+      queryKey: messageKeys.list(conversationId),
       queryFn: () => getMessages({ conversationId }),
     }),
 
     queryClient.fetchQuery({
-      queryKey: ["member", conversationId],
+      queryKey: memberKeys.detail(conversationId),
       queryFn: () => getUserMember({ conversationId }),
     }),
   ]);

@@ -18,7 +18,7 @@ type Props = {
   members: UserMember[];
 };
 
-export default function ConversationInfoButton({ members, ...props }: Props) {
+export default function ConversationInfoDialog({ members, ...props }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>

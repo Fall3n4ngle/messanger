@@ -1,17 +1,14 @@
-import "@livekit/components-styles";
-import {
-  LiveKitRoom,
-  GridLayout,
-  ParticipantTile,
-  RoomAudioRenderer,
-  ControlBar,
-  useTracks,
-} from "@livekit/components-react";
-import { useEffect, useState } from "react";
-import { Track } from "livekit-client";
-import { Loader, ToastMessage } from "@/components";
 import { useMember, useToast } from "@/common/hooks";
+import { Loader, ToastMessage } from "@/components";
+import {
+  ControlBar,
+  LiveKitRoom,
+  RoomAudioRenderer
+} from "@livekit/components-react";
+import "@livekit/components-styles";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MyVideoConference } from "./VideoConference";
 
 type Props = {
   onDisconected: () => void;
@@ -65,23 +62,5 @@ export default function MediaRoom({ onDisconected }: Props) {
       <RoomAudioRenderer />
       <ControlBar />
     </LiveKitRoom>
-  );
-}
-
-function MyVideoConference() {
-  const tracks = useTracks(
-    [
-      { source: Track.Source.Camera, withPlaceholder: true },
-      { source: Track.Source.ScreenShare, withPlaceholder: false },
-    ],
-    { onlySubscribed: false }
-  );
-  return (
-    <GridLayout
-      tracks={tracks}
-      style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
-    >
-      <ParticipantTile />
-    </GridLayout>
   );
 }

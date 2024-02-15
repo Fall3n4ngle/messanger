@@ -1,4 +1,4 @@
-import { memberEvents } from "@/common/const";
+import { conversationKeys, memberEvents, memberKeys } from "@/common/const";
 import { useToast } from "@/common/hooks";
 import { ChangeRoleEvent, MemberEvent } from "@/common/types";
 import { getMemberChannel } from "@/common/utils";
@@ -23,7 +23,7 @@ export const usePusherMember = () => {
 
     const handleJoinConversation = ({ conversationName }: MemberEvent) => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       toast({
@@ -42,7 +42,7 @@ export const usePusherMember = () => {
       }
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       toast({
@@ -61,11 +61,11 @@ export const usePusherMember = () => {
       conversationName,
     }: ChangeRoleEvent) => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", conversationId],
+        queryKey: conversationKeys.detail(conversationId),
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["member", conversationId],
+        queryKey: memberKeys.detail(conversationId),
       });
 
       toast({

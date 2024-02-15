@@ -1,6 +1,5 @@
 "use client";
 
-import { UserConversation } from "@/common/actions/conversation/queries";
 import { cn } from "@/common/utils";
 import { Search } from "@/components";
 import { CreateConversationButton } from "@/modules/createConversation";

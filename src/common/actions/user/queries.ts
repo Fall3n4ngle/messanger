@@ -20,7 +20,7 @@ export const getUser = async () => {
 };
 
 type Props = {
-  query: string | null;
+  query: string;
 } & PaginationProps;
 
 export const getUsers = async ({ query, lastCursor, take = 25 }: Props) => {

@@ -1,9 +1,10 @@
 import { getUsers } from "@/common/actions/user/queries";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { USERS_PER_PAGE } from "../const";
+import { userKeys } from "@/common/const";
 
 type Props = {
-  query: string | null;
+  query: string;
 };
 
 export const useInfiniteUsers = ({ query }: Props) => {
@@ -16,7 +17,7 @@ export const useInfiniteUsers = ({ query }: Props) => {
   };
 
   return useInfiniteQuery({
-    queryKey: ["users", query],
+    queryKey: userKeys.list(query),
     queryFn: getData,
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => {

@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteMember } from "../../actions/member";
 import { ToastMessage } from "@/components";
 import { Loader2 } from "lucide-react";
+import { conversationKeys } from "@/common/const";
 
 type Props = {
   conversationId: string;
@@ -23,7 +24,7 @@ export default function DeleteMemberButton({
     mutationFn: deleteMember,
     onSuccess: async () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", conversationId],
+        queryKey: conversationKeys.detail(conversationId),
       });
 
       toast({

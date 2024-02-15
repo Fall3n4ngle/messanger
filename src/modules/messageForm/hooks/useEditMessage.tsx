@@ -2,6 +2,7 @@ import { ToastMessage } from "@/components";
 import { editMessage } from "../actions/message";
 import { useToast } from "@/common/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { conversationKeys, messageKeys } from "@/common/const";
 
 export const useEditMessage = () => {
   const queryClient = useQueryClient();
@@ -11,12 +12,12 @@ export const useEditMessage = () => {
     mutationFn: editMessage,
     onSuccess: (_, { conversationId }) => {
       queryClient.invalidateQueries({
-        queryKey: ["messages", conversationId],
+        queryKey: messageKeys.list(conversationId),
         stale: true,
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       toast({

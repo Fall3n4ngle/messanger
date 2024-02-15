@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import ConversationCardSkeleton from "./ConversationCardSkeleton";
 
 export default function ConversationsClient() {
-  const query = useSearchParams().get("query");
+  const query = useSearchParams().get("query") ?? "";
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,

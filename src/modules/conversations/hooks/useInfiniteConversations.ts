@@ -1,14 +1,13 @@
 import { getUserConversations } from "@/common/actions/conversation/queries";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { CONVERSATIONS_PER_PAGE } from "../const";
+import { conversationKeys } from "@/common/const";
 
-type UseInfiniteConversationsProps = {
-  query: string | null;
+type Props = {
+  query: string;
 };
 
-export const useInfiniteConversations = ({
-  query,
-}: UseInfiniteConversationsProps) => {
+export const useInfiniteConversations = ({ query }: Props) => {
   const getData = async ({ pageParam }: { pageParam?: string }) => {
     return await getUserConversations({
       lastCursor: pageParam,
@@ -18,7 +17,7 @@ export const useInfiniteConversations = ({
   };
 
   return useInfiniteQuery({
-    queryKey: ["conversations", "list", query],
+    queryKey: conversationKeys.list(query),
     queryFn: getData,
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => {

@@ -8,7 +8,7 @@ import UsersList from "./UsersList";
 import { useSearchParams } from "next/navigation";
 
 export default function UsersClient() {
-  const query = useSearchParams().get("query");
+  const query = useSearchParams().get("query") ?? "";
 
   const { ref: bottomRef, inView } = useInView({
     threshold: 1,

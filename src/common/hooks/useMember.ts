@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUserMember } from "../actions/member/queries";
+import { memberKeys } from "../const";
 
 type Props = {
   conversationId: string;
@@ -7,9 +8,8 @@ type Props = {
 
 export const useMember = ({ conversationId }: Props) => {
   return useQuery({
-    queryKey: ["member", conversationId],
+    queryKey: memberKeys.detail(conversationId),
     queryFn: () => getUserMember({ conversationId }),
-    enabled: !!conversationId,
     throwOnError: true,
   });
 };

@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { leaveConversation } from "../../actions/member";
+import { conversationKeys } from "@/common/const";
 
 type Props = {
   conversationId: string;
@@ -34,7 +35,7 @@ export default function LeaveConversationButton({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: conversationKeys.lists(),
       });
 
       onDialogClose();

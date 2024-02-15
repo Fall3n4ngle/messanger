@@ -1,7 +1,7 @@
 import { useActiveUsers } from "@/common/store";
 import { ScrollArea } from "@/ui";
 import DeleteMemberDialog from "./DeleteMemberDialog";
-import MemberRoles from "./MemberRoles";
+import RolesPopover from "./RolesPopover";
 import { UserCard } from "@/components";
 import { UserMember } from "@/common/actions/member/queries";
 import { AvailableRoles } from "@/common/const";
@@ -29,7 +29,7 @@ export default function MembersList({ conversationId, members }: Props) {
                   conversationId={conversationId}
                   memberId={id}
                 />
-                <MemberRoles
+                <RolesPopover
                   id={id}
                   role={role as AvailableRoles}
                   conversationId={conversationId}

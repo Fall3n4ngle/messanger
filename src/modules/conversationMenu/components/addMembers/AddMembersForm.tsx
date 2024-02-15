@@ -8,6 +8,7 @@ import { formMembersSchema, FormMembersFields } from "@/common/validations";
 import { addMembers } from "@/common/actions/conversation/mutations";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { conversationKeys } from "@/common/const";
 
 type Props = {
   conversationId: string;
@@ -34,7 +35,7 @@ export default function AddMembersForm({
     mutationFn: addMembers,
     onSuccess: async () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", conversationId],
+        queryKey: conversationKeys.detail(conversationId),
       });
 
       toast({
