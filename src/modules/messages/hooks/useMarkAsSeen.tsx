@@ -9,13 +9,15 @@ import { UserConversation } from "@/common/actions/conversation/queries";
 import { markAsSeen } from "../actions/message";
 import { conversationKeys } from "@/common/const";
 
+const mutationKey = ["messages", "mark_as_seen"];
+
 export const useMarkAsSeen = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
     mutationFn: markAsSeen,
-    mutationKey: ["messages", "mark_as_seen"],
+    mutationKey,
     onMutate: async ({ conversationId, messageId }) => {
       await queryClient.cancelQueries({
         queryKey: conversationKeys.lists(),
@@ -81,7 +83,7 @@ export const useMarkAsSeen = () => {
     onSettled: () => {
       if (
         queryClient.isMutating({
-          mutationKey: ["messages", "mark_as_seen"],
+          mutationKey,
         }) === 1
       ) {
         queryClient.invalidateQueries({

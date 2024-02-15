@@ -1,6 +1,5 @@
-import { Conversation } from "../../types";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { conversationKeys } from "@/common/const";
+import { useToast } from "@/common/hooks";
 import { Dropzone, ToastMessage } from "@/components";
 import {
   Button,
@@ -12,21 +11,21 @@ import {
   FormMessage,
   Input,
 } from "@/ui";
-import { editConversationSchema } from "../../validations/conversation";
-import { z } from "zod";
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { editConversation } from "../../actions/conversation";
-import { useToast } from "@/common/hooks";
 import { Loader2 } from "lucide-react";
-import { conversationKeys } from "@/common/const";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { editConversation } from "../../actions/conversation";
+import { EditConversationFields, editConversationSchema } from "../../validations/conversation";
 
 const formSchema = editConversationSchema.pick({ name: true, image: true });
 type FormFields = z.infer<typeof formSchema>;
 
-type Props = Conversation & {
+type Props =  {
   onDialogClose: Function;
-};
+} & EditConversationFields;
 
 export default function EditConversationForm({
   id,

@@ -123,3 +123,5 @@ export const getConversationById = cache(async (conversationId: string) => {
 
   return conversation;
 });
+
+export type Conversation = Awaited<ReturnType<typeof getConversationById>>;

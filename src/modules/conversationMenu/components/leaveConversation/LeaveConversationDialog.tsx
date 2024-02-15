@@ -7,20 +7,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
+  DropdownMenuItem,
 } from "@/ui";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import LeaveConversationButton from "./LeaveConversationButton";
-
-type Props = {
-  conversationId: string;
-  memberId: string;
-};
+import { DeleteMemberFields } from "../../validations/member";
 
 export default function LeaveConversationDialog({
   conversationId,
   memberId,
-}: Props) {
+}: DeleteMemberFields) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDialogClose = () => {
@@ -30,10 +27,12 @@ export default function LeaveConversationDialog({
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <button className="flex items-center gap-3 px-2 py-1.5">
-          <Trash2 className="h-4 w-4 text-destructive" />
-          Leave
-        </button>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
+          <button className="flex items-center gap-3 px-2 py-1.5">
+            <Trash2 className="h-4 w-4 text-destructive" />
+            Leave
+          </button>
+        </DropdownMenuItem>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

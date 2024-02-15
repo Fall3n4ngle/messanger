@@ -5,13 +5,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DropdownMenuItem,
 } from "@/ui";
 import { Settings } from "lucide-react";
-import { Conversation } from "../../types";
 import { useState } from "react";
 import EditConversationForm from "./EditConversationForm";
+import { EditConversationFields } from "../../validations/conversation";
 
-export default function EditConversationButton(props: Conversation) {
+export default function EditConversationDialog(props: EditConversationFields) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDialogClose = () => {
@@ -19,12 +20,14 @@ export default function EditConversationButton(props: Conversation) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen} modal>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-3 px-2 py-1.5">
-          <Settings className="h-4 w-4" />
-          Edit group
-        </button>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
+          <button className="flex items-center gap-3 px-2 py-1.5">
+            <Settings className="h-4 w-4" />
+            Edit group
+          </button>
+        </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

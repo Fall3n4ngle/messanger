@@ -5,12 +5,11 @@ import { deleteMember } from "../../actions/member";
 import { ToastMessage } from "@/components";
 import { Loader2 } from "lucide-react";
 import { conversationKeys } from "@/common/const";
+import { DeleteMemberFields } from "../../validations/member";
 
 type Props = {
-  conversationId: string;
-  memberId: string;
   onDialogClose: Function;
-};
+} & DeleteMemberFields;
 
 export default function DeleteMemberButton({
   conversationId,

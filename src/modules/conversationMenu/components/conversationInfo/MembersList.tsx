@@ -1,3 +1,7 @@
+import { Conversation } from "@/common/actions/conversation/queries";
+import { allMemberRoles } from "@/common/const";
+import { useActiveUsers } from "@/common/store";
+import { UserCard } from "@/components";
 import {
   ScrollArea,
   Tooltip,
@@ -5,15 +9,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/ui";
-import { UserCard } from "@/components";
-import { useActiveUsers } from "@/common/store";
 import { MemberRole } from "@prisma/client";
-import { allMemberRoles } from "@/common/const";
-import { UserMember } from "@/common/actions/member/queries";
 
-type Props = {
-  members: UserMember[];
-};
+type Props = Pick<Conversation, "members">;
 
 export default function MembersList({ members }: Props) {
   const { usersIds } = useActiveUsers();

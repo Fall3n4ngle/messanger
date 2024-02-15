@@ -1,5 +1,3 @@
-"use client";
-
 import { useToast } from "@/common/hooks";
 import { ToastMessage } from "@/components";
 import { Button } from "@/ui";
@@ -8,12 +6,11 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { leaveConversation } from "../../actions/member";
 import { conversationKeys } from "@/common/const";
+import { DeleteMemberFields } from "../../validations/member";
 
 type Props = {
-  conversationId: string;
-  memberId: string;
   onDialogClose: Function;
-};
+} & DeleteMemberFields;
 
 export default function LeaveConversationButton({
   conversationId,

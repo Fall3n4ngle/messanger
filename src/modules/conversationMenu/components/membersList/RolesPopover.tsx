@@ -1,74 +1,15 @@
-"use client";
-
-import {
-  Button,
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/ui";
+import { availableMemberRoles } from "@/common/const";
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@/ui";
 import { ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/common/utils";
-import {
-  AvailableRoles,
-  availableMemberRoles,
-  conversationKeys,
-} from "@/common/const";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/common/hooks";
-import { changeMemberRole } from "../../actions/member";
-import { ToastMessage } from "@/components";
+import { ChangeRoleFields } from "../../validations/member";
+import RolesCommand from "./RolesCommand";
 
-type Props = {
-  id: string;
-  role: AvailableRoles;
-  conversationId: string;
-};
-
-export default function RolesPopover({ id, role, conversationId }: Props) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+export default function RolesPopover(props: ChangeRoleFields) {
   const [isOpen, setIsOpen] = useState(false);
-  const [optimisticRole, setOptimisticRole] = useState(role);
-
-  const { mutate: changeRole } = useMutation({
-    mutationFn: changeMemberRole,
-    onMutate: ({ role: newRole,  }) => {
-      setOptimisticRole(newRole);
-
-      toast({
-        description: (
-          <ToastMessage type="success" message="Role changed successfully" />
-        ),
-      });
-    },
-    onError: () => {
-      setOptimisticRole(role);
-
-      toast({
-        description: (
-          <ToastMessage type="error" message="Failed to change role" />
-        ),
-      });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: conversationKeys.detail(conversationId),
-      });
-    },
-  });
-
-  const handleSelect = async (newRole: AvailableRoles) => {
-    changeRole({ memberId: id, role: newRole, conversationId });
-  };
 
   const currentRoleLabel = availableMemberRoles.find(
-    (r) => r.value === optimisticRole
+    (r) => r.value === props.role
   )?.label;
 
   return (
@@ -85,28 +26,7 @@ export default function RolesPopover({ id, role, conversationId }: Props) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0" align="end">
-        <Command>
-          <CommandInput placeholder="Select a role..." />
-          <CommandEmpty>No roles found.</CommandEmpty>
-          <CommandGroup>
-            {availableMemberRoles.map((r) => (
-              <CommandItem
-                key={r.value}
-                className={cn(
-                  "teamaspace-y-1 flex flex-col mb-1 items-start px-4 py-2",
-                  r.value === optimisticRole &&
-                    "bg-secondary hover:bg-secondary cursor-default"
-                )}
-                value={r.value}
-                disabled={r.value === optimisticRole}
-                onSelect={() => handleSelect(r.value)}
-              >
-                <p>{r.label}</p>
-                <p className="text-sm text-muted-foreground">{r.description}</p>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </Command>
+        <RolesCommand {...props} />
       </PopoverContent>
     </Popover>
   );

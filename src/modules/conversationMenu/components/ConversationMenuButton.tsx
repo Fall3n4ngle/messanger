@@ -4,7 +4,6 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
@@ -54,38 +53,24 @@ export default function ConversationMenuButton() {
         </Tooltip>
       </TooltipProvider>
       <DropdownMenuContent className="p-1.5 space-y-0.5">
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
-          <ConversationInfoDialog name={name} image={image} members={members} />
-        </DropdownMenuItem>
+        <ConversationInfoDialog name={name} image={image} members={members} />
         {canMutate && (
           <>
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="p-0"
-            >
-              <EditConversationDialog
-                id={conversationId}
-                name={name}
-                image={image}
-              />
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="p-0"
-            >
-              <ManageMembersDialog
-                members={members}
-                conversationId={conversationId}
-              />
-            </DropdownMenuItem>
+            <EditConversationDialog
+              id={conversationId}
+              name={name}
+              image={image}
+            />
+            <ManageMembersDialog
+              members={members}
+              conversationId={conversationId}
+            />
           </>
         )}
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="p-0">
-          <LeaveConversationDialog
-            conversationId={conversationId}
-            memberId={memberId}
-          />
-        </DropdownMenuItem>
+        <LeaveConversationDialog
+          conversationId={conversationId}
+          memberId={memberId}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

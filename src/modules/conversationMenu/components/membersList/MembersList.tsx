@@ -30,7 +30,7 @@ export default function MembersList({ conversationId, members }: Props) {
                   memberId={id}
                 />
                 <RolesPopover
-                  id={id}
+                  memberId={id}
                   role={role as AvailableRoles}
                   conversationId={conversationId}
                 />

@@ -12,16 +12,9 @@ import {
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import DeleteMemberButton from "./DeleteMemberButton";
+import { DeleteMemberFields } from "../../validations/member";
 
-type Props = {
-  conversationId: string;
-  memberId: string;
-};
-
-export default function DeleteMemberDialog({
-  conversationId,
-  memberId,
-}: Props) {
+export default function DeleteMemberDialog(props: DeleteMemberFields) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDialogClose = () => {
@@ -45,11 +38,7 @@ export default function DeleteMemberDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <DeleteMemberButton
-            conversationId={conversationId}
-            memberId={memberId}
-            onDialogClose={handleDialogClose}
-          />
+          <DeleteMemberButton {...props} onDialogClose={handleDialogClose} />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
