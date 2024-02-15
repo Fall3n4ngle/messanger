@@ -40,22 +40,6 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
       );
     }
 
-    const updatedMember = await db.member.update({
-      select: {
-        user: {
-          select: {
-            clerkId: true,
-          },
-        },
-      },
-      where: {
-        id: memberId,
-      },
-      data: {
-        role,
-      },
-    });
-
     const conversation = await db.conversation.findFirst({
       where: { id: conversationId },
       select: {
@@ -69,6 +53,26 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
             },
           },
         },
+      },
+    });
+
+    if (!conversation) {
+      throw new Error("Conversation not found");
+    }
+
+    const updatedMember = await db.member.update({
+      select: {
+        user: {
+          select: {
+            clerkId: true,
+          },
+        },
+      },
+      where: {
+        id: memberId,
+      },
+      data: {
+        role,
       },
     });
 
@@ -149,6 +153,10 @@ export const deleteMember = async (data: DeleteMemberFields) => {
       },
     });
 
+    if (!conversation) {
+      throw new Error("Conversation not found");
+    }
+
     const deletedMember = await db.member.delete({
       where: {
         id: memberId,
@@ -162,7 +170,7 @@ export const deleteMember = async (data: DeleteMemberFields) => {
       },
     });
 
-    conversation?.members.forEach((member) => {
+    conversation.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
         if (member.user.clerkId === deletedMember.user.clerkId) {
           const memberChannel = getMemberChannel({
@@ -193,6 +201,76 @@ export const deleteMember = async (data: DeleteMemberFields) => {
     return { success: true, data: deletedMember };
   } catch (error) {
     const message = (error as Error).message ?? "Failed to delete member";
+    console.log(message);
+    throw new Error(message);
+  }
+};
+
+export const leaveConversation = async (data: DeleteMemberFields) => {
+  const result = deleteMemberSchema.safeParse(data);
+
+  if (!result.success) {
+    throw new Error(result.error.toString());
+  }
+
+  const { userId } = await getUserAuth();
+  const { conversationId, memberId } = result.data;
+
+  try {
+    const conversation = await db.conversation.findFirst({
+      where: {
+        id: conversationId,
+      },
+      select: {
+        name: true,
+        members: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!conversation) {
+      throw new Error("Conversation not found");
+    }
+
+    const deletedMember = await db.member.delete({
+      where: {
+        id: memberId,
+      },
+      select: {
+        user: {
+          select: {
+            clerkId: true,
+          },
+        },
+      },
+    });
+
+    conversation.members.forEach((member) => {
+      if (member.user.clerkId !== userId) {
+        const conversationsChannel = getConversationsChannel({
+          userId: member.user.clerkId,
+        });
+
+        pusherServer.trigger(
+          conversationsChannel,
+          conversationEvents.deleteMember,
+          {
+            conversationId,
+          } as ConversationEvent
+        );
+      }
+    });
+
+    return { success: true, data: deletedMember };
+  } catch (error) {
+    const message = (error as Error).message ?? "Failed leave conversation";
     console.log(message);
     throw new Error(message);
   }

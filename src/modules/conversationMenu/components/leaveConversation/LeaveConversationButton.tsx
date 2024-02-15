@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@/ui";
-import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/common/hooks";
-import { deleteMember } from "../../actions/member";
 import { ToastMessage } from "@/components";
+import { Button } from "@/ui";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { leaveConversation } from "../../actions/member";
 
 type Props = {
   conversationId: string;
@@ -24,7 +24,7 @@ export default function LeaveConversationButton({
   const { toast } = useToast();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: deleteMember,
+    mutationFn: leaveConversation,
     onError() {
       toast({
         description: (
