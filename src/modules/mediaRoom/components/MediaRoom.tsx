@@ -11,13 +11,14 @@ import { useEffect, useState } from "react";
 import { Track } from "livekit-client";
 import { Loader, ToastMessage } from "@/components";
 import { useMember, useToast } from "@/common/hooks";
+import { useParams } from "next/navigation";
 
 type Props = {
-  conversationId: string;
   onDisconected: () => void;
 };
 
-export default function MediaRoom({ conversationId, onDisconected }: Props) {
+export default function MediaRoom({ onDisconected }: Props) {
+  const conversationId = useParams().conversationId as string;
   const { toast } = useToast();
   const { data: member } = useMember({ conversationId });
 

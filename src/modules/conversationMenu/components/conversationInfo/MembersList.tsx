@@ -8,7 +8,7 @@ import {
 import { UserCard } from "@/components";
 import { useActiveUsers } from "@/common/store";
 import { MemberRole } from "@prisma/client";
-import { allMemberRoles } from "../../const";
+import { allMemberRoles } from "@/common/const";
 import { UserMember } from "@/common/actions/member/queries";
 
 type Props = {
@@ -24,7 +24,7 @@ export default function MembersList({ members }: Props) {
     const { label, description } = value;
 
     return (
-      <TooltipProvider delayDuration={300} >
+      <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger>{label}</TooltipTrigger>
           <TooltipContent side="bottom">{description}</TooltipContent>

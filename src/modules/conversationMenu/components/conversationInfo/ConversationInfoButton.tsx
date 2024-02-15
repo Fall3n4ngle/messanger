@@ -35,10 +35,8 @@ export default function ConversationInfoButton({ members, ...props }: Props) {
           <DialogTitle>Group info</DialogTitle>
         </DialogHeader>
         <ConversationDescription membersCount={members.length} {...props} />
-        <div>
-          <h4 className="scroll-m-20 font-semibold tracking-tight mb-3">Members</h4>
-          <MembersList members={members} />
-        </div>
+        <h4 className="scroll-m-20 font-semibold tracking-tight">Members</h4>
+        <MembersList members={members} />
       </DialogContent>
     </Dialog>
   );

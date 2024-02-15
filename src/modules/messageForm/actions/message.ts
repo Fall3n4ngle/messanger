@@ -102,7 +102,13 @@ export const editMessage = async (data: EditMessageFields) => {
   const { id, conversationId, ...fields } = result.data;
 
   try {
-    if (!canMutateMessage({ clerkId: userId, messageId: id, conversationId })) {
+    const canMutate = await canMutateMessage({
+      clerkId: userId,
+      messageId: id,
+      conversationId,
+    });
+
+    if (!canMutate) {
       throw new Error(
         "You must be admin, editor or the sender of the message in order to edit it"
       );

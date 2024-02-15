@@ -10,8 +10,9 @@ import { MemberRole } from "@prisma/client";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
 import { getUserAuth } from "@/common/dataAccess";
-import { getConversationsChannel } from "@/common/utils";
-import { conversationEvents } from "@/common/const";
+import { getMemberChannel } from "@/common/utils";
+import { memberEvents } from "@/common/const";
+import { MemberEvent } from "@/common/types";
 
 export const createConversation = async (fields: CreateConversationFields) => {
   const result = createConversationSchema.safeParse(fields);
@@ -48,41 +49,7 @@ export const createConversation = async (fields: CreateConversationFields) => {
         },
       },
       select: {
-        id: true,
         name: true,
-        image: true,
-        updatedAt: true,
-        messages: {
-          where: {
-            AND: {
-              seenBy: {
-                none: {
-                  id: currentUser.id,
-                },
-              },
-              userId: {
-                not: currentUser.id,
-              },
-            },
-          },
-          select: {
-            id: true,
-          },
-        },
-        lastMessage: {
-          select: {
-            id: true,
-            content: true,
-            updatedAt: true,
-            file: true,
-            user: {
-              select: {
-                clerkId: true,
-                name: true,
-              },
-            },
-          },
-        },
         members: {
           select: {
             user: {
@@ -95,23 +62,19 @@ export const createConversation = async (fields: CreateConversationFields) => {
       },
     });
 
-    const { members, ...conversation } = createdConversation;
-
-    members.forEach((member) => {
+    createdConversation.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
-        const conversationChannel = getConversationsChannel({
+        const memberChannel = getMemberChannel({
           userId: member.user.clerkId,
         });
 
-        pusherServer.trigger(
-          conversationChannel,
-          conversationEvents.newConversation,
-          null
-        );
+        pusherServer.trigger(memberChannel, memberEvents.join, {
+          conversationName: createdConversation.name,
+        } as MemberEvent);
       }
     });
 
-    return { success: true, data: conversation };
+    return { success: true, data: createdConversation };
   } catch (error) {
     const message = (error as Error).message ?? "Failed to create conversation";
     console.log(message);

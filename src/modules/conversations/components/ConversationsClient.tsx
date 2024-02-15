@@ -5,6 +5,7 @@ import {
   usePusherConversations,
   usePusherMessages,
   useInfiniteConversations,
+  usePusherMember,
 } from "../hooks";
 import ConversationsList from "./ConversationsList";
 import { useInView } from "react-intersection-observer";
@@ -25,6 +26,7 @@ export default function ConversationsClient() {
 
   usePusherConversations();
   usePusherMessages();
+  usePusherMember();
 
   useEffect(() => {
     if (inView && hasNextPage) {

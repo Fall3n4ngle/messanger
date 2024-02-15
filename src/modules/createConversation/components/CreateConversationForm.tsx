@@ -56,10 +56,6 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
           />
         ),
       });
-
-      if (result?.data.id) {
-        router.push(`/conversations/${result?.data?.id}`);
-      }
     },
     onError: () => {
       toast({

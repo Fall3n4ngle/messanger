@@ -1,6 +1,6 @@
 import { MemberRole } from "@prisma/client";
 import { z } from "zod";
-import { AvailableRoles } from "../const";
+import { AvailableRoles } from "@/common/const";
 
 export const deleteMemberSchema = z.object({
   conversationId: z.string(),

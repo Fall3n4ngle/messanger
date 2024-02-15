@@ -2,7 +2,11 @@
 
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
-import { ConversationEvent, DeleteMemberEvent } from "@/common/types";
+import {
+  ChangeRoleEvent,
+  ConversationEvent,
+  MemberEvent,
+} from "@/common/types";
 import {
   ChangeRoleFields,
   DeleteMemberFields,
@@ -10,8 +14,12 @@ import {
   deleteMemberSchema,
 } from "../validations/member";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
-import { getConversationsChannel } from "@/common/utils";
-import { conversationEvents } from "@/common/const";
+import { getConversationsChannel, getMemberChannel } from "@/common/utils";
+import {
+  availableMemberRoles,
+  conversationEvents,
+  memberEvents,
+} from "@/common/const";
 
 export const changeMemberRole = async (data: ChangeRoleFields) => {
   const result = changeRoleSchema.safeParse(data);
@@ -24,13 +32,22 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
   const { role, memberId, conversationId } = result.data;
 
   try {
-    if (!canMutateConversation(userId, conversationId)) {
+    const canMutate = await canMutateConversation(userId, conversationId);
+
+    if (!canMutate) {
       throw new Error(
         "You must be an admin of a conversation to delete member"
       );
     }
 
     const updatedMember = await db.member.update({
+      select: {
+        user: {
+          select: {
+            clerkId: true,
+          },
+        },
+      },
       where: {
         id: memberId,
       },
@@ -42,6 +59,7 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
     const conversation = await db.conversation.findFirst({
       where: { id: conversationId },
       select: {
+        name: true,
         members: {
           select: {
             user: {
@@ -56,13 +74,29 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
 
     conversation?.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
+        if (member.user.clerkId === updatedMember.user.clerkId) {
+          const memberCahnnel = getMemberChannel({
+            userId: member.user.clerkId,
+          });
+
+          const newRole = availableMemberRoles.find((r) => r.value === role);
+
+          pusherServer.trigger(memberCahnnel, memberEvents.changeRole, {
+            conversationId,
+            newRole: newRole?.label ?? role,
+            conversationName: conversation.name,
+          } as ChangeRoleEvent);
+
+          return;
+        }
+
         const conversationsChannel = getConversationsChannel({
           userId: member.user.clerkId,
         });
 
         pusherServer.trigger(
           conversationsChannel,
-          conversationEvents.updateMember,
+          conversationEvents.changeMemberRole,
           {
             conversationId,
           } as ConversationEvent
@@ -89,9 +123,11 @@ export const deleteMember = async (data: DeleteMemberFields) => {
   const { conversationId, memberId } = result.data;
 
   try {
-    if (!canMutateConversation(userId, conversationId)) {
+    const canMutate = await canMutateConversation(userId, conversationId);
+
+    if (!canMutate) {
       throw new Error(
-        "You must be an admin of a conversation to change member role"
+        "You must be an admin of a conversation to delete member"
       );
     }
 
@@ -127,7 +163,19 @@ export const deleteMember = async (data: DeleteMemberFields) => {
     });
 
     conversation?.members.forEach((member) => {
-      if (userId !== deletedMember.user.clerkId) {
+      if (member.user.clerkId !== userId) {
+        if (member.user.clerkId === deletedMember.user.clerkId) {
+          const memberChannel = getMemberChannel({
+            userId: member.user.clerkId,
+          });
+
+          pusherServer.trigger(memberChannel, memberEvents.leave, {
+            conversationName: conversation.name,
+          } as MemberEvent);
+
+          return;
+        }
+
         const conversationsChannel = getConversationsChannel({
           userId: member.user.clerkId,
         });
@@ -137,9 +185,7 @@ export const deleteMember = async (data: DeleteMemberFields) => {
           conversationEvents.deleteMember,
           {
             conversationId,
-            userId: deletedMember.user.clerkId,
-            conversationName: conversation.name,
-          } as DeleteMemberEvent
+          } as ConversationEvent
         );
       }
     });

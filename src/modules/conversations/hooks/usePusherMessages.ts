@@ -19,7 +19,7 @@ export const usePusherMessages = () => {
     }: {
       conversationId: string;
     }) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: ["messages", conversationId],
       });
 

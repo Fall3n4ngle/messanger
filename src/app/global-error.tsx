@@ -1,7 +1,11 @@
 "use client";
 
+import { cn } from "@/common/utils";
 import { ThemeProvider } from "@/providers";
 import { Button } from "@/ui";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function GlobalError({
   reset,
@@ -10,8 +14,13 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <html>
-      <body className="flex flex-col gap-4 w-full h-screen items-center justify-center">
+    <html lang="en">
+      <body
+        className={cn(
+          "flex flex-col gap-4 w-full h-screen items-center justify-center",
+          inter.className
+        )}
+      >
         <ThemeProvider>
           <h2 className="scroll-m-20 text-3xl text-red-600 font-semibold tracking-tight first:mt-0">
             Error

@@ -2,8 +2,12 @@ export type ConversationEvent = {
   conversationId: string;
 };
 
-export type DeleteMemberEvent = {
+export type MemberEvent = {
+  conversationName: string;
+};
+
+export type ChangeRoleEvent = {
   conversationId: string;
-  userId: string;
+  newRole: string;
   conversationName: string;
 };

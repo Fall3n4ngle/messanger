@@ -14,7 +14,7 @@ import {
 import { ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/common/utils";
-import { AvailableRoles, availableMemberRoles } from "../../const";
+import { AvailableRoles, availableMemberRoles } from "@/common/const";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/common/hooks";
 import { changeMemberRole } from "../../actions/member";

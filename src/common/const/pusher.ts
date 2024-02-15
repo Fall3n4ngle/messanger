@@ -1,9 +1,8 @@
 export const conversationEvents = {
-  newConversation: "conversation:new",
   deleteMember: "conversation:delete_member",
   updateConversation: "conversation:update",
   addMembers: "conversation:add_members",
-  updateMember: "conversation:update_member",
+  changeMemberRole: "conversation:change_member_role",
 };
 
 export const messageEvents = {
@@ -11,4 +10,10 @@ export const messageEvents = {
   deleteMessage: "message:delete",
   updateMessage: "message:update",
   markAsSeen: "message:seen",
+};
+
+export const memberEvents = {
+  changeRole: "member:change_role",
+  leave: "member:leave",
+  join: "member:join",
 };

@@ -23,7 +23,13 @@ export const deleteMessage = async (data: DeleteMessageFields) => {
   const { conversationId, messageId } = result.data;
 
   try {
-    if (!canMutateMessage({ clerkId: userId, conversationId, messageId })) {
+    const canMutate = await canMutateMessage({
+      clerkId: userId,
+      conversationId,
+      messageId,
+    });
+
+    if (!canMutate) {
       throw new Error(
         "You must be admin, editor or the sender of the message in order to delete it"
       );
@@ -144,7 +150,7 @@ export const markAsSeen = async (data: MarkAsSeenFields) => {
       userId: updatedMessage.user.clerkId,
     });
 
-    pusherServer.trigger(messagesChannel, "messages:seen", {
+    pusherServer.trigger(messagesChannel, messageEvents.markAsSeen, {
       conversationId,
     });
 

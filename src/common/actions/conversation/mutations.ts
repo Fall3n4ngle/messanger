@@ -7,10 +7,10 @@ import {
 import { MemberRole } from "@prisma/client";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher/server";
-import { ConversationEvent } from "@/common/types";
+import { ConversationEvent, MemberEvent } from "@/common/types";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
-import { getConversationsChannel } from "@/common/utils";
-import { conversationEvents } from "@/common/const";
+import { getConversationsChannel, getMemberChannel } from "@/common/utils";
+import { conversationEvents, memberEvents } from "@/common/const";
 
 export const addMembers = async (fields: AddMembersFields) => {
   const result = addMembersSchema.safeParse(fields);
@@ -42,10 +42,12 @@ export const addMembers = async (fields: AddMembersFields) => {
         },
       },
       select: {
+        name: true,
         members: {
           select: {
             user: {
               select: {
+                id: true,
                 clerkId: true,
               },
             },
@@ -56,6 +58,18 @@ export const addMembers = async (fields: AddMembersFields) => {
 
     updatedConversation.members.forEach((member) => {
       if (member.user.clerkId !== userId) {
+        if (newMembers.find(({ id }) => id === member.user.id)) {
+          const memberChannel = getMemberChannel({
+            userId: member.user.clerkId,
+          });
+
+          pusherServer.trigger(memberChannel, memberEvents.join, {
+            conversationName: updatedConversation.name,
+          } as MemberEvent);
+
+          return;
+        }
+
         const conversationChannel = getConversationsChannel({
           userId: member.user.clerkId,
         });

@@ -13,10 +13,8 @@ import {
 import { PhoneCall } from "lucide-react";
 import MediaRoom from "./MediaRoom";
 import { useState } from "react";
-import { useParams } from "next/navigation";
 
 export default function MediaRoomButton() {
-  const conversationId = useParams().conversationId as string;
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDisconnect = () => {
@@ -43,10 +41,7 @@ export default function MediaRoomButton() {
         </Tooltip>
       </TooltipProvider>
       <DialogContent className="top-0 left-0 w-full max-w-full h-full translate-x-0 translate-y-0 rounded-none p-0">
-        <MediaRoom
-          conversationId={conversationId}
-          onDisconected={handleDisconnect}
-        />
+        <MediaRoom onDisconected={handleDisconnect} />
       </DialogContent>
     </Dialog>
   );

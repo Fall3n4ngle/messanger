@@ -22,7 +22,9 @@ export const editConversation = async (data: EditConversationFields) => {
   const { id, ...fields } = result.data;
 
   try {
-    if (!canMutateConversation(userId, id)) {
+    const canMutate = await canMutateConversation(userId, id)
+
+    if (!canMutate) {
       throw new Error(
         "You must be an admin of a conversation to edit conversation"
       );
@@ -65,7 +67,7 @@ export const editConversation = async (data: EditConversationFields) => {
 
     return { success: true, data: conversation };
   } catch (error) {
-    const message = (error as Error).message ?? "Failed to create group";
+    const message = (error as Error).message ?? "Failed to update group";
     console.log(message);
     throw new Error(message);
   }
