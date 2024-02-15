@@ -1,3 +1,4 @@
+import { conversationKeys, messageKeys } from "@/common/const";
 import { useToast } from "@/common/hooks";
 import { useMessageForm } from "@/common/store";
 import { ToastMessage } from "@/components";
@@ -23,11 +24,11 @@ export default function DeleteMessageButton({
     mutationFn: deleteMessage,
     onSuccess: (_, { messageId, conversationId }) => {
       queryClient.invalidateQueries({
-        queryKey: ["messages", conversationId],
+        queryKey: messageKeys.list(conversationId),
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["conversations", "list"],
+        queryKey: conversationKeys.lists(),
       });
 
       toast({

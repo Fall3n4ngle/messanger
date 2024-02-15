@@ -1,6 +1,6 @@
 "use client";
 
-import { useActiveStatus } from "@/common/hooks";
+import { useActiveStatus } from "../hooks";
 
 export default function ActiveStatus() {
   useActiveStatus();

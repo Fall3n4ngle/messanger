@@ -1,16 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import {
-  usePusherConversations,
-  usePusherMessages,
-  useInfiniteConversations,
-  usePusherMember,
-} from "../hooks";
-import ConversationsList from "./ConversationsList";
-import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
+import { useInfiniteConversations } from "../hooks/useInfiniteConversations";
 import ConversationCardSkeleton from "./ConversationCardSkeleton";
+import ConversationsList from "./ConversationsList";
 
 export default function ConversationsClient() {
   const query = useSearchParams().get("query") ?? "";
@@ -23,10 +18,6 @@ export default function ConversationsClient() {
     useInfiniteConversations({
       query,
     });
-
-  usePusherConversations();
-  usePusherMessages();
-  usePusherMember();
 
   useEffect(() => {
     if (inView && hasNextPage) {
