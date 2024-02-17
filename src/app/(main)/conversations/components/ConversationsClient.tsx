@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/common/utils";
-import { CreateConversationButton } from "@/modules/createConversation";
+import { CreateConversationDialog } from "@/modules/createConversation";
 import { useParams } from "next/navigation";
 import { PropsWithChildren } from "react";
 
@@ -18,10 +18,10 @@ export default function ConversationsClient({ children }: PropsWithChildren) {
       <div className="mx-auto flex w-full min-w-[270px] max-w-[450px] items-center gap-3 p-4 md:mx-0">
         <div className="grow">
           <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-            Groups
+            Conversations
           </h4>
         </div>
-        <CreateConversationButton />
+        <CreateConversationDialog />
       </div>
       {children}
     </div>

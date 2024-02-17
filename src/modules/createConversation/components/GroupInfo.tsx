@@ -34,7 +34,7 @@ export default function GroupInfo({ onSubmit, ...props }: Props) {
         name="image"
         render={() => (
           <FormItem className="mb-2">
-            <FormLabel>Group image</FormLabel>
+            <FormLabel>Image</FormLabel>
             <FormControl>
               <Dropzone {...props} />
             </FormControl>
@@ -46,7 +46,7 @@ export default function GroupInfo({ onSubmit, ...props }: Props) {
         name="name"
         render={({ field }) => (
           <FormItem className="mb-4">
-            <FormLabel>Group name</FormLabel>
+            <FormLabel>Name</FormLabel>
             <FormControl>
               <Input {...field} onKeyDown={handleKeyDown} />
             </FormControl>

@@ -1,1 +1,1 @@
-export { default as CreateConversationButton } from "./components/CreateConversationButton";
+export { default as CreateConversationDialog } from "./components/CreateConversationDialog";

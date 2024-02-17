@@ -33,21 +33,21 @@ export default function CreateConversationButton() {
               <Button
                 variant="secondary"
                 size="icon"
-                aria-label="Create group conversation"
+                aria-label="Create conversation"
                 className="rounded-full"
               >
                 <UserPlus className="h-4 w-4" />
               </Button>
             </DialogTrigger>
           </TooltipTrigger>
-          <TooltipContent>Create group</TooltipContent>
+          <TooltipContent>Create conversation</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <DialogContent className="flex min-h-[300px] flex-col">
         <DialogHeader>
-          <DialogTitle>Create group</DialogTitle>
+          <DialogTitle>Create conversation</DialogTitle>
           <DialogDescription>
-            Choose group name, image and add other users
+            Choose conversation&apos;s name, image and add other users
           </DialogDescription>
         </DialogHeader>
         <CreateConversationForm onDialogClose={handleDialogClose} />

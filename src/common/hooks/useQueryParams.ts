@@ -23,7 +23,7 @@ export const useQueryParams = <T>() => {
 
       router.push(`${pathname}${query}`);
     },
-    [pathname, searchParams],
+    [pathname, searchParams, router],
   );
 
   return { queryParams: searchParams, setQueryParams };
