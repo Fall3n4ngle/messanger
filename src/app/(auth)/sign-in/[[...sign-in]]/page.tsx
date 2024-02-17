@@ -4,7 +4,7 @@ import TestUsers from "./components/TestUsers";
 export default function Page() {
   return (
     <>
-      <div className="mb-6 max-w-[370px] w-full">
+      <div className="mb-6 w-full max-w-[370px]">
         <TestUsers />
       </div>
       <SignIn />

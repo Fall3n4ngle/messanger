@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       { message: "Failed to authorize pusher client" },
       {
         status: 401,
-      }
+      },
     );
   }
 
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       { message: "socket_id was not provided" },
       {
         status: 401,
-      }
+      },
     );
   }
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       { message: "channel_name was not provided" },
       {
         status: 401,
-      }
+      },
     );
   }
 
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   const authResponse = pusherServer.authorizeChannel(
     socket_id,
     channel_name,
-    data
+    data,
   );
 
   return NextResponse.json(authResponse);

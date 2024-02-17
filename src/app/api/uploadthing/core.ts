@@ -13,7 +13,7 @@ export const ourFileRouter = {
 
       if (!user)
         throw new UploadThingError(
-          "You must be logged in to upload a profile picture"
+          "You must be logged in to upload a profile picture",
         );
 
       return { userId: user.id };

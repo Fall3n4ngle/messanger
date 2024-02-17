@@ -36,7 +36,7 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
 
     if (!canMutate) {
       throw new Error(
-        "You must be an admin of a conversation to delete member"
+        "You must be an admin of a conversation to delete member",
       );
     }
 
@@ -103,7 +103,7 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
           conversationEvents.changeMemberRole,
           {
             conversationId,
-          } as ConversationEvent
+          } as ConversationEvent,
         );
       }
     });
@@ -131,7 +131,7 @@ export const deleteMember = async (data: DeleteMemberFields) => {
 
     if (!canMutate) {
       throw new Error(
-        "You must be an admin of a conversation to delete member"
+        "You must be an admin of a conversation to delete member",
       );
     }
 
@@ -193,7 +193,7 @@ export const deleteMember = async (data: DeleteMemberFields) => {
           conversationEvents.deleteMember,
           {
             conversationId,
-          } as ConversationEvent
+          } as ConversationEvent,
         );
       }
     });
@@ -263,7 +263,7 @@ export const leaveConversation = async (data: DeleteMemberFields) => {
           conversationEvents.deleteMember,
           {
             conversationId,
-          } as ConversationEvent
+          } as ConversationEvent,
         );
       }
     });

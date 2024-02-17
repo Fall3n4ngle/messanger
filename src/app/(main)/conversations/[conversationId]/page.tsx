@@ -29,10 +29,12 @@ export default async function Conversation({
 }: Props) {
   const queryClient = new QueryClient();
 
-  await queryClient.fetchQuery({
+  const conversation = await queryClient.fetchQuery({
     queryKey: conversationKeys.detail(conversationId),
     queryFn: () => getConversationById(conversationId),
   });
+
+  if (!conversation) notFound();
 
   await queryClient.fetchQuery({
     queryKey: memberKeys.detail(conversationId),
@@ -41,10 +43,10 @@ export default async function Conversation({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="w-full h-full">
-        <div className="flex flex-col h-full">
-          <div className="p-3 md:px-6 border-b w-full">
-            <div className="flex justify-between items-center">
+      <div className="h-full w-full">
+        <div className="flex h-full flex-col">
+          <div className="w-full border-b p-3 md:px-6">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Link
                   href="/conversations"
@@ -64,7 +66,7 @@ export default async function Conversation({
           <Suspense fallback={<Loader />}>
             <Messages conversationId={conversationId} />
           </Suspense>
-          <div className="self-center w-full px-3 md:px-6 py-4 flex justify-center border-t">
+          <div className="flex w-full justify-center self-center border-t px-3 py-4 md:px-6">
             <MessageForm />
           </div>
         </div>

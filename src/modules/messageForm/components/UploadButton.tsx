@@ -36,7 +36,7 @@ export default function UploadButton({
   const handleUploadComplete = (
     result: UploadFileResponse<{
       uploadedBy: string;
-    }>[]
+    }>[],
   ) => {
     const { key, url } = result[0];
     setValue("file", url);
@@ -61,7 +61,7 @@ export default function UploadButton({
   });
 
   const { fileTypes, multiple } = generatePermittedFileTypes(
-    permittedFileInfo?.config
+    permittedFileInfo?.config,
   );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -78,8 +78,8 @@ export default function UploadButton({
           size: "icon",
           variant: "secondary",
         }),
-        "cursor-pointer !mt-0 rounded-full",
-        disabled && "cursor-default opacity-50"
+        "!mt-0 cursor-pointer rounded-full",
+        disabled && "cursor-default opacity-50",
       )}
     >
       <input
@@ -91,7 +91,7 @@ export default function UploadButton({
         disabled={disabled}
       />
       {isUploading ? (
-        <Loader2 className="w-5 h-5 animate-spin" />
+        <Loader2 className="h-5 w-5 animate-spin" />
       ) : (
         <ImageIcon />
       )}

@@ -16,7 +16,7 @@ export default function SubmitButton({
 
   let icon;
   if (isSubmitting) {
-    icon = <Loader2 className="w-4 h-4 animate-spin" />;
+    icon = <Loader2 className="h-4 w-4 animate-spin" />;
   } else if (isEditing) {
     icon = <Check />;
   } else {

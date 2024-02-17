@@ -52,7 +52,7 @@ export default function ConversationMenuButton() {
           <TooltipContent>Options</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DropdownMenuContent className="p-1.5 space-y-0.5">
+      <DropdownMenuContent className="space-y-0.5 p-1.5">
         <ConversationInfoDialog name={name} image={image} members={members} />
         {canMutate && (
           <>

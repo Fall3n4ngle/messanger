@@ -17,7 +17,7 @@ export const sendMessageSchema = messageSchema
   .merge(
     z.object({
       content: z.string().min(1),
-    })
+    }),
   );
 
 export const editMessageSchema = messageSchema.pick({

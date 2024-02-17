@@ -12,7 +12,7 @@ export default function EditMessageButton(props: Props) {
   };
 
   return (
-    <button className="w-full flex items-end gap-3 p-2" onClick={handleClick}>
+    <button className="flex w-full items-end gap-3 p-2" onClick={handleClick}>
       <Pencil className="text-primary" />
       Edit
     </button>

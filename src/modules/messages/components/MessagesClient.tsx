@@ -20,7 +20,7 @@ export default function MessagesClient() {
 
   if (!messages?.length) {
     return (
-      <div className="flex items-center justify-center h-full w-full">
+      <div className="flex h-full w-full items-center justify-center">
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           No messages yet
         </h3>

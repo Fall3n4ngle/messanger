@@ -33,7 +33,7 @@ export default function ManageMembersButton({
           </button>
         </DropdownMenuItem>
       </DialogTrigger>
-      <DialogContent className="h-[500px] max-w-[600px] flex flex-col gap-5">
+      <DialogContent className="flex h-[500px] max-w-[600px] flex-col gap-5">
         <DialogHeader>
           <DialogTitle>Manage members ({members.length - 1})</DialogTitle>
           <DialogDescription>
@@ -41,7 +41,7 @@ export default function ManageMembersButton({
           </DialogDescription>
         </DialogHeader>
         <MembersList conversationId={conversationId} members={members} />
-        <div className="self-end mt-auto">
+        <div className="mt-auto self-end">
           <AddMembersDialog
             conversationId={conversationId}
             currentMembers={currentMembers}

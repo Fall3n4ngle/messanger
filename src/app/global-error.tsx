@@ -9,20 +9,22 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function GlobalError({
   reset,
+  error
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  
   return (
     <html lang="en">
       <body
         className={cn(
-          "flex flex-col gap-4 w-full h-screen items-center justify-center",
-          inter.className
+          "flex h-screen w-full flex-col items-center justify-center gap-4",
+          inter.className,
         )}
       >
         <ThemeProvider>
-          <h2 className="scroll-m-20 text-3xl text-red-600 font-semibold tracking-tight first:mt-0">
+          <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-red-600 first:mt-0">
             Error
           </h2>
           <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">

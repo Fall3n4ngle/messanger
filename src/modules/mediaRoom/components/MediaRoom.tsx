@@ -28,7 +28,7 @@ export default function MediaRoom({ onDisconected }: Props) {
     (async () => {
       try {
         const resp = await fetch(
-          `/api/get-participant-token?room=${conversationId}&username=${member.user.name}`
+          `/api/get-participant-token?room=${conversationId}&username=${member.user.name}`,
         );
         const data = await resp.json();
 
@@ -43,7 +43,7 @@ export default function MediaRoom({ onDisconected }: Props) {
         });
       }
     })();
-  }, [conversationId, member?.user.name]);
+  }, [conversationId, member?.user.name, toast, onDisconected]);
 
   if (token === "") {
     return <Loader />;

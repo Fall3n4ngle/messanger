@@ -29,7 +29,7 @@ export default function DesktopItem({
               buttonVariants({
                 size: "icon",
                 variant: isActive ? "secondary" : "ghost",
-              })
+              }),
             )}
             aria-label={label}
           >

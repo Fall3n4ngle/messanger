@@ -18,10 +18,7 @@ type Props = {
   onSubmit: (e: FormEvent) => void;
 };
 
-export default function GroupInfo({
-  onSubmit,
-  ...props
-}: Props) {
+export default function GroupInfo({ onSubmit, ...props }: Props) {
   const { control } = useFormContext();
 
   const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {

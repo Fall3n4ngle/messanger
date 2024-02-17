@@ -14,7 +14,7 @@ export default function ToastMessage({ type, message }: Props) {
           "flex items-center justify-center rounded-full p-1.5 sm:p-2",
           type === "error"
             ? "bg-destructive text-destructive-foreground"
-            : "bg-primary text-primary-foreground"
+            : "bg-primary text-primary-foreground",
         )}
       >
         {type === "error" ? (

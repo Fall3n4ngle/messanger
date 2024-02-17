@@ -36,14 +36,14 @@ export default function CreateConversationButton() {
                 aria-label="Create group conversation"
                 className="rounded-full"
               >
-                <UserPlus className="w-4 h-4" />
+                <UserPlus className="h-4 w-4" />
               </Button>
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>Create group</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DialogContent className="min-h-[300px] flex flex-col">
+      <DialogContent className="flex min-h-[300px] flex-col">
         <DialogHeader>
           <DialogTitle>Create group</DialogTitle>
           <DialogDescription>

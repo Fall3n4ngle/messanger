@@ -19,7 +19,7 @@ export default function MobileItem({
       className={cn(
         buttonVariants({
           variant: isActive ? "secondary" : "ghost",
-        })
+        }),
       )}
       aria-label={label}
     >

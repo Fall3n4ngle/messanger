@@ -14,7 +14,7 @@ export default function ConversationHeading() {
   const { image, name, members } = conversation;
 
   return (
-    <div className="flex gap-3 items-center">
+    <div className="flex items-center gap-3">
       <Avatar>
         {image && <AvatarImage src={image} alt={`${name} image`} />}
         <AvatarFallback className="bg-primary text-primary-foreground">
@@ -22,10 +22,10 @@ export default function ConversationHeading() {
         </AvatarFallback>
       </Avatar>
       <div>
-        <h4 className="scroll-m-20 font-semibold tracking-tight whitespace-nowrap mb-1">
+        <h4 className="mb-1 scroll-m-20 whitespace-nowrap font-semibold tracking-tight">
           {name}
         </h4>
-        <p className="text-sm text-muted-foreground whitespace-nowrap">
+        <p className="whitespace-nowrap text-sm text-muted-foreground">
           {typingUsers.length > 0 ? (
             <span className="animate-pulse text-primary">
               {formatTypingUsers(typingUsers)}

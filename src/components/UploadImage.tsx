@@ -20,13 +20,13 @@ export default function UploadImage({
       <button
         type="button"
         onClick={onDelete}
-        className="absolute right-0 top-0 rounded-full p-1 bg-destructive"
+        className="absolute right-0 top-0 rounded-full bg-destructive p-1"
         disabled={isPending}
       >
         {isPending ? (
           <Loader2 size={17} className="animate-spin" />
         ) : (
-          <X size={17} />
+          <X size={17} className="text-[#f8fafc]" />
         )}
       </button>
     </div>

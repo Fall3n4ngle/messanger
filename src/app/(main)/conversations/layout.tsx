@@ -9,7 +9,7 @@ export default async function layout({ children }: PropsWithChildren) {
   return (
     <>
       <ConversationsClient>
-        <ScrollArea className="max-w-[450px] w-full mx-auto md:mx-0 pb-10 sm:pb-0 px-4">
+        <ScrollArea className="mx-auto w-full max-w-[450px] px-4 pb-10 sm:pb-0 md:mx-0">
           <Suspense fallback={<ConversationsSkeleton />}>
             <Conversations />
           </Suspense>

@@ -60,8 +60,8 @@ export default function UserButton({ image, name, clerkId, id }: Props) {
                 </Avatar>
                 <div
                   className={cn(
-                    "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-muted-foreground border-2 border-background",
-                    isActive && "bg-green-400"
+                    "absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full border-2 border-background bg-muted-foreground",
+                    isActive && "bg-green-400",
                   )}
                 />
               </div>

@@ -13,17 +13,17 @@ export default function ConversationDescription({
 }: Props) {
   return (
     <div className="flex items-center gap-4">
-      <Avatar className="w-16 h-16">
+      <Avatar className="h-16 w-16">
         {image && <AvatarImage src={image} alt={`${name} image`} />}
-        <AvatarFallback className="text-lg bg-primary text-primary-foreground">
+        <AvatarFallback className="bg-primary text-lg text-primary-foreground">
           {name[0].toUpperCase()}
         </AvatarFallback>
       </Avatar>
       <div>
-        <h4 className="scroll-m-20 text-lg mb-1 font-semibold tracking-tight">
+        <h4 className="mb-1 scroll-m-20 text-lg font-semibold tracking-tight">
           {name}
         </h4>
-        <p className="text-sm text-muted-foreground whitespace-nowrap">
+        <p className="whitespace-nowrap text-sm text-muted-foreground">
           {membersCount} members
         </p>
       </div>

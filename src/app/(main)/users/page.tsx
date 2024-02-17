@@ -13,17 +13,17 @@ type Props = {
 export default async function UsersPage({ searchParams }: Props) {
   return (
     <>
-      <div className="p-4 md:border-r md:max-w-[320px] w-full flex flex-col gap-6">
-        <div className="min-w-[270px] max-w-[450px] w-full mx-auto md:mx-0">
+      <div className="flex w-full flex-col gap-6 p-4 md:max-w-[320px] md:border-r">
+        <div className="mx-auto w-full min-w-[270px] max-w-[450px] md:mx-0">
           <Search id="searchUsers" label="Search users" />
         </div>
         <Suspense fallback={<UsersSkeleton />}>
-          <ScrollArea className="max-w-[450px] w-full mx-auto md:mx-0 pb-10 sm:pb-0">
+          <ScrollArea className="mx-auto w-full max-w-[450px] pb-10 sm:pb-0 md:mx-0">
             <Users searchParams={searchParams} />
           </ScrollArea>
         </Suspense>
       </div>
-      <main className="hidden md:flex px-4 items-center justify-center w-full min-h-screen ">
+      <main className="hidden min-h-screen w-full items-center justify-center px-4 md:flex ">
         <EmptyConversationMessage />
       </main>
     </>

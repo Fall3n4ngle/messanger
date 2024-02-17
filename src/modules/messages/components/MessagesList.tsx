@@ -41,23 +41,23 @@ export default function MessagesList({
   }, [dataUpdatedAt, isScrolledToBottom]);
 
   return (
-    <ScrollArea className="flex-1 h-full px-4 md:px-6 py-6 relative">
+    <ScrollArea className="relative h-full flex-1 px-4 py-6 md:px-6">
       <Button
         variant="secondary"
         size="icon"
         className={cn(
-          "rounded-full absolute right-6 bottom-6 z-10 w-14 h-14 hover:bg-secondary transition-opacity delay-200",
+          "absolute bottom-6 right-6 z-10 h-14 w-14 rounded-full transition-opacity delay-200 hover:bg-secondary",
           {
             "visible opacity-100": !isScrolledToBottom,
             "invisible opacity-0": isScrolledToBottom,
-          }
+          },
         )}
         onClick={scrollToBottom}
         aria-label="Scroll to bottom"
       >
         <ChevronsDown className="text-muted-foreground" />
       </Button>
-      <div className="flex-1 flex flex-col gap-6" ref={messagesListRef}>
+      <div className="flex flex-1 flex-col gap-6" ref={messagesListRef}>
         {messages.map(({ user, ...props }) => {
           if (!user || !userId) return;
 

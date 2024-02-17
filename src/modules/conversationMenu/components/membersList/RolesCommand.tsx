@@ -30,9 +30,9 @@ export default function RolesCommand({
           <CommandItem
             key={r.value}
             className={cn(
-              "teamaspace-y-1 flex flex-col mb-1 items-start px-4 py-2",
+              "teamaspace-y-1 mb-1 flex flex-col items-start px-4 py-2",
               r.value === role &&
-                "bg-secondary hover:bg-secondary cursor-default"
+                "cursor-default bg-secondary hover:bg-secondary",
             )}
             value={r.value}
             disabled={r.value === role}

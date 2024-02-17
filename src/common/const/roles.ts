@@ -6,7 +6,7 @@ type Role<T> = {
   value: T;
   label: string;
   description: string;
-} ;
+};
 
 export const availableMemberRoles: ReadonlyArray<Role<AvailableRoles>> = [
   {
@@ -19,7 +19,7 @@ export const availableMemberRoles: ReadonlyArray<Role<AvailableRoles>> = [
     value: "VIEW",
     description: "Can edit his own messages",
   },
-]
+];
 
 export const allMemberRoles: Role<MemberRole>[] = [
   ...availableMemberRoles,

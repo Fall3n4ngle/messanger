@@ -15,15 +15,13 @@ export default function ConversationsClient() {
   });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteConversations({
-      query,
-    });
+    useInfiniteConversations({ query });
 
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
     }
-  }, [hasNextPage, inView, fetchNextPage]);
+  }, [inView, hasNextPage, fetchNextPage]);
 
   if (!data?.pages[0].length) {
     return <p className="pl-3">No conversations found</p>;
@@ -31,7 +29,7 @@ export default function ConversationsClient() {
 
   return (
     <>
-      <ConversationsList data={data} />
+      <ConversationsList conversations={data.pages} />
       {isFetchingNextPage && <ConversationCardSkeleton />}
       <div ref={bottomRef} className="pt-4" />
     </>

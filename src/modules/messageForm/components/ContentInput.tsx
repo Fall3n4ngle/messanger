@@ -67,7 +67,7 @@ const ContentInput = forwardRef<HTMLTextAreaElement, Props>(
         placeholder="Write a message..."
         className={cn(
           inputClassName,
-          "!m-0 resize-none bg-secondary dark:bg-secondary/50 border-none"
+          "!m-0 resize-none border-none bg-secondary dark:bg-secondary/50",
         )}
         {...props}
         ref={ref}
@@ -75,7 +75,7 @@ const ContentInput = forwardRef<HTMLTextAreaElement, Props>(
         onKeyUp={handleKeyUp}
       />
     );
-  }
+  },
 );
 
 ContentInput.displayName = "MessageFormInput";

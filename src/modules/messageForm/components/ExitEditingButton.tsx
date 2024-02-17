@@ -19,7 +19,7 @@ export default function ExitEditingButton() {
             variant="ghost"
             size="icon"
             onClick={resetMessageData}
-            className="rounded-full ml-auto mb-5"
+            className="mb-5 ml-auto rounded-full"
           >
             <X className="w-4.5 h-4.5" />
           </Button>

@@ -20,11 +20,10 @@ export const useQueryParams = <T>() => {
 
       const search = urlSearchParams.toString();
       const query = search ? `?${search}` : "";
-      router.push(`${pathname}${query}`, {
-        scroll: false,
-      });
+
+      router.push(`${pathname}${query}`);
     },
-    [pathname, router, searchParams],
+    [pathname, searchParams],
   );
 
   return { queryParams: searchParams, setQueryParams };

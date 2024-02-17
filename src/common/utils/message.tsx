@@ -11,7 +11,7 @@ export const getMessageSeen = ({ isOwn, isSeen }: GetMessageSeen) => {
 
   return (
     <CheckCheck
-      className={cn("text-muted-foreground w-4 h-4", isSeen && "text-primary")}
+      className={cn("h-4 w-4 text-muted-foreground", isSeen && "text-primary")}
     />
   );
 };

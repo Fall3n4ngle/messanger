@@ -18,12 +18,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { editConversation } from "../../actions/conversation";
-import { EditConversationFields, editConversationSchema } from "../../validations/conversation";
+import {
+  EditConversationFields,
+  editConversationSchema,
+} from "../../validations/conversation";
 
 const formSchema = editConversationSchema.pick({ name: true, image: true });
 type FormFields = z.infer<typeof formSchema>;
 
-type Props =  {
+type Props = {
   onDialogClose: Function;
 } & EditConversationFields;
 
@@ -124,7 +127,7 @@ export default function EditConversationForm({
           className="self-end"
         >
           Submit
-          {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+          {isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
         </Button>
       </form>
     </Form>

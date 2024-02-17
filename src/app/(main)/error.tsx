@@ -9,8 +9,8 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-4 w-full h-full items-center justify-center">
-      <h2 className="scroll-m-20 text-3xl text-red-600 font-semibold tracking-tight first:mt-0">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4">
+      <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-red-600 first:mt-0">
         Error
       </h2>
       <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">

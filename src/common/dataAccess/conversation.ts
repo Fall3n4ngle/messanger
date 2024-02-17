@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 
 export const canMutateConversation = async (
   clerkId: string,
-  conversationId: string
+  conversationId: string,
 ) => {
   const member = await db.member.findFirst({
     where: {

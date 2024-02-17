@@ -2,7 +2,6 @@
 
 import { checkAuth } from "@/common/dataAccess";
 import { db } from "@/lib/db";
-import { notFound } from "next/navigation";
 import { cache } from "react";
 
 export const getConversationById = cache(async (conversationId: string) => {
@@ -28,8 +27,6 @@ export const getConversationById = cache(async (conversationId: string) => {
       },
     },
   });
-
-  if (!conversation) notFound();
 
   return conversation;
 });

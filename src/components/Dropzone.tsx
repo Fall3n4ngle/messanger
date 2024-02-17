@@ -58,7 +58,7 @@ export default function Dropzone({ isUploading, setIsUploading }: Props) {
   const handleUploadComplete = (
     res: UploadFileResponse<{
       uploadedBy: string;
-    }>[]
+    }>[],
   ) => {
     const { key, url } = res[0];
     setFileKey(key);
@@ -92,7 +92,7 @@ export default function Dropzone({ isUploading, setIsUploading }: Props) {
   }
 
   return (
-    <div className="px-6 py-10 flex items-center justify-center">
+    <div className="flex items-center justify-center px-6 py-10">
       <UploadImage
         isPending={isUploading}
         onDelete={handleDelete}

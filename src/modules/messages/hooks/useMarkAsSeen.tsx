@@ -47,7 +47,7 @@ export const useMarkAsSeen = () => {
                   ...conversation,
                   messages: [
                     ...conversation.messages.filter(
-                      (message) => message.id !== messageId
+                      (message) => message.id !== messageId,
                     ),
                   ],
                 };
@@ -61,7 +61,7 @@ export const useMarkAsSeen = () => {
             pages: newPages,
             pageParams,
           };
-        }
+        },
       );
 
       return { previousData };
@@ -71,7 +71,7 @@ export const useMarkAsSeen = () => {
         {
           queryKey: conversationKeys.lists(),
         },
-        context?.previousData
+        context?.previousData,
       );
 
       toast({

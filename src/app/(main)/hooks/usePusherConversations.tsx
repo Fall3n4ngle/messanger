@@ -42,7 +42,7 @@ export const usePusherConversations = () => {
 
     pusherClient.bind(
       conversationEvents.updateConversation,
-      handleConversation
+      handleConversation,
     );
     pusherClient.bind(conversationEvents.addMembers, handleMember);
     pusherClient.bind(conversationEvents.deleteMember, handleMember);
@@ -52,7 +52,7 @@ export const usePusherConversations = () => {
       pusherClient.unsubscribe(conversationsChannel);
       pusherClient.unbind(
         conversationEvents.updateConversation,
-        handleConversation
+        handleConversation,
       );
       pusherClient.unbind(conversationEvents.addMembers, handleMember);
       pusherClient.unbind(conversationEvents.deleteMember, handleMember);

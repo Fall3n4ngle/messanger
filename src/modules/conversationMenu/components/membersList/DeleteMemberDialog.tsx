@@ -25,7 +25,7 @@ export default function DeleteMemberDialog(props: DeleteMemberFields) {
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger>
         <Button variant="destructive" size="icon">
-          <Trash2 className="w-5 h-5" />
+          <Trash2 className="h-5 w-5" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

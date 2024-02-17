@@ -115,7 +115,7 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col justify-between grow"
+        className="flex grow flex-col justify-between"
       >
         {steps[step].component}
         <div className="flex items-center justify-between">
@@ -138,7 +138,7 @@ export default function CreateConversationForm({ onDialogClose }: Props) {
               className="self-end"
             >
               Submit
-              {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+              {isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
             </Button>
           )}
         </div>

@@ -32,7 +32,7 @@ const getLastMessageContent = ({
 
   return (
     <>
-      <span className="text-primary font-semibold">{sender}</span>{" "}
+      <span className="font-semibold text-primary">{sender}</span>{" "}
       <span className="text-muted-foreground">{message}</span>
     </>
   );

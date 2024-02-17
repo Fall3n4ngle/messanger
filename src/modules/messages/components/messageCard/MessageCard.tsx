@@ -23,7 +23,7 @@ const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
       seen,
       ...props
     },
-    ref
+    ref,
   ) => {
     const { image, name } = user;
     const isEdited = updatedAt.toString() !== createdAt.toString();
@@ -34,7 +34,7 @@ const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
         {...props}
         className={cn("flex gap-3", isOwn && "justify-end")}
       >
-        <div className={cn("order-1 relative", isOwn && "order-2")}>
+        <div className={cn("relative order-1", isOwn && "order-2")}>
           <Avatar>
             {image && (
               <AvatarImage src={image} alt={name} className="object-cover" />
@@ -43,45 +43,45 @@ const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
           </Avatar>
           <div
             className={cn(
-              "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-muted-foreground border-2 border-background",
-              isActive && "bg-green-400"
+              "absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full border-2 border-background bg-muted-foreground",
+              isActive && "bg-green-400",
             )}
           />
         </div>
         <div
           className={cn(
-            "mt-2 max-w-[450px] flex flex-col gap-2 order-2",
-            isOwn && "order-1"
+            "order-2 mt-2 flex max-w-[450px] flex-col gap-2",
+            isOwn && "order-1",
           )}
         >
           <div className={cn("flex gap-2", isOwn && "justify-end")}>
             <span className=" font-semibold text-foreground/[85%]">
               {isOwn ? "You" : name}
             </span>
-            <span className="text-sm mt-[3px] text-muted-foreground">
+            <span className="mt-[3px] text-sm text-muted-foreground">
               {formatDate(createdAt)}
             </span>
             {isEdited && (
-              <span className="text-sm mt-[3px] text-muted-foreground">
+              <span className="mt-[3px] text-sm text-muted-foreground">
                 (edited)
               </span>
             )}
             <span className="mt-[4.5px]">{seen}</span>
           </div>
           {file && (
-            <div className="relative w-44 pt-[92%] mb-2 self-end">
+            <div className="relative mb-2 w-44 self-end pt-[92%]">
               <Image
                 src={file}
                 alt="Attached image"
                 fill
-                className="object-cover rounded-2xl"
+                className="rounded-2xl object-cover"
               />
             </div>
           )}
           <p
             className={cn(
-              "p-2.5 rounded-2xl bg-secondary tracking-tight max-w-[max-content] min-w-[50px]",
-              isOwn && "bg-primary text-primary-foreground self-end"
+              "min-w-[50px] max-w-[max-content] rounded-2xl bg-secondary p-2.5 tracking-tight",
+              isOwn && "self-end bg-primary text-primary-foreground",
             )}
           >
             {content}
@@ -89,7 +89,7 @@ const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 MessageCard.displayName = "MessageCard";

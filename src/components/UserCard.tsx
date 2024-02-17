@@ -16,7 +16,7 @@ export default function UserCard({
   rightSide,
 }: UserCardProps) {
   return (
-    <div className="flex items-center gap-5 p-2 rounded-md transition-colors">
+    <div className="flex items-center gap-5 rounded-md p-2 transition-colors">
       <div className="relative">
         <Avatar>
           {image && <AvatarImage src={image} alt={`${name} profile image`} />}
@@ -24,12 +24,12 @@ export default function UserCard({
         </Avatar>
         <div
           className={cn(
-            "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-muted-foreground border-2 border-background",
-            isActive && "bg-green-400"
+            "absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full border-2 border-background bg-muted-foreground",
+            isActive && "bg-green-400",
           )}
         />
       </div>
-      <span className="font-semibold grow">{name}</span>
+      <span className="grow font-semibold">{name}</span>
       {rightSide}
     </div>
   );

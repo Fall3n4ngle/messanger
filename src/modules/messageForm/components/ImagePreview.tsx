@@ -44,14 +44,14 @@ export default function ImagePreview() {
     <UploadImage
       isPending={isPending}
       onDelete={handleDelete}
-      className="w-28 h-28 ml-[52px] mb-5"
+      className="mb-5 ml-[52px] h-28 w-28"
     >
-      <div className="relative w-full h-full ">
+      <div className="relative h-full w-full ">
         <Image
           src={url}
           alt="Attached image"
           fill
-          className="object-cover rounded-md"
+          className="rounded-md object-cover"
         />
       </div>
     </UploadImage>

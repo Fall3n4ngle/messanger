@@ -22,11 +22,11 @@ export const editConversation = async (data: EditConversationFields) => {
   const { id, ...fields } = result.data;
 
   try {
-    const canMutate = await canMutateConversation(userId, id)
+    const canMutate = await canMutateConversation(userId, id);
 
     if (!canMutate) {
       throw new Error(
-        "You must be an admin of a conversation to edit conversation"
+        "You must be an admin of a conversation to edit conversation",
       );
     }
 
@@ -60,7 +60,7 @@ export const editConversation = async (data: EditConversationFields) => {
           conversationEvents.updateConversation,
           {
             conversationId: conversation.id,
-          } as ConversationEvent
+          } as ConversationEvent,
         );
       }
     });

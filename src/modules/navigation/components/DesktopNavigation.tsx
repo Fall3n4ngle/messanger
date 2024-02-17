@@ -9,7 +9,7 @@ type Props = {
 
 export default function DesktopNavigation({ links, ...props }: Props) {
   return (
-    <aside className="hidden p-4 pb-7 border-r sm:flex flex-col justify-between">
+    <aside className="hidden flex-col justify-between border-r p-4 pb-7 sm:flex">
       <nav>
         <ul className="flex flex-col gap-3">
           {links.map((link) => (

@@ -11,8 +11,9 @@ export function MyVideoConference() {
       { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
-    { onlySubscribed: false }
+    { onlySubscribed: false },
   );
+  
   return (
     <GridLayout
       tracks={tracks}

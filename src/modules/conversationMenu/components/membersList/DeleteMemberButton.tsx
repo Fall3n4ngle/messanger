@@ -50,7 +50,7 @@ export default function DeleteMemberButton({
   return (
     <Button onClick={handleClick} disabled={isPending} variant="destructive">
       Delete
-      {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+      {isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
     </Button>
   );
 }

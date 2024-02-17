@@ -18,7 +18,7 @@ export default async function page() {
   if (!user?.id) redirect("/sign-in");
 
   return (
-    <Card className="max-w-[450px] w-full">
+    <Card className="w-full max-w-[450px]">
       <CardHeader>
         <CardTitle>OnBoarding</CardTitle>
         <CardDescription>

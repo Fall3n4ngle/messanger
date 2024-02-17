@@ -24,9 +24,9 @@ export default function ConversationCard({
   return (
     <div
       className={cn(
-        "flex relative items-center justify-between gap-3 cursor-pointer p-2 dark:hover:bg-secondary/60 hover:bg-secondary/70 rounded-md transition-colors",
+        "relative flex cursor-pointer items-center justify-between gap-3 rounded-md p-2 transition-colors hover:bg-secondary/70 dark:hover:bg-secondary/60",
         isActive &&
-          "bg-secondary/90 hover:bg-secondary/90 dark:hover:bg-secondary/90 cursor-default"
+          "cursor-default bg-secondary/90 hover:bg-secondary/90 dark:hover:bg-secondary/90",
       )}
     >
       <Avatar>
@@ -36,19 +36,19 @@ export default function ConversationCard({
         </AvatarFallback>
       </Avatar>
       <div className="grow">
-        <h4 className="scroll-m-20 font-semibold tracking-tight whitespace-nowrap mb-1.5">
+        <h4 className="mb-1.5 scroll-m-20 whitespace-nowrap font-semibold tracking-tight">
           {name}
         </h4>
-        <p className="text-sm text-muted-foreground whitespace-nowrap">
+        <p className="whitespace-nowrap text-sm text-muted-foreground">
           {lastMessageContent}
         </p>
       </div>
-      <div className="absolute top-[9px] right-2 text-sm text-muted-foreground flex items-center gap-1">
+      <div className="absolute right-2 top-[9px] flex items-center gap-1 text-sm text-muted-foreground">
         {seen}
         <time>{lastMessageAt}</time>
       </div>
       {unreadMessagesCount > 0 ? (
-        <div className="self-end text-xs text-center p-[3px] bg-primary rounded-full min-w-[21px] relative bottom-0.5">
+        <div className="relative bottom-0.5 min-w-[21px] self-end rounded-full bg-primary p-[3px] text-center text-xs text-primary-foreground">
           {unreadMessagesCount}
         </div>
       ) : null}

@@ -30,11 +30,11 @@ export const Select = forwardRef<
   );
 });
 
-Select.displayName = "AsyncSelect"
+Select.displayName = "AsyncSelect";
 
 const CustomOption = <
   IsMulti extends boolean = true,
-  GroupType extends GroupBase<Option> = GroupBase<Option>
+  GroupType extends GroupBase<Option> = GroupBase<Option>,
 >({
   innerProps,
   innerRef,
@@ -46,9 +46,9 @@ const CustomOption = <
     <div
       ref={innerRef}
       {...innerProps}
-      className="flex items-center gap-3 cursor-pointer py-2 px-4 hover:bg-secondary rounded-md transition-colors"
+      className="flex cursor-pointer items-center gap-3 rounded-md px-4 py-2 transition-colors hover:bg-secondary"
     >
-      <Avatar className="w-7 h-7">
+      <Avatar className="h-7 w-7">
         {image && <AvatarImage src={image} alt="image" />}
         <AvatarFallback className="bg-primary text-primary-foreground">
           {label[0].toUpperCase()}
@@ -68,14 +68,14 @@ const classNames = {
     cn(
       "border border-input bg-background px-3 py-2 rounded-md ring-offset-background",
 
-      isFocused && "ring-offset-2 ring-ring ring-2"
+      isFocused && "ring-offset-2 ring-ring ring-2",
     ),
   valueContainer: () => "cursor-pointer",
   indicatorsContainer: () => "cursor-pointer",
   dropdownIndicator: ({ isFocused }: any) =>
     cn(
       "text-muted-foreground hover:text-foreground ml-1.5",
-      isFocused && "text-foreground"
+      isFocused && "text-foreground",
     ),
   indicatorSeparator: () => "bg-secondary ml-1.5",
   menu: () => "rounded-md mt-4 bg-background border border-input",

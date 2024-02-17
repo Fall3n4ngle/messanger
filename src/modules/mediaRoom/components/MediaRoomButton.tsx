@@ -12,14 +12,14 @@ import {
 } from "@/ui";
 import { PhoneCall } from "lucide-react";
 import MediaRoom from "./MediaRoom";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export default function MediaRoomButton() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleDisconnect = () => {
+  const handleDisconnect = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -40,7 +40,7 @@ export default function MediaRoomButton() {
           <TooltipContent>Join call</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DialogContent className="top-0 left-0 w-full max-w-full h-full translate-x-0 translate-y-0 rounded-none p-0">
+      <DialogContent className="left-0 top-0 h-full w-full max-w-full translate-x-0 translate-y-0 rounded-none p-0">
         <MediaRoom onDisconected={handleDisconnect} />
       </DialogContent>
     </Dialog>

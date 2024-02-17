@@ -74,7 +74,7 @@ export default function MessageForm() {
   const isSubmitting = isSendingMessage || isEditingMessage;
 
   return (
-    <div className="max-w-[1000px] w-full">
+    <div className="w-full max-w-[1000px]">
       <Form {...form}>
         <div className="flex w-full items-center justify-between">
           <ImagePreview />

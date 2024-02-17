@@ -4,4 +4,4 @@ export * from "./users";
 export * from "./message";
 export * from "./shortenSentence";
 export * from "./pusher";
-export * from "./query"
+export * from "./query";

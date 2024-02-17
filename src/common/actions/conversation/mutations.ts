@@ -79,7 +79,7 @@ export const addMembers = async (fields: AddMembersFields) => {
           conversationEvents.addMembers,
           {
             conversationId: id,
-          } as ConversationEvent
+          } as ConversationEvent,
         );
       }
     });

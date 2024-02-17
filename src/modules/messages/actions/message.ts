@@ -31,7 +31,7 @@ export const deleteMessage = async (data: DeleteMessageFields) => {
 
     if (!canMutate) {
       throw new Error(
-        "You must be admin, editor or the sender of the message in order to delete it"
+        "You must be admin, editor or the sender of the message in order to delete it",
       );
     }
 

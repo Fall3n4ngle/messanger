@@ -25,7 +25,7 @@ export default function ConversationInfoDialog({ members, ...props }: Props) {
         </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent
-        className="h-[500px] space-y-4 flex flex-col"
+        className="flex h-[500px] flex-col space-y-4"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>

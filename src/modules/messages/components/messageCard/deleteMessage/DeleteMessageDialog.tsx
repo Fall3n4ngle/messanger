@@ -23,7 +23,7 @@ export default function DeleteMessageDialog(props: DeleteMessageFields) {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <button className="w-full flex items-end gap-3 p-2">
+        <button className="flex w-full items-end gap-3 p-2">
           <Trash2 className="text-destructive" /> <span>Delete</span>
         </button>
       </AlertDialogTrigger>

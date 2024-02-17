@@ -124,7 +124,7 @@ export default function UserForm({
           className="self-end"
         >
           Submit
-          {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+          {isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
         </Button>
       </form>
     </Form>

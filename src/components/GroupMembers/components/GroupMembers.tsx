@@ -38,9 +38,7 @@ export default function GroupMembersForm({ excludedUsers }: Props) {
                 ref={ref}
                 defaultValue={getValues("members")}
                 filterOption={filterOption}
-                loadOptions={(query) =>
-                  loadUsers({ query })
-                }
+                loadOptions={(query) => loadUsers({ query })}
                 onChange={(data) => {
                   onChange(data);
                 }}

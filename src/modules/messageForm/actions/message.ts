@@ -110,7 +110,7 @@ export const editMessage = async (data: EditMessageFields) => {
 
     if (!canMutate) {
       throw new Error(
-        "You must be admin, editor or the sender of the message in order to edit it"
+        "You must be admin, editor or the sender of the message in order to edit it",
       );
     }
 

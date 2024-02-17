@@ -5,13 +5,12 @@ import Link from "next/link";
 import ConversationCard from "./ConversationCard";
 import { useAuth } from "@clerk/nextjs";
 import { UserConversation } from "@/common/actions/conversation/queries";
-import { InfiniteData } from "@tanstack/react-query";
 
 type Props = {
-  data: InfiniteData<UserConversation[]>;
+  conversations: UserConversation[][];
 };
 
-export default function ConversationsList({ data }: Props) {
+export default function ConversationsList({ conversations }: Props) {
   const pathname = usePathname();
   const { userId } = useAuth();
 
@@ -21,7 +20,7 @@ export default function ConversationsList({ data }: Props) {
 
   return (
     <ul className="flex flex-col gap-3">
-      {data.pages.map((group) =>
+      {conversations.map((group) =>
         group.map(
           ({
             id,
@@ -52,8 +51,8 @@ export default function ConversationsList({ data }: Props) {
                 </Link>
               </li>
             );
-          }
-        )
+          },
+        ),
       )}
     </ul>
   );

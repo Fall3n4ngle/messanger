@@ -5,7 +5,7 @@ import { conversationKeys } from "@/common/const";
 import { Conversation } from "@/common/actions/conversation/queries";
 import { ToastMessage } from "@/components";
 
-const mutationKey = ["member", "change_role"]
+const mutationKey = ["member", "change_role"];
 
 export const useChangeRole = () => {
   const { toast } = useToast();
@@ -20,7 +20,7 @@ export const useChangeRole = () => {
       });
 
       const previousConversationData = queryClient.getQueryData(
-        conversationKeys.detail(conversationId)
+        conversationKeys.detail(conversationId),
       );
 
       queryClient.setQueryData(
@@ -36,7 +36,7 @@ export const useChangeRole = () => {
               return member;
             }),
           } as Conversation;
-        }
+        },
       );
 
       toast({
@@ -50,7 +50,7 @@ export const useChangeRole = () => {
     onError: (_error, { conversationId }, context) => {
       queryClient.setQueryData(
         conversationKeys.detail(conversationId),
-        context?.previousConversationData
+        context?.previousConversationData,
       );
 
       toast({
@@ -62,7 +62,7 @@ export const useChangeRole = () => {
     onSettled: (_success, _data, { conversationId }) => {
       if (
         queryClient.isMutating({
-          mutationKey
+          mutationKey,
         }) === 1
       ) {
         queryClient.invalidateQueries({

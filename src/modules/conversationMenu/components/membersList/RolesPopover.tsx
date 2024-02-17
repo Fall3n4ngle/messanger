@@ -9,7 +9,7 @@ export default function RolesPopover(props: ChangeRoleFields) {
   const [isOpen, setIsOpen] = useState(false);
 
   const currentRoleLabel = availableMemberRoles.find(
-    (r) => r.value === props.role
+    (r) => r.value === props.role,
   )?.label;
 
   return (
