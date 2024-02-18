@@ -12,10 +12,9 @@ export default async function ConversationsServer() {
   const queryClient = new QueryClient();
 
   await queryClient.fetchInfiniteQuery({
-    queryKey: conversationKeys.list(""),
+    queryKey: conversationKeys.lists(),
     queryFn: ({ pageParam }: { pageParam?: string }) =>
       getUserConversations({
-        query: "",
         lastCursor: pageParam,
         take: CONVERSATIONS_PER_PAGE,
       }),

@@ -15,11 +15,7 @@ import {
 } from "../validations/member";
 import { canMutateConversation, getUserAuth } from "@/common/dataAccess";
 import { getConversationsChannel, getMemberChannel } from "@/common/utils";
-import {
-  availableMemberRoles,
-  conversationEvents,
-  memberEvents,
-} from "@/common/const";
+import { conversationEvents, memberEvents } from "@/common/const";
 
 export const changeMemberRole = async (data: ChangeRoleFields) => {
   const result = changeRoleSchema.safeParse(data);
@@ -83,11 +79,9 @@ export const changeMemberRole = async (data: ChangeRoleFields) => {
             userId: member.user.clerkId,
           });
 
-          const newRole = availableMemberRoles.find((r) => r.value === role);
-
           pusherServer.trigger(memberCahnnel, memberEvents.changeRole, {
             conversationId,
-            newRole: newRole?.label ?? role,
+            newRole: role,
             conversationName: conversation.name,
           } as ChangeRoleEvent);
 

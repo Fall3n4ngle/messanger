@@ -17,7 +17,7 @@ export default function ConversationsClient({ children }: PropsWithChildren) {
     >
       <div className="mx-auto flex w-full min-w-[270px] max-w-[450px] items-center gap-3 p-4 md:mx-0">
         <div className="grow">
-          <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
+          <h4 className="scroll-m-20 text-lg font-semibold tracking-tight">
             Conversations
           </h4>
         </div>

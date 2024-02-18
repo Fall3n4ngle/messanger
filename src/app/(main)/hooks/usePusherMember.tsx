@@ -1,4 +1,9 @@
-import { conversationKeys, memberEvents, memberKeys } from "@/common/const";
+import {
+  availableMemberRoles,
+  conversationKeys,
+  memberEvents,
+  memberKeys,
+} from "@/common/const";
 import { useToast } from "@/common/hooks";
 import { ChangeRoleEvent, MemberEvent } from "@/common/types";
 import { getMemberChannel } from "@/common/utils";
@@ -68,11 +73,15 @@ export const usePusherMember = () => {
         queryKey: memberKeys.detail(conversationId),
       });
 
+      const newRoleLabel = availableMemberRoles.find(
+        (r) => r.value === newRole,
+      );
+
       toast({
         description: (
           <ToastMessage
             type="success"
-            message={`Your role in ${conversationName} has just been changed to ${newRole}`}
+            message={`Your role in ${conversationName} has just been changed to ${newRoleLabel}`}
           />
         ),
       });

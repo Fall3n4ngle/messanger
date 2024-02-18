@@ -6,15 +6,10 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
-type Props = {
-  query: string;
-} & PaginationProps;
-
 export const getUserConversations = async ({
-  query,
   lastCursor,
   take,
-}: Props) => {
+}: PaginationProps) => {
   const { userId: clerkId } = await getUserAuth();
   const cursor = lastCursor ? { id: lastCursor } : undefined;
 
@@ -27,10 +22,6 @@ export const getUserConversations = async ({
               clerkId,
             },
           },
-        },
-        name: {
-          contains: query ?? "",
-          mode: "insensitive",
         },
       },
       select: {

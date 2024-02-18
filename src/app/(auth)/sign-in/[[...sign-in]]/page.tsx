@@ -1,5 +1,6 @@
 import { SignIn } from "@clerk/nextjs";
 import TestUsers from "./components/TestUsers";
+import { Suspense } from "react";
 
 export default function Page() {
   return (
@@ -7,7 +8,9 @@ export default function Page() {
       <div className="mb-6 w-full max-w-[370px]">
         <TestUsers />
       </div>
-      <SignIn />
+      <Suspense fallback={"loading"}>
+        <SignIn />
+      </Suspense>
     </>
   );
 }
