@@ -19,23 +19,24 @@ import { UserForm } from "@/components";
 import { useActiveUsers } from "@/common/store/useActiveUsers";
 import { cn } from "@/common/utils";
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 type Props = {
   image: string | null;
   name: string;
-  clerkId: string;
   id: string;
 };
 
-export default function UserButton({ image, name, clerkId, id }: Props) {
+export default function UserButton({ image, name, id }: Props) {
+  const { userId: clerkId } = useAuth();
   const { usersIds } = useActiveUsers();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleModalClose = () => {
+  const handleDialogClose = () => {
     setIsOpen(false);
   };
 
-  const isActive = usersIds.includes(clerkId);
+  const isActive = clerkId && usersIds.includes(clerkId);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -78,11 +79,10 @@ export default function UserButton({ image, name, clerkId, id }: Props) {
           </DialogDescription>
         </DialogHeader>
         <UserForm
-          clerkId={clerkId}
           name={name}
           image={image}
           id={id}
-          onCloseModal={handleModalClose}
+          onDialogClose={handleDialogClose}
         />
       </DialogContent>
     </Dialog>

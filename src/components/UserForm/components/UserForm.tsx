@@ -1,7 +1,6 @@
 "use client";
 
 import { useToast } from "@/common/hooks";
-import { userSchema } from "@/common/validations";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,25 +20,24 @@ import ToastMessage from "../../ToastMessage";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { upsertUserSchema } from "../validations/user";
 
 type Props = {
   id?: string;
   name?: string;
   image?: string | null;
-  clerkId: string;
   successMessage?: string;
-  onCloseModal?: Function;
+  onDialogClose?: Function;
 };
 
-const formSchema = userSchema.pick({ image: true, name: true });
+const formSchema = upsertUserSchema.pick({ image: true, name: true });
 type FormFields = z.infer<typeof formSchema>;
 
 export default function UserForm({
   id,
   name,
   image,
-  clerkId,
-  onCloseModal,
+  onDialogClose,
   successMessage = "Profile updated successfully",
 }: Props) {
   const { toast } = useToast();
@@ -60,7 +58,7 @@ export default function UserForm({
         description: <ToastMessage type="success" message={successMessage} />,
       });
 
-      onCloseModal && onCloseModal();
+      onDialogClose && onDialogClose();
     },
     onError: (error) => {
       toast({
@@ -71,16 +69,16 @@ export default function UserForm({
 
   async function onSubmit(values: FormFields) {
     if (!id) {
-      upsertUser({ ...values, clerkId, id });
+      upsertUser(values);
       return;
     }
 
     if (values.name !== name || values.image !== image) {
-      upsertUser({ ...values, clerkId, id });
+      upsertUser({ ...values, id });
       return;
     }
 
-    onCloseModal && onCloseModal();
+    onDialogClose && onDialogClose();
   }
 
   return (

@@ -1,14 +1,13 @@
 import { z } from "zod";
 
-export const userSchema = z.object({
+export const upsertUserSchema = z.object({
   name: z
     .string({
       required_error: "Name is required",
     })
     .min(2, { message: "Name must be at least 2 characters long" }),
   image: z.string().nullable(),
-  clerkId: z.string(),
   id: z.string().optional(),
 });
 
-export type UserFields = z.infer<typeof userSchema>;
+export type UpsertUserFields = z.infer<typeof upsertUserSchema>;

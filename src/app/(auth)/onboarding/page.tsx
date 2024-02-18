@@ -15,7 +15,6 @@ export default async function page() {
   if (existingUser) redirect("/");
 
   const user = await currentUser();
-  if (!user?.id) redirect("/sign-in");
 
   return (
     <Card className="w-full max-w-[450px]">
@@ -27,7 +26,6 @@ export default async function page() {
       </CardHeader>
       <CardContent>
         <UserForm
-          clerkId={user?.id}
           name={user?.username ?? ""}
           successMessage="Profile created successfully"
         />

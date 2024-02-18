@@ -78,14 +78,16 @@ const MessageCard = forwardRef<HTMLDivElement, MessageCardPorps>(
               />
             </div>
           )}
-          <p
-            className={cn(
-              "min-w-[50px] max-w-[max-content] rounded-2xl bg-secondary p-2.5 tracking-tight",
-              isOwn && "self-end bg-primary text-primary-foreground",
-            )}
-          >
-            {content}
-          </p>
+          {content && content.length > 0 && (
+            <p
+              className={cn(
+                "min-w-[50px] max-w-[max-content] rounded-2xl bg-secondary p-2.5 tracking-tight",
+                isOwn && "self-end bg-primary text-primary-foreground",
+              )}
+            >
+              {content}
+            </p>
+          )}
         </div>
       </div>
     );

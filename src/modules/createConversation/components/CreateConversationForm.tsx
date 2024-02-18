@@ -3,13 +3,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormEvent, useState } from "react";
 import { Button, Form } from "@/ui";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { FormFields, formSchema } from "../validations/formSchema";
 import { useToast } from "@/common/hooks";
 import { GroupMembers, ToastMessage } from "@/components";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createConversation } from "../actions/conversation";
 import GroupInfo from "./GroupInfo";
 import { conversationKeys } from "@/common/const";
+import { createConversationSchema } from "../validations/conversation";
+import { formMembersSchema } from "@/common/validations";
+import { z } from "zod";
+
+const formSchema = createConversationSchema
+  .pick({
+    name: true,
+    image: true,
+  })
+  .merge(formMembersSchema);
+
+type FormFields = z.infer<typeof formSchema>;
 
 type Step = {
   id: string;

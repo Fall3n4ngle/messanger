@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import ContentInput from "./ContentInput";
-import { sendMessageSchema } from "../validations/message";
 import { useSendMessage, useEditMessage } from "../hooks";
 import { useMessageForm } from "@/common/store/useMessageForm";
 import ExitEditingButton from "./ExitEditingButton";
@@ -15,8 +14,15 @@ import UploadButton from "./UploadButton";
 import SubmitButton from "./SubmitButton";
 import { useParams } from "next/navigation";
 import { useMember } from "@/common/hooks";
+import { hasContentOrFile } from "../utils/hasContentOrFile";
+import { messageSchema } from "@/common/validations";
 
-const formSchema = sendMessageSchema.pick({ content: true, file: true });
+const formSchema = messageSchema
+  .pick({ content: true, file: true })
+  .refine(hasContentOrFile, {
+    path: ["content"],
+  });
+
 type FormFields = z.infer<typeof formSchema>;
 
 export default function MessageForm() {

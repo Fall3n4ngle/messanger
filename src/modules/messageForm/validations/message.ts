@@ -1,31 +1,22 @@
+import { messageSchema } from "@/common/validations";
 import { z } from "zod";
-
-const messageSchema = z.object({
-  id: z.string(),
-  content: z.string().nullish(),
-  file: z.string().nullish(),
-  conversationId: z.string(),
-  userId: z.string(),
-});
+import { hasContentOrFile } from "../utils/hasContentOrFile";
 
 export const sendMessageSchema = messageSchema
-  .pick({
-    file: true,
-    conversationId: true,
+  .omit({
+    id: true,
+  })
+  .refine(hasContentOrFile, {
+    path: ["content", "file"],
+  });
+
+export const editMessageSchema = messageSchema
+  .omit({
     userId: true,
   })
-  .merge(
-    z.object({
-      content: z.string().min(1),
-    }),
-  );
-
-export const editMessageSchema = messageSchema.pick({
-  id: true,
-  file: true,
-  content: true,
-  conversationId: true,
-});
+  .refine(hasContentOrFile, {
+    path: ["content", "file"],
+  });
 
 export type SendMessageFields = z.infer<typeof sendMessageSchema>;
 export type EditMessageFields = z.infer<typeof editMessageSchema>;

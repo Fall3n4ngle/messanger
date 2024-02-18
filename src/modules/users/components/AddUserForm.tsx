@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import { FormFields, formSchema } from "../validations/formSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -19,6 +18,16 @@ import { addMembers } from "@/common/actions/conversation/mutations";
 import { useToast } from "@/common/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { z } from "zod";
+import { selectItemSchema } from "@/common/validations";
+
+const formSchema = z.object({
+  conversation: z.object(selectItemSchema.shape, {
+    required_error: "Select a conversation",
+  }),
+});
+
+type FormFields = z.infer<typeof formSchema>;
 
 type Props = {
   userId: string;
