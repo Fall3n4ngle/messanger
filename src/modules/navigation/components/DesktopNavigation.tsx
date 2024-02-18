@@ -1,6 +1,6 @@
 import React from "react";
 import { NavigationItem, User } from "../types";
-import UserButton from "./UserButton";
+import ProfileDialog from "./ProfileDialog";
 import DesktopItem from "./DesktopItem";
 
 type Props = {
@@ -19,7 +19,7 @@ export default function DesktopNavigation({ links, ...props }: Props) {
           ))}
         </ul>
       </nav>
-      <UserButton {...props} />
+      <ProfileDialog {...props} />
     </aside>
   );
 }

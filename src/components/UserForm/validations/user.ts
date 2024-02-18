@@ -7,7 +7,6 @@ export const upsertUserSchema = z.object({
     })
     .min(2, { message: "Name must be at least 2 characters long" }),
   image: z.string().nullable(),
-  id: z.string().optional(),
 });
 
 export type UpsertUserFields = z.infer<typeof upsertUserSchema>;

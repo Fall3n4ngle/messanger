@@ -1,6 +1,6 @@
 import { NavigationItem, User } from "../types";
 import MobileItem from "./MobileItem";
-import UserButton from "./UserButton";
+import ProfileDialog from "./ProfileDialog";
 
 type Props = {
   links: NavigationItem[];
@@ -18,7 +18,7 @@ export default function MobileNavigation({ links, ...props }: Props) {
           ))}
         </ul>
       </nav>
-      <UserButton {...props} />
+      <ProfileDialog {...props} />
     </div>
   );
 }

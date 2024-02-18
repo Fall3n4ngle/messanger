@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { UpsertUserFields, upsertUserSchema } from "../validations/user";
 import { getUserAuth } from "@/common/dataAccess";
@@ -14,7 +13,7 @@ export const upsertUser = async (fields: UpsertUserFields) => {
   }
 
   const {
-    data: { id, name, ...data },
+    data: { name, image },
   } = parsed;
 
   const { userId: clerkId } = await getUserAuth();
@@ -34,16 +33,15 @@ export const upsertUser = async (fields: UpsertUserFields) => {
   const result = await db.user.upsert({
     create: {
       name,
-      ...data,
+      image,
       clerkId,
     },
-    update: data,
-    where: { id: id ?? "" },
+    update: {
+      name,
+      image,
+    },
+    where: { clerkId },
   });
-
-  if (!id) {
-    redirect("/");
-  }
 
   revalidatePath("/");
 

@@ -24,10 +24,9 @@ import { useAuth } from "@clerk/nextjs";
 type Props = {
   image: string | null;
   name: string;
-  id: string;
 };
 
-export default function UserButton({ image, name, id }: Props) {
+export default function ProfileDialog({ image, name }: Props) {
   const { userId: clerkId } = useAuth();
   const { usersIds } = useActiveUsers();
   const [isOpen, setIsOpen] = useState(false);
@@ -81,7 +80,6 @@ export default function UserButton({ image, name, id }: Props) {
         <UserForm
           name={name}
           image={image}
-          id={id}
           onDialogClose={handleDialogClose}
         />
       </DialogContent>

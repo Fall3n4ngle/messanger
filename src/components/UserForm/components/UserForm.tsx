@@ -3,7 +3,6 @@
 import { useToast } from "@/common/hooks";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { upsertUser as upsertUserServer } from "../actions/user";
 import {
   Form,
@@ -20,31 +19,29 @@ import ToastMessage from "../../ToastMessage";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { upsertUserSchema } from "../validations/user";
+import { UpsertUserFields, upsertUserSchema } from "../validations/user";
+import { usePathname, useRouter } from "next/navigation";
 
 type Props = {
-  id?: string;
   name?: string;
   image?: string | null;
   successMessage?: string;
   onDialogClose?: Function;
 };
 
-const formSchema = upsertUserSchema.pick({ image: true, name: true });
-type FormFields = z.infer<typeof formSchema>;
-
 export default function UserForm({
-  id,
   name,
   image,
   onDialogClose,
   successMessage = "Profile updated successfully",
 }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
 
-  const form = useForm<FormFields>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<UpsertUserFields>({
+    resolver: zodResolver(upsertUserSchema),
     defaultValues: {
       name: name ?? "",
       image: image ?? "",
@@ -58,6 +55,11 @@ export default function UserForm({
         description: <ToastMessage type="success" message={successMessage} />,
       });
 
+      if (pathname === "/onboarding") {
+        router.push("/conversations");
+        return;
+      }
+
       onDialogClose && onDialogClose();
     },
     onError: (error) => {
@@ -67,14 +69,14 @@ export default function UserForm({
     },
   });
 
-  async function onSubmit(values: FormFields) {
-    if (!id) {
+  async function onSubmit(values: UpsertUserFields) {
+    if (pathname === "/onboarding") {
       upsertUser(values);
       return;
     }
 
     if (values.name !== name || values.image !== image) {
-      upsertUser({ ...values, id });
+      upsertUser(values);
       return;
     }
 
