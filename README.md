@@ -12,6 +12,7 @@ _https://messanger-lovat.vercel.app/_
 - Log in, register with different providers
 - Search users
 - Create, update, delete group conversations
+- File upload 
 - Send, edit, delete text and file messages
 - Join audio and video conferences with screen share
 - Assign different roles to group members
@@ -19,7 +20,7 @@ _https://messanger-lovat.vercel.app/_
 - Indicate typing status
 
 #### Each group member can have one of three roles:
-= **Viewer:** can edit and delete only their own messages
+- **Viewer:** can edit and delete only their own messages
 - **Editor:** can edit and delete other members’ messages
 - **Admin:** the creator of a group who can edit it, assign roles, add or delete members
 
@@ -35,4 +36,5 @@ _https://messanger-lovat.vercel.app/_
 - _[@tanstack/react-query](https://tanstack.com/query/latest)_
 - _[Zustand](https://zustand-demo.pmnd.rs/)_
 - _[React-hook-form](https://react-hook-form.com/)_
+- _[Uploadthing](https://uploadthing.com/)_
 
